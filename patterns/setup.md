@@ -74,7 +74,16 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 
 ## Phase 2 — MCP Setup & Verification
 
-**Goal:** Configure MCP connections for Snowflake, Confluence, and Slack, then verify each is working.
+**Goal:** Configure MCP connections. Snowflake and GitHub are required for all users. Confluence and Slack are optional — configure only the tools you use.
+
+### What are MCPs?
+MCPs (Model Context Protocol servers) let Claude Code call external systems — databases,
+wikis, messaging tools — directly during a session. Each server is configured in
+`~/.claude/settings.json` under `mcpServers`, with a `command` (the server binary) and
+`env` (credentials). GitHub is an exception: it uses the `gh` CLI, not mcpServers.
+
+After any change to `settings.json`, Claude Code must be restarted for the change to
+take effect. `/setup` is resumable — re-running it skips steps that are already complete.
 
 ### Pre-check: settings.json
 
@@ -101,22 +110,6 @@ Check if `~/.claude/settings.json` exists:
         "SNOWFLAKE_DATABASE": "PICNIC_NL_PROD",
         "SNOWFLAKE_SCHEMA": "DIM",
         "SNOWFLAKE_ROLE": "ANALYST"
-      }
-    },
-    "confluence": {
-      "command": "mcp-atlassian",
-      "args": [],
-      "env": {
-        "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
-        "CONFLUENCE_USERNAME": "",
-        "CONFLUENCE_API_TOKEN": ""
-      }
-    },
-    "slack": {
-      "command": "slack-mcp-server",
-      "args": [],
-      "env": {
-        "SLACK_MCP_XOXP_TOKEN": ""
       }
     }
   }
@@ -158,7 +151,42 @@ regenerate the token and replace `SNOWFLAKE_TOKEN` in `settings.json`.
 
 ---
 
-### Confluence
+### Mandatory: GitHub
+
+**Goal:** Ensure `gh` CLI is installed and authenticated.
+
+Run: `gh auth status`
+- ✅ Logged in → confirm and continue
+- ⚠️ Not authenticated → run `gh auth login` and follow the prompts:
+  1. Select **GitHub.com**
+  2. Choose **HTTPS**
+  3. Authenticate via browser — sign in with your Picnic GitHub account
+  4. After login, re-run `gh auth status` to confirm
+
+Verify repo access:
+```bash
+gh repo view PicnicSupermarket/picnic-dbt-models --json name
+```
+- ✅ Returns repo info → working
+- ⚠️ Access denied → "Check with your team lead to be added to the PicnicSupermarket org."
+
+Note: `gh` credentials are stored by the CLI — no entry needed in `settings.json`.
+
+---
+
+### Optional tools — select what you need
+
+Ask the user: "Which optional tools would you like to configure?
+  - **Confluence** — read and write Confluence pages (useful for documentation work)
+  - **Slack** — read channels and send messages from Claude
+
+You can configure them now or skip and re-run `/setup` later to add them."
+
+Work through each selected tool below. Skip any tool the user does not select.
+
+---
+
+### Optional: Confluence
 
 **Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
 
@@ -177,6 +205,20 @@ When you have the token, update `~/.claude/settings.json`:
 - Set `CONFLUENCE_USERNAME` to their email (lowercase)
 - Set `CONFLUENCE_API_TOKEN` to the pasted token
 
+If `mcpServers.confluence` does not yet exist in `settings.json`, add the following block
+to the `mcpServers` object:
+```json
+"confluence": {
+  "command": "mcp-atlassian",
+  "args": [],
+  "env": {
+    "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
+    "CONFLUENCE_USERNAME": "<email>",
+    "CONFLUENCE_API_TOKEN": "<token>"
+  }
+}
+```
+
 **Verification** (run after configuring, or if already configured):
 Attempt to fetch a Confluence page using the MCP tool.
 - ✅ Returns content → working
@@ -185,31 +227,38 @@ Attempt to fetch a Confluence page using the MCP tool.
 
 ---
 
-### Slack
+### Optional: Slack
 
-**Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
+**Check:** Is `mcpServers.slack` present and `SLACK_MCP_XOXP_TOKEN` set and non-empty?
 
 **If not configured — walk through these steps with the user:**
-1. Ask if they have access to the Picnic Slack MCP app. If unsure, they should check with a
-   colleague who already has the assistant set up.
-2. To get a user token:
-   - Go to https://api.slack.com/apps → open the shared Picnic Claude assistant app
-   - Go to **OAuth & Permissions** → confirm **User Token Scopes** include:
-     `chat:write`, `channels:read`, `channels:history`, `lists:read`
-   - Under **OAuth Tokens for Your Workspace**, copy the **User OAuth Token** (starts with `xoxp-`)
-3. Ask the user to paste the token here
+1. Check with a colleague who already has Slack set up — they can share the Picnic Claude
+   app details and confirm your token scopes.
+2. Go to the Picnic Claude Slack app → **OAuth & Permissions** → confirm **User Token Scopes**
+   include: `chat:write`, `channels:read`, `channels:history`, `lists:read`
+3. Under **OAuth Tokens for Your Workspace**, copy the **User OAuth Token** (starts with `xoxp-`)
+4. Ask the user to paste the token here
 
-When you have the token, update `~/.claude/settings.json`:
-- Set `SLACK_MCP_XOXP_TOKEN` to the pasted token
+When you have the token:
+- Add the following block to `mcpServers` in `settings.json`:
+  ```json
+  "slack": {
+    "command": "slack-mcp-server",
+    "args": [],
+    "env": {
+      "SLACK_MCP_XOXP_TOKEN": "<token>"
+    }
+  }
+  ```
+- Confirm the block is saved
 
 **Verification:**
-Check if `SLACK_MCP_XOXP_TOKEN` is set and non-empty.
-- ✅ Present and non-empty → configured (scope cannot be verified without a test send)
-- ⚠️ Missing or placeholder → "Slack is not yet configured. It's optional — you can skip
-  it now and configure it later."
+Check that `SLACK_MCP_XOXP_TOKEN` is set and non-empty.
+- ✅ Present → configured (scope cannot be verified without a test send)
+- ⚠️ Not yet → "You can add it later by re-running `/setup`."
 
-Note: Slack is the least critical of the three. If the user can't access the Picnic Slack app
-yet, skip it and continue.
+Note: Slack token needs manual renewal when it expires. When Slack calls stop working,
+re-run `/setup` to update the token in `settings.json`.
 
 ---
 
@@ -224,12 +273,13 @@ If you updated `settings.json` during this phase, tell the user:
 
 ### Phase 2 summary
 
-Report a summary table:
+Report a summary table covering every tool checked in this phase:
 ```
 MCP Status:
-  Snowflake   ✅ / ⚠️
-  Confluence  ✅ / ⚠️
-  Slack       ✅ / ⚠️ (token configured — scope unverified)
+  Snowflake    ✅ / ⚠️
+  GitHub       ✅ / ⚠️
+  <Confluence> ✅ / ⚠️  (if selected)
+  <Slack>      ✅ / ⚠️  (if selected)
 ```
 
 If any ⚠️: tell the user they can fix these later and re-run `/setup` to re-check.
@@ -239,40 +289,7 @@ Then ask: "Continue to Phase 3?"
 
 ## Phase 3 — Personal Context
 
-**Goal:** Create personal context files so agents have background on communication style
-and current projects.
-
-### Communication style (`context/communication-style.md`)
-
-Ask: "Would you like to create a communication style file? It helps the WRITER agent
-match your tone and know your key stakeholders. (Recommended — takes ~2 min)"
-
-If yes, ask:
-1. **Preferred language for outputs** — English or Dutch? (For Slack drafts, for example.)
-2. **Key stakeholders** — Who do you regularly message? (Name + role, 2–5 people)
-3. **Writing style** — Any preferences? (e.g. "brief, BLUF", "formal", "casual")
-
-Write `~/picnic-analyst-assistant/context/communication-style.md`:
-```markdown
-# Communication Style
-
-## Language
-Default output language: <English | Dutch>
-Slack DMs to Dutch-speaking colleagues: Dutch (ask agent to confirm per task)
-
-## Key Stakeholders
-| Name | Role | Notes |
-|------|------|-------|
-<rows from user input>
-
-## Writing Style
-<user's style notes>
-
-## General Rules
-- BLUF structure: conclusion before methodology
-- No fluff; keep messages short and direct
-- State assumptions explicitly
-```
+**Goal:** Create personal context files so agents have background on current projects, and ensure TASKS.md exists.
 
 ### Project context
 
@@ -332,18 +349,20 @@ Local skills (gdrive, slides, costs) require Poetry to run.
 
 ### Skill sync
 
-Tell the user: "Now I'll sync the shared skills from `picnic-analytical-tools`.
-Make sure the repo is cloned at `~/Documents/Github/picnic-analytical-tools`
-and up to date (`git pull`)."
+Check if `~/Documents/Github/picnic-analytical-tools` exists:
 
-Ask: "Is the repo ready? (yes / skip)"
+- ✅ Exists → run `git -C ~/Documents/Github/picnic-analytical-tools pull` to update
+- ⚠️ Missing → clone it now (uses the `gh` CLI set up in Phase 2):
+  ```bash
+  gh repo clone PicnicSupermarket/picnic-analytical-tools ~/Documents/Github/picnic-analytical-tools
+  ```
+  - ✅ Cloned → continue
+  - ⚠️ Error → "Check that your GitHub account has access to PicnicSupermarket/picnic-analytical-tools.
+    You can re-run `/setup` later to retry."
 
-If yes: run the `sync-picnic-skills` skill.
+Once the repo is present and up to date, run the `sync-picnic-skills` skill.
 - ✅ Success: list the installed skills
-- ⚠️ Error: "Sync failed. Check that `~/Documents/Github/picnic-analytical-tools` exists
-  and `git pull` has been run. You can re-run `/setup` later to retry."
-
-If skip: note "Skipped — run `/sync-picnic-skills` manually when the repo is ready."
+- ⚠️ Error: "Sync failed. You can re-run `/setup` later to retry."
 
 ---
 
@@ -367,12 +386,9 @@ If skip: note "Skipped — run `/sync-picnic-skills` manually when the repo is r
      ✅ user-config.md written
 
    MCP Tools
-     <Snowflake status>
-     <Confluence status>
-     <Slack status>
+     <status line per tool configured in Phase 2>
 
    Personal Context
-     <communication-style.md status>
      <project context status>
      ✅ TASKS.md ready
 
