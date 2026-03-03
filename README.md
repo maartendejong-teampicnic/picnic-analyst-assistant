@@ -27,6 +27,7 @@ For focused, single-domain work you can invoke any agent directly: `/analyst`, `
 The repo must live at a fixed path — `~/CLAUDE.md` imports the orchestration rules from there.
 
 ```bash
+mkdir -p ~/Documents/Claude
 git clone <repo-url> ~/Documents/Claude/picnic-analyst-assistant
 cp ~/Documents/Claude/picnic-analyst-assistant/commands/* ~/.claude/commands/
 ```
