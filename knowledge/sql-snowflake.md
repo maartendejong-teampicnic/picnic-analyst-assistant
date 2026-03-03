@@ -10,12 +10,23 @@ against Picnic's Snowflake (PICNIC_NL/DE/FR_PROD). Not for Calcite SQL — see `
 
 ## How to do it
 
+### Step 0 — Discover tables with the catalog
+
+**Before writing any SQL**, use the `read-dwh-data-catalog` skill to find the right table:
+```
+skill: read-dwh-data-catalog  |  args: <topic> --limit 5
+```
+- `full_path` in the result (e.g. `picnic_market.dim.ft_order`) is what goes in the `FROM` clause — use it exactly
+- `columns` with descriptions tell you what fields exist and what they mean
+- Search multiple topics if the first doesn't return enough (e.g. `order` and then `basket`)
+- To browse EDGE models specifically: `args: <topic> --schema edge`
+- To force a catalog refresh: `args: refresh`
+
 ### Running queries
 
 1. Write the query to `~/.claude/data/snowflake-query/queries/<descriptive_name>.sql`
    — use snake_case, e.g. `weekly_order_trend.sql`
-2. **Show the query to Maarten and wait for confirmation that it is correct before running it.**
-   Do not execute until he approves.
+2. **Show the query and wait for confirmation that it is correct before running it.**
    After approval, also save `<descriptive_name>.sql` alongside the task's output.md:
    direct mode → direct task folder; orchestrated → `tasks/<task-id>/`.
 3. Invoke the skill:
@@ -66,7 +77,7 @@ When writing a SQL query whose output will land in a Usuals Dashboard sheet:
 - **Comments**: `/*` style, capitalised, placed above the code line they describe. Each CTE always get's a brief comment describing it's use. Non-trivial column or filters also get comments. 
 - **No `order by` inside CTEs** — only in the final output
 
-### Standard Filters (apply unless Maarten says otherwise)
+### Standard Filters (apply unless instructed otherwise)
 ```sql
 -- Active real orders
 and dmo.order_actual = 'yes'
@@ -79,43 +90,17 @@ and dmc.cust_deleted = 'no'
 ### Database Structure
 
 ```
-PICNIC_NL_PROD      — NL production (primary for most analysis)
-PICNIC_DE_PROD      — DE production
-PICNIC_FR_PROD      — FR production
-PICNIC_GLOBAL_PROD  — Cross-market production
-USER$MAARTEN.DEJONG@TEAMPICNIC.COM — personal sandbox
+picnic_market           — per-market database (NL/DE/FR), resolved at query time
+picnic_global           — cross-market database
 
 Within each database:
-  dim     — core fact + dimension tables (FT_ORDER, DM_CUSTOMER, DM_DATE, etc.)
-  EDGE    — 200+ processed analyst models (use these before building from scratch)
-  SANDBOX — personal experimentation
-  TEMP    — temporary staging tables
+  dim     — core fact + dimension tables (orders, customers, articles, dates, …)
+  edge    — 200+ processed analyst models (use these before building from scratch)
+  sandbox — personal experimentation
+  temp    — temporary staging tables
 ```
 
-### Key Tables in PICNIC_NL_PROD.dim
-- `dim.DM_CUSTOMER` — customer master (`cust_internal`, `cust_deleted` flags)
-- `dim.DM_ARTICLE` — article/product master, category hierarchy
-- `dim.DM_DATE` — date dimension (ALWAYS use instead of date functions)
-- `dim.DM_TAG` — tag/variant dimension for A/B experiments
-- `dim.FT_ORDER` — order fact table
-- `dim.DM_ORDER` — order dimension (`order_actual`, `order_actual_delivery_rank`)
-- `dim.FT_DELIVERY` — delivery fact table
-- `dim.DM_DATE_DELIVERY` — delivery date dimension
-- `dim.FT_SELLING_PRICE` — price history (`KEY_TAG` for experiment variant)
-- `dim.DM_SELLING_UNIT` — selling unit dimension
-- `dim.FT_CUSTOMER_TAG` — customer tag/experiment assignments
-- Cross-market: use fully qualified `PICNIC_DE_PROD.dim.TABLE` or `PICNIC_GLOBAL_PROD.dim.TABLE`
-
-### Additional DWH Tables
-```
-ft_orderline_item          — order line items; join dm_order for order_actual filter
-ft_deliveryline            — delivery line items (for GMD/IPD calculations)
-ft_article_profit_loss     — GMI per article per week (requires analyst_finance role)
-ft_store_selling_unit_events — article-level events (add/view per selling unit)
-ft_attribute_data_store_values — ADS config; JSON values, use get_path() / parse_json()
-dm_delivery                — delivery dimension
-dm_selling_unit            — selling unit dimension; su_article_qty, selling_unit_count
-```
+**Always discover tables via the catalog before writing SQL** — use `read-dwh-data-catalog <topic>` to get exact `full_path` values and column details. Do not guess table names.
 
 ### Query Boilerplate
 ```sql
@@ -294,14 +279,12 @@ public.f_get_key_dim(null)           -- returns null-dimension key (for baseline
 ```
 
 ### Reusable Edge Models
-```sql
-from edge.customer_growth_reporting_weekly   -- weekly acquisition/retention metrics
-from edge.activation_reporting_hub           -- customer hub-level retention KPIs
-from edge.commercial_report_wow              -- week-over-week commercial KPIs
-from edge.pricing_ab_test_significance       -- A/B test significance calculations
-from edge.braze_comms_performance            -- CRM campaign performance (Braze)
+
+Always check the EDGE schema before building a query from scratch — a ready-made model may already exist:
 ```
-To see what edge models exist: check `~/Documents/Github/picnic-dbt-models/edge-models/models/edge/`
+skill: read-dwh-data-catalog  |  args: <topic> --schema edge
+```
+Edge models cover: acquisition/retention, commercial KPIs, A/B test significance, CRM performance, pricing, and more. Use the catalog to discover what's available and get exact column names.
 
 ### A/B Test Random Assignment Pattern
 ```sql
