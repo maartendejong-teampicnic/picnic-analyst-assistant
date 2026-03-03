@@ -70,8 +70,8 @@ All other core rules (no % without N, state assumptions, no Calcite) still apply
 - **No Calcite via snowflake-query.** The snowflake-query skill runs against Snowflake.
   Calcite SQL (picnic-store-config) is an ENGINEER task. If your assignment crosses into
   Calcite, flag it to the orchestrator via `STATUS: BLOCKED`.
-- **Deduplication before aggregation.** Apply dedup logic (see sql-patterns.md) before
-  any join or count.
+- **Deduplication before aggregation.** Apply dedup logic before any join or count,
+  following the conventions from your loaded SQL knowledge.
 
 ---
 
@@ -81,7 +81,7 @@ All other core rules (no % without N, state assumptions, no Calcite) still apply
 
 1. Read the brief in CONTEXT.md `## Task Brief`
 2. Identify: table, filters, date range, grouping, metric definition
-3. Check `knowledge/sql-snowflake.md` for relevant table templates
+3. Apply relevant table patterns and conventions from your loaded SQL knowledge
 4. Draft the query with inline comments explaining each step
 5. Write to output file with `STATUS: NEEDS_APPROVAL`:
    ```
@@ -111,11 +111,10 @@ All other core rules (no % without N, state assumptions, no Calcite) still apply
 
 ### A/B test design task
 
-1. Read `knowledge/ab-testing.md` fully
-2. Identify: metric, baseline rate, MDE, confidence level
-3. Calculate sample size using the formula in abtest.md
-4. Write design doc to output file with `STATUS: NEEDS_APPROVAL`
-5. After approval, write significance SQL if requested
+1. Identify: metric, baseline rate, MDE, confidence level
+2. Apply methodology and formulas from your loaded A/B testing knowledge
+3. Write design doc to output file with `STATUS: NEEDS_APPROVAL`
+4. After approval, write significance SQL if requested
 
 ### Google Sheets output
 
@@ -159,9 +158,25 @@ illustrate a finding; always include raw output path]
 
 ---
 
-## Context files to read (hardcoded — not in INDEX.yaml)
+## When knowledge is missing
 
-| Domain | File |
-|--------|------|
-| Picnic business context | `~/Documents/Claude/analysistant/context/picnic-business.md` |
-| Usuals project context | `~/Documents/Claude/analysistant/context/usuals-project.md` |
+Your capabilities depend on what was loaded at startup via INDEX.yaml.
+If a task requires conventions, templates, or methodology you don't have — recognise the
+gap from the task context, not from a checklist. Tell the user what's missing and suggest:
+
+```
+/onboard-knowledge <skill description>
+```
+
+Do not attempt to improvise domain conventions you haven't been given.
+
+---
+
+## Context files to read
+
+Always read (shared, always present):
+- `~/Documents/Claude/analysistant/context/picnic-business.md`
+
+Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+relevant to the task (project context, communication style, setup notes). Skip gracefully
+if absent — personal context files are gitignored and may not be present for all users.

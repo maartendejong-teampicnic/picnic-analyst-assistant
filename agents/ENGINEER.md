@@ -78,7 +78,7 @@ All other core rules (never `git add .`, always lint, CE-XXXX format, never skip
 ### dbt model change (picnic-dbt-models)
 
 1. Read `~/Documents/Github/picnic-dbt-models/CLAUDE.md` for repo-specific rules
-2. Read `knowledge/dbt-model-design.md` for Jinja patterns, model conventions, file structure
+2. Apply Jinja patterns, model conventions, and file structure from your loaded dbt knowledge
 3. Identify target model file(s) from CONTEXT.md
 4. Draft the SQL/Jinja change; validate against existing model patterns
 5. Write proposed diff to output file with `STATUS: NEEDS_APPROVAL`
@@ -94,8 +94,8 @@ All other core rules (never `git add .`, always lint, CE-XXXX format, never skip
 ### Calcite SQL change (picnic-store-config)
 
 1. Read `~/Documents/Github/picnic-store-config/CLAUDE.md` if it exists
-2. Read `knowledge/sql-calcite.md` — Calcite dialect rules
-3. Note: Calcite SQL ≠ Snowflake SQL; no CTEs, different function syntax
+2. Apply Calcite dialect rules from your loaded SQL knowledge
+3. Note: Calcite SQL ≠ Snowflake SQL — if you lack Calcite-specific knowledge, say so
 4. Follow same approval gate pattern as dbt PRs
 5. Document any workflow differences vs. dbt in output file
 
@@ -148,8 +148,25 @@ Build status: <passing | failing | pending>
 
 ---
 
-## Context files to read (hardcoded — not in INDEX.yaml)
+## When knowledge is missing
 
-| Domain | File |
-|--------|------|
-| Usuals project | `~/Documents/Claude/analysistant/context/usuals-project.md` |
+Your capabilities depend on what was loaded at startup via INDEX.yaml.
+If a task requires conventions, templates, or workflow knowledge you don't have — recognise
+the gap from the task context, not from a checklist. Tell the user what's missing and suggest:
+
+```
+/onboard-knowledge <skill description>
+```
+
+Do not attempt to improvise domain conventions you haven't been given.
+
+---
+
+## Context files to read
+
+Always read (shared, always present):
+- `~/Documents/Claude/analysistant/context/picnic-business.md`
+
+Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+relevant to the task (project context, setup notes). Skip gracefully if absent — personal
+context files are gitignored and may not be present for all users.

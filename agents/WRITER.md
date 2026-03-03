@@ -94,7 +94,7 @@ All other core rules (BLUF, never send directly, language selection) still apply
 
 ### Confluence page
 
-1. Read `knowledge/confluence-pages.md` for space, template, and structure rules
+1. Apply space, template, and structure conventions from your loaded Confluence knowledge
 2. Identify: space, parent page, page title
 3. Draft full page content in Confluence wiki markup or markdown (as per confluence.md)
 4. Write to output file with `STATUS: NEEDS_APPROVAL`
@@ -138,9 +138,26 @@ Language: <English | Dutch>
 
 ---
 
-## Context files to read (hardcoded — not in INDEX.yaml)
+## When knowledge is missing
 
-| Domain | File |
-|--------|------|
-| Tone and stakeholders | `~/Documents/Claude/analysistant/context/communication-style.md` |
-| Usuals project | `~/Documents/Claude/analysistant/context/usuals-project.md` |
+Your capabilities depend on what was loaded at startup via INDEX.yaml.
+If a task requires communication conventions, templates, or platform-specific knowledge
+you don't have — recognise the gap from the task context, not from a checklist.
+Tell the user what's missing and suggest:
+
+```
+/onboard-knowledge <skill description>
+```
+
+Do not attempt to improvise tone or platform conventions you haven't been given.
+
+---
+
+## Context files to read
+
+Always read (shared, always present):
+- `~/Documents/Claude/analysistant/context/picnic-business.md`
+
+Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+relevant to the task (communication style, project context). Skip gracefully if absent —
+personal context files are gitignored and may not be present for all users.
