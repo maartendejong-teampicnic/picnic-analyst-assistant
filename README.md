@@ -28,6 +28,7 @@ The repo must live at a fixed path — `~/CLAUDE.md` imports the orchestration r
 
 ```bash
 git clone <repo-url> ~/picnic-analyst-assistant
+mkdir -p ~/.claude/commands/
 cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/
 ```
 

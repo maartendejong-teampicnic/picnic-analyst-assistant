@@ -148,7 +148,7 @@ When asked to "review the system" or "check for issues", work through these:
 1. Share the repo URL with the colleague
 2. They clone it: `git clone <url> ~/picnic-analyst-assistant/`
 3. They set up `~/CLAUDE.md`: single line `@picnic-analyst-assistant/CLAUDE.md`
-4. They copy command wrappers: `cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/`
+4. They create the commands directory and copy wrappers: `mkdir -p ~/.claude/commands/ && cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/`
 5. They run `/setup` in Claude Code — walks through all 5 phases automatically:
    - Identity → writes `user-config.md`
    - MCP check → Snowflake, Confluence, Slack
