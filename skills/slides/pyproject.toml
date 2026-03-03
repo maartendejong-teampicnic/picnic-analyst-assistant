@@ -1,0 +1,13 @@
+[tool.poetry]
+name = "slides-tool"
+version = "0.1.0"
+description = "Create PowerPoint .pptx files from structured JSON input"
+authors = ["Picnic"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-pptx = "^0.6"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

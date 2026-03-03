@@ -1,0 +1,12 @@
+# Personal files — per-user, not committed
+user-config.md
+TASKS.md
+CONTEXT.md
+tasks/
+direct/
+
+# Personal context files
+context/communication-style.md
+context/setup-notes.md
+context/usuals-project.md
+# keep: context/picnic-business.md (shared Picnic vocab)

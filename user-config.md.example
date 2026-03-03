@@ -1,0 +1,11 @@
+# User Config — Template
+
+Copy this file to `user-config.md` (gitignored) and fill in your details.
+Agents read this file at startup to parameterize task IDs and output paths.
+
+---
+
+username_prefix: mdejong          # used in task IDs (e.g. mdejong-20260303-my-task) and direct/ output paths
+full_name: Maarten de Jong
+email: maarten.dejong@teampicnic.com
+team: Product Analytics

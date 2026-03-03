@@ -1,0 +1,86 @@
+# Knowledge routing authority
+# Agents: read this file at startup. Load files where your role is in `agents` and status is ready.
+#   load: always      → read unconditionally
+#   load: conditional → read only if task context matches `condition` (when in doubt, read it)
+#
+# Context files (picnic-business.md, usuals-project.md, etc.) are NOT listed here.
+# They are project reference, not skills, and are hardcoded in each agent file.
+#
+# How to add a new skill:
+#   1. Create knowledge/<skill-name>.md using the standard template
+#   2. Add an entry below — that's it. No other files need changing.
+
+skills:
+  - skill: Write Snowflake SQL
+    file: sql-snowflake.md
+    status: ready
+    agents: [ANALYST, ORCHESTRATOR]
+    load: always
+
+  - skill: Write Calcite SQL
+    file: sql-calcite.md
+    status: ready
+    agents: [ENGINEER]
+    load: conditional
+    condition: task involves Calcite SQL or picnic-store-config changes
+
+  - skill: Create PR (picnic-dbt-models / picnic-store-config)
+    file: pr-dbt-models.md
+    status: ready
+    agents: [ENGINEER]
+    load: always
+
+  - skill: Design dbt models
+    file: dbt-model-design.md
+    status: ready
+    agents: [ENGINEER]
+    load: always
+
+  - skill: Design A/B experiments
+    file: ab-testing.md
+    status: ready
+    agents: [ANALYST]
+    load: conditional
+    condition: task involves A/B testing or experiment design
+
+  - skill: Draft Slack messages
+    file: slack-messages.md
+    status: ready
+    agents: [WRITER]
+    load: always
+
+  - skill: Write Confluence pages
+    file: confluence-pages.md
+    status: ready
+    agents: [WRITER]
+    load: always
+
+  - skill: Create ADS attributes
+    file: ads-attributes.md
+    status: ready
+    agents: [ANALYST]
+    load: conditional
+    condition: task involves the Attribute Data Store (ADS) or customer attributes
+
+  - skill: Create slides (.pptx)
+    file: slides-pptx.md
+    status: ready
+    agents: [PRESENTER]
+    load: always
+
+  - skill: Create Excalidraw diagrams
+    file: diagrams-excalidraw.md
+    status: ready
+    agents: [DESIGNER]
+    load: always
+
+  - skill: Dashboard reporting (Usuals)
+    file: reporting-dashboard.md
+    status: ready
+    agents: [ORCHESTRATOR]
+    load: conditional
+    condition: task involves the Usuals dashboard or weekly reporting
+
+not_yet_onboarded:
+  - skill: Create Excalidraw UI designs
+    notes: Needs dedicated skill file

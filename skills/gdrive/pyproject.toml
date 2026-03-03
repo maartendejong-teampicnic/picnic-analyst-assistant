@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "gdrive-tool"
+version = "1.0.0"
+description = "Google Drive CLI tool for Claude Code"
+authors = ["Picnic"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+google-api-python-client = "^2.0"
+google-auth = "^2.0"
+google-auth-oauthlib = "^1.0"
+google-auth-httplib2 = "^0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
