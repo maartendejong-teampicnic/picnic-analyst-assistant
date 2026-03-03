@@ -50,7 +50,7 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 1. Ask the user for:
    - **Full name** (e.g. Maarten de Jong)
    - **Email** (e.g. maarten.dejong@teampicnic.com)
-   - **Team** (e.g. Product Analytics)
+   - **Team** (e.g. Shopping / Usuals)
    - **Username prefix** — suggest: first initial + last name, all lowercase, no spaces
      (e.g. `mdejong`). This prefix appears in task IDs and output folder names.
      Ask them to confirm or change the suggestion.
