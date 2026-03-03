@@ -27,8 +27,7 @@ skill: read-dwh-data-catalog  |  args: <topic> --limit 5
 1. Write the query to `~/.claude/data/snowflake-query/queries/<descriptive_name>.sql`
    — use snake_case, e.g. `weekly_order_trend.sql`
 2. **Show the query and wait for confirmation that it is correct before running it.**
-   After approval, also save `<descriptive_name>.sql` alongside the task's output.md:
-   direct mode → direct task folder; orchestrated → `tasks/<task-id>/`.
+   After approval, save `<descriptive_name>.sql` alongside the task's output.md.
 3. Invoke the skill:
    ```
    skill: snowflake-query  |  args: nl <descriptive_name>
