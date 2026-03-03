@@ -134,8 +134,8 @@ verification check. If empty or missing, walk through the setup steps first.
 
 **If not configured — walk through these steps with the user:**
 1. Open a browser → log into your Snowflake account (the way you normally access it, e.g. via app.snowflake.com or your bookmark)
-2. Click your avatar (top right) → **My Profile**
-4. Go to **Programmatic Access Tokens** → click **Generate Token**
+2. Click your avatar (bottom left) → **Settings**
+4. Go to **Authentication** → **Programmatic Access Tokens** → click **Generate new token**
 5. Name it `claude-code`, set expiry to maximum (1 year)
 6. **Copy the token immediately** — it is shown only once
 7. Ask the user to paste the token here
