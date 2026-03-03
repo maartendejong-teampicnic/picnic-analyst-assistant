@@ -11,7 +11,7 @@ messages, or build slides. You plan, sequence, delegate, and present.
 
 ## Task ID generation
 
-Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md` to get `username_prefix`.
+Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`.
 If the file does not exist, use `user` as the prefix and remind the user to run `/setup`.
 
 Every task gets a unique `task-id` of the form:
@@ -41,7 +41,7 @@ Examples (with prefix `mdejong`):
 Each task lives in its own folder:
 
 ```
-~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/
+~/picnic-analyst-assistant/tasks/<task-id>/
 ├── context.md      ← coordination file: plan, assignments, subtask tracker (the "storyline")
 ├── analyst.md      ← ANALYST output: queries, results, A/B design
 ├── engineer.md     ← ENGINEER output: PR details, diffs, CI status
@@ -61,14 +61,14 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
 
 ## Startup sequence
 
-0. Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md` — get `username_prefix` for task ID generation
-1. Read `~/Documents/Claude/picnic-analyst-assistant/TASKS.md` — identify the target task(s)
+0. Read `~/picnic-analyst-assistant/user-config.md` — get `username_prefix` for task ID generation
+1. Read `~/picnic-analyst-assistant/TASKS.md` — identify the target task(s)
 2. Resolve task-id(s) (see Task ID generation above)
-3. Check for `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`:
+3. Check for `~/picnic-analyst-assistant/tasks/<task-id>/context.md`:
    - File exists and no `summary.md` → task in flight; resume from `## Subtask Tracker`
    - File exists and `summary.md` present → task already done; confirm before restarting
    - File absent → clean slate; start planning
-4. **Knowledge loading:** Read `~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml`.
+4. **Knowledge loading:** Read `~/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes `ORCHESTRATOR` and `status` is `ready`.
    - `load: always` → read that file now.
    - `load: conditional` → read only if the task context matches the `condition` value.
@@ -116,10 +116,10 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
 6. Decompose into subtasks; decide agent assignment and ordering
 7. Create task folder and context file:
    ```
-   mkdir ~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/
+   mkdir ~/picnic-analyst-assistant/tasks/<task-id>/
    ```
-   Copy blank template from `~/Documents/Claude/picnic-analyst-assistant/CONTEXT.md` →
-   `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`
+   Copy blank template from `~/picnic-analyst-assistant/CONTEXT.md` →
+   `~/picnic-analyst-assistant/tasks/<task-id>/context.md`
    Fill in all fields (task title, id, status, brief, relevant files, subtask tracker)
 8. Present to user:
    ```
@@ -144,10 +144,10 @@ b. Paste all prior agent key findings into `## Inputs From Prior Agents`
 c. Spawn via Agent tool with prompt:
    ```
    You are the <ROLE> specialist. Read your context file at
-   ~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md. Execute your assignment exactly.
+   ~/picnic-analyst-assistant/tasks/<task-id>/context.md. Execute your assignment exactly.
    Write all output to ~/.claude/data/agents/<task-id>/<role>/output.md
    (create the directory if it doesn't exist).
-   Read ~/Documents/Claude/picnic-analyst-assistant/agents/<ROLE>.md for your full onboarding.
+   Read ~/picnic-analyst-assistant/agents/<ROLE>.md for your full onboarding.
    ```
 d. After agent completes, read `~/.claude/data/agents/<task-id>/<role>/output.md`
 e. If `STATUS: NEEDS_APPROVAL` → surface full draft to user (see gate format)
@@ -242,9 +242,9 @@ If the user types a revision instruction, relay it back to the relevant speciali
 
 | Domain | File | Type |
 |--------|------|------|
-| Picnic business vocabulary | `~/Documents/Claude/picnic-analyst-assistant/context/picnic-business.md` | Shared |
-| Communication style | `~/Documents/Claude/picnic-analyst-assistant/context/communication-style.md` | Personal (gitignored) |
-| Active project context | `~/Documents/Claude/picnic-analyst-assistant/context/<project>.md` | Personal (gitignored) |
-| Setup notes / MCP status | `~/Documents/Claude/picnic-analyst-assistant/context/setup-notes.md` | Personal (gitignored) |
+| Picnic business vocabulary | `~/picnic-analyst-assistant/context/picnic-business.md` | Shared |
+| Communication style | `~/picnic-analyst-assistant/context/communication-style.md` | Personal (gitignored) |
+| Active project context | `~/picnic-analyst-assistant/context/<project>.md` | Personal (gitignored) |
+| Setup notes / MCP status | `~/picnic-analyst-assistant/context/setup-notes.md` | Personal (gitignored) |
 
 Read shared context unconditionally. Read personal context files if they exist (they may not for new users).

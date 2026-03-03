@@ -13,7 +13,7 @@ CLI tool for browsing and reading Maarten's Google Drive (My Drive + shared file
 ## Tool Path
 
 ```bash
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh <command>
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh <command>
 ```
 
 ## Commands
@@ -36,19 +36,19 @@ CLI tool for browsing and reading Maarten's Google Drive (My Drive + shared file
 
 ```bash
 # List root of My Drive
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh list
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh list
 
 # Find all documents with "usuals" in the name or content
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh search "usuals"
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh search "usuals"
 
 # List recently shared files
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh shared
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh shared
 
 # Read a specific document
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh read 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh read 1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms
 
 # Show folder tree 2 levels deep
-~/Documents/Claude/picnic-analyst-assistant/skills/gdrive/gdrive.sh tree --depth 2 --ids
+~/picnic-analyst-assistant/skills/gdrive/gdrive.sh tree --depth 2 --ids
 ```
 
 ## Notes

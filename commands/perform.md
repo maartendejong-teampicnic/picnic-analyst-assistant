@@ -1,4 +1,4 @@
-@~/Documents/Claude/picnic-analyst-assistant/agents/ORCHESTRATOR.md
+@~/picnic-analyst-assistant/agents/ORCHESTRATOR.md
 
 You have been invoked via `/perform`. Argument (if any): $ARGUMENTS
 
@@ -9,9 +9,9 @@ You have been invoked via `/perform`. Argument (if any): $ARGUMENTS
    Multiple arguments separated by commas or "and" indicate multiple tasks to run
    sequentially in this session.
 
-2. Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md` to get `username_prefix`.
+2. Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`.
 
-3. Read `~/Documents/Claude/picnic-analyst-assistant/TASKS.md` to identify the target task(s).
+3. Read `~/picnic-analyst-assistant/TASKS.md` to identify the target task(s).
 
 4. Resolve the `task-id` for each task (see Task ID resolution in ORCHESTRATOR.md).
 

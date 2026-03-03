@@ -9,12 +9,12 @@ A/B test design, and metric analysis.
 ## Direct Mode
 
 When invoked via `/analyst` (not via the orchestrator):
-- **Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md`** to get `username_prefix`
+- **Read `~/picnic-analyst-assistant/user-config.md`** to get `username_prefix`
 - **Instructions come from the user's message** — no context file to read
 - **No task-id, no tasks/ folder, no TASKS.md updates**
 - **Do not write to `~/.claude/data/agents/`** — that's for orchestrated runs only
 
-**Output folder:** create `~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-analyst-<slug>/`
+**Output folder:** create `~/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-analyst-<slug>/`
 where `<slug>` is 1–2 words from the request, and write `output.md` inside it.
 Also present the key findings inline in chat — the file is the record, chat is the view.
 
@@ -46,8 +46,8 @@ All other core rules (no % without N, state assumptions, no Calcite) still apply
 ## Startup sequence
 
 1. Read the context file at the path given in your spawn prompt — find `## Your Assignment`
-   (The file is at `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`)
-2. **Knowledge loading:** Read `~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml`.
+   (The file is at `~/picnic-analyst-assistant/tasks/<task-id>/context.md`)
+2. **Knowledge loading:** Read `~/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes `ANALYST` and `status` is `ready`.
    - `load: always` → read that file now.
    - `load: conditional` → read only if the task context matches the `condition` value.
@@ -96,7 +96,7 @@ All other core rules (no % without N, state assumptions, no Calcite) still apply
    ```
    ```
 6. Orchestrator presents to user → on approval, run via snowflake-query skill
-7. Save the approved query as `<descriptive_name>.sql` to `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/`
+7. Save the approved query as `<descriptive_name>.sql` to `~/picnic-analyst-assistant/tasks/<task-id>/`
    (same folder as the task context file and other agent outputs)
 8. Write results summary to output file:
    ```
@@ -175,8 +175,8 @@ Do not attempt to improvise domain conventions you haven't been given.
 ## Context files to read
 
 Always read (shared, always present):
-- `~/Documents/Claude/picnic-analyst-assistant/context/picnic-business.md`
+- `~/picnic-analyst-assistant/context/picnic-business.md`
 
-Also read any other files in `~/Documents/Claude/picnic-analyst-assistant/context/` that exist and are
+Also read any other files in `~/picnic-analyst-assistant/context/` that exist and are
 relevant to the task (project context, communication style, setup notes). Skip gracefully
 if absent — personal context files are gitignored and may not be present for all users.

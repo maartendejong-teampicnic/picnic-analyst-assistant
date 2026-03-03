@@ -1,3 +1,3 @@
-@~/Documents/Claude/picnic-analyst-assistant/patterns/onboard-knowledge.md
+@~/picnic-analyst-assistant/patterns/onboard-knowledge.md
 
 $ARGUMENTS

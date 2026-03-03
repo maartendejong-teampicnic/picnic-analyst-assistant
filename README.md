@@ -27,9 +27,8 @@ For focused, single-domain work you can invoke any agent directly: `/analyst`, `
 The repo must live at a fixed path — `~/CLAUDE.md` imports the orchestration rules from there.
 
 ```bash
-mkdir -p ~/Documents/Claude
-git clone <repo-url> ~/Documents/Claude/picnic-analyst-assistant
-cp ~/Documents/Claude/picnic-analyst-assistant/commands/* ~/.claude/commands/
+git clone <repo-url> ~/picnic-analyst-assistant
+cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/
 ```
 
 ### 2. Run `/setup` in Claude Code
@@ -139,5 +138,5 @@ picnic-analyst-assistant/
 ## Onboarding a colleague
 
 1. Share the repo URL
-2. They clone to `~/Documents/Claude/picnic-analyst-assistant` and copy the commands (step 1 above)
+2. They clone to `~/picnic-analyst-assistant` and copy the commands (step 1 above)
 3. They run `/setup` in Claude Code — everything else is guided

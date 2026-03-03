@@ -1,3 +1,3 @@
-@~/Documents/Claude/picnic-analyst-assistant/patterns/setup.md
+@~/picnic-analyst-assistant/patterns/setup.md
 
 $ARGUMENTS

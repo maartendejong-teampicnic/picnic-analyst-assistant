@@ -28,7 +28,7 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 | File | Purpose |
 |------|---------|
 | `~/CLAUDE.md` | Single @import redirect → picnic-analyst-assistant/CLAUDE.md |
-| `~/Documents/Claude/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules |
+| `~/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules |
 | `~/.claude/projects/-home-picnic/memory/MEMORY.md` | Auto-memory index (always loaded) |
 
 ### Commands (`~/.claude/commands/`)
@@ -146,9 +146,9 @@ When asked to "review the system" or "check for issues", work through these:
 ### Onboard a new colleague
 
 1. Share the repo URL with the colleague
-2. They clone it: `git clone <url> ~/Documents/Claude/picnic-analyst-assistant/`
-3. They set up `~/CLAUDE.md`: single line `@Documents/Claude/picnic-analyst-assistant/CLAUDE.md`
-4. They copy command wrappers: `cp ~/Documents/Claude/picnic-analyst-assistant/commands/* ~/.claude/commands/`
+2. They clone it: `git clone <url> ~/picnic-analyst-assistant/`
+3. They set up `~/CLAUDE.md`: single line `@picnic-analyst-assistant/CLAUDE.md`
+4. They copy command wrappers: `cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/`
 5. They run `/setup` in Claude Code — walks through all 5 phases automatically:
    - Identity → writes `user-config.md`
    - MCP check → Snowflake, Confluence, Slack
@@ -194,7 +194,7 @@ Manual fallback (if needed):
 2. Add to ORCHESTRATOR.md: specialist agents table + routing table
 3. Create `~/.claude/commands/<role>.md`:
    ```
-   @~/Documents/Claude/picnic-analyst-assistant/agents/<ROLE>.md
+   @~/picnic-analyst-assistant/agents/<ROLE>.md
    $ARGUMENTS
    ```
 4. Update MEMORY.md: add to "Slash Commands" and note in agent list

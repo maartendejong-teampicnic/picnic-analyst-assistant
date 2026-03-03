@@ -1,3 +1,3 @@
-@~/Documents/Claude/picnic-analyst-assistant/patterns/architect.md
+@~/picnic-analyst-assistant/patterns/architect.md
 
 $ARGUMENTS

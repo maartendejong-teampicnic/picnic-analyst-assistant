@@ -18,7 +18,7 @@ before moving to the next.
 
 Check if `~/CLAUDE.md` exists and contains exactly:
 ```
-@Documents/Claude/picnic-analyst-assistant/CLAUDE.md
+@picnic-analyst-assistant/CLAUDE.md
 ```
 
 - ✅ Correct → confirm and continue
@@ -31,7 +31,7 @@ Note: this file is your personal entry point and is **not** in the repo.
 
 ## Phase 1 — Identity
 
-**Goal:** Create `~/Documents/Claude/picnic-analyst-assistant/user-config.md` with the user's identity.
+**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity.
 
 1. Ask the user for:
    - **Full name** (e.g. Maarten de Jong)
@@ -41,7 +41,7 @@ Note: this file is your personal entry point and is **not** in the repo.
      (e.g. `mdejong`). This prefix appears in task IDs and output folder names.
      Ask them to confirm or change the suggestion.
 
-2. Check if `~/Documents/Claude/picnic-analyst-assistant/user-config.md` already exists.
+2. Check if `~/picnic-analyst-assistant/user-config.md` already exists.
    If it does, show the current contents and ask: "Overwrite with new values?"
    Only proceed if they confirm.
 
@@ -115,7 +115,7 @@ If yes, ask:
 2. **Key stakeholders** — Who do you regularly message? (Name + role, 2–5 people)
 3. **Writing style** — Any preferences? (e.g. "brief, BLUF", "formal", "casual")
 
-Write `~/Documents/Claude/picnic-analyst-assistant/context/communication-style.md`:
+Write `~/picnic-analyst-assistant/context/communication-style.md`:
 ```markdown
 # Communication Style
 
@@ -146,7 +146,7 @@ This helps agents understand domain-specific vocabulary and status."
 If yes:
 1. Ask for the project name and a brief description (2–3 sentences)
 2. Ask: "Any key components, terminology, or ongoing work to document?"
-3. Write `~/Documents/Claude/picnic-analyst-assistant/context/<project-slug>.md` with the provided content,
+3. Write `~/picnic-analyst-assistant/context/<project-slug>.md` with the provided content,
    using this template:
    ```markdown
    # <Project Name>
@@ -165,7 +165,7 @@ If no: skip.
 
 ### TASKS.md
 
-Check if `~/Documents/Claude/picnic-analyst-assistant/TASKS.md` exists.
+Check if `~/picnic-analyst-assistant/TASKS.md` exists.
 If not, create it:
 ```markdown
 # Tasks

@@ -119,7 +119,7 @@ Produce the complete draft. Show both artifacts inline in chat.
 Label the block with the destination path:
 
 ```
-File: ~/Documents/Claude/picnic-analyst-assistant/knowledge/<slug>.md
+File: ~/picnic-analyst-assistant/knowledge/<slug>.md
 ```
 
 Content — follow the standard template exactly:
@@ -147,7 +147,7 @@ Content — follow the standard template exactly:
 Label the block:
 
 ```
-Entry to append to: ~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml
+Entry to append to: ~/picnic-analyst-assistant/knowledge/INDEX.yaml
 ```
 
 Content:
