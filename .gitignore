@@ -1,3 +1,14 @@
+# Personal knowledge files — kept locally, not shared via this repo
+knowledge/sql-calcite.md
+knowledge/pr-dbt-models.md
+knowledge/dbt-model-design.md
+knowledge/slack-messages.md
+knowledge/confluence-pages.md
+knowledge/ads-attributes.md
+knowledge/slides-pptx.md
+knowledge/diagrams-excalidraw.md
+knowledge/reporting-dashboard.md
+
 # Personal files — per-user, not committed
 user-config.md
 TASKS.md
