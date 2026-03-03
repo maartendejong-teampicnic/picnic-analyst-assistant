@@ -138,7 +138,7 @@ inner join dim.dm_customer as dmc
     on (ftssue.key_customer = dmc.key_customer)
 where
     ftssue.event_is_add_product_to_basket = 'yes'
-    and dmes.event_screen_name in ('purchases-page-root', 'purchases-page-root-category', 'aisle-deep-dive')
+    and dmes.event_screen_name in ('purchases-page-root', 'aisle-deep-dive')
     and dmc.cust_internal = 'no'
     and dmc.cust_deleted = 'no'
 ```
@@ -259,21 +259,21 @@ public.f_get_market()                -- current market ('nl'/'de'/'fr')
 ### Usuals Page
 
 #### Screen name filters (dm_event_screen.event_screen_name)
-| Screen name | What it captures |
-|-------------|-----------------|
-| `purchases-page-root` | Main Usuals page |
-| `purchases-page-root-category` | Category view on the Usuals page |
-| `aisle-deep-dive` | Section deep-dive |
-| `action-bottom-sheet` | Long-press context menu — add `and dmes.event_screen_tab_name = 'usuals'` to scope to Usuals-specific long-presses |
+| Screen name | What it captures | Status |
+|-------------|-----------------|--------|
+| `purchases-page-root` | Main Usuals page | Current DWH name — migrating to `usuals` |
+| `aisle-deep-dive` | Section deep-dive (replaces deprecated `purchases-page-root-category`) | Current DWH name — migrating to `usuals-deep-dive` |
+| `action-bottom-sheet` | Long-press context menu — add `and dmes.event_screen_tab_name = 'usuals'` to scope to Usuals-specific long-presses | Active |
+
+> `purchases-page-root-category` is deprecated (removed — replaced by `aisle-deep-dive`). Do not include in filters.
 
 #### Standard Usuals add filter
 Apply when counting article adds originating from the Usuals page (use with `ft_store_selling_unit_events`):
 ```sql
 where ftssue.event_is_add_product_to_basket = 'yes'
   and dmes.event_screen_name in (
-      'purchases-page-root',
-      'purchases-page-root-category',
-      'aisle-deep-dive'
+      'purchases-page-root',   -- main page (migrating to 'usuals')
+      'aisle-deep-dive'        -- section deep-dive (migrating to 'usuals-deep-dive')
   )
 ```
 
