@@ -107,7 +107,6 @@ plans the work, and routes it to the right specialists.
 /onboard-knowledge → add a new skill file to knowledge/
 /gdrive            → browse Google Drive for context
 /costs             → check Claude API cost breakdown
-/excalidraw        → generate Excalidraw diagrams (needs sync-picnic-skills first)
 ```
 
 ---
