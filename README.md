@@ -12,11 +12,11 @@ When you run `/perform`, the ORCHESTRATOR reads your task brief, decomposes it i
 
 | Agent | Responsibilities |
 |-------|-----------------|
-| **ANALYST** | SQL queries, A/B experiment design, metrics analysis |
-| **ENGINEER** | dbt model changes, GitHub PRs, CI validation |
-| **WRITER** | Slack messages, Confluence pages, PR descriptions |
-| **PRESENTER** | PowerPoint slide decks |
-| **DESIGNER** | Excalidraw architecture diagrams |
+| **ANALYST** | Snowflake queries, reporting sheets, ... |
+| **ENGINEER** | DBT models, Github PRs, ... |
+| **WRITER** | Slack messages, Confluence pages, ... |
+| **PRESENTER** | Storylines, PowerPoint slides, ... |
+| **DESIGNER** | Excalidraw diagrams, Figma sketches, ... |
 
 Agents load the relevant **skill files** from `knowledge/` at startup and build on each other's outputs. Every irreversible action — sending a message, merging a PR, publishing a page — is surfaced to you for approval before it happens.
 
