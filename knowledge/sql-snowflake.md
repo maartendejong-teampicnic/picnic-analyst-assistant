@@ -27,7 +27,8 @@ skill: read-dwh-data-catalog  |  args: <topic> --limit 5
 1. Write the query to `~/.claude/data/snowflake-query/queries/<descriptive_name>.sql`
    — use snake_case, e.g. `weekly_order_trend.sql`
 2. **Show the query and wait for confirmation that it is correct before running it.**
-   After approval, save `<descriptive_name>.sql` alongside the task's output.md.
+   After approval, also save `<descriptive_name>.sql` alongside the task's output.md:
+   direct mode → direct task folder; orchestrated → `tasks/<task-id>/`.
 3. Invoke the skill:
    ```
    skill: snowflake-query  |  args: nl <descriptive_name>
@@ -69,22 +70,9 @@ When writing a SQL query whose output will land in a Usuals Dashboard sheet:
 - **Comparisons**: `<>` not `!=`; `where foo = false` not `where not foo`
 - **Joins**: `on (condition)` with parentheses always — never `using`
 - **Join types**: prefer `inner join`; use `left join` only when you need unmatched rows; never `full join` or `right join`
-- **Left join filter trap**: always apply `left join` filters in the `on` clause, not `where` (a `where` on the right table silently turns it into an inner join)
 - **Structure**: CTEs with `with` clause — not subqueries; never `select *`
-- **Deduplication**: `qualify row_number() over (partition by ... order by ...) = 1`
-- **Market**: `public.f_get_market()` — not hardcoded `'nl'`/`'de'`/`'fr'`
 - **Comments**: `/*` style, capitalised, placed above the code line they describe. Each CTE always get's a brief comment describing it's use. Non-trivial column or filters also get comments. 
 - **No `order by` inside CTEs** — only in the final output
-
-### Standard Filters (apply unless instructed otherwise)
-```sql
--- Active real orders
-and dmo.order_actual = 'yes'
-
--- Real customers (exclude test + deleted)
-and dmc.cust_internal = 'no'
-and dmc.cust_deleted = 'no'
-```
 
 ### Database Structure
 
@@ -95,7 +83,6 @@ picnic_global           — cross-market database
 Within each database:
   dim     — core fact + dimension tables (orders, customers, articles, dates, …)
   edge    — 200+ processed analyst models (use these before building from scratch)
-  sandbox — personal experimentation
   temp    — temporary staging tables
 ```
 
@@ -124,47 +111,14 @@ from <cte_name>
 
 ### Core Join Patterns
 
-#### Customer + Orders
-```sql
-from dim.FT_ORDER as fto
-inner join dim.dm_order as dmo
-    on (fto.key_order = dmo.key_order)
-inner join dim.dm_customer as dmc
-    on (fto.key_customer = dmc.key_customer)
-inner join dim.dm_date as dmd
-    on (fto.key_order_date = dmd.key_date)
-where
-    dmo.order_actual = 'yes'
-    and dmo.order_actual_delivery_rank = 1
-    and dmc.cust_internal = 'no'
-    and dmc.cust_deleted = 'no'
-```
-
-#### Delivery-based queries
-```sql
-from dim.ft_delivery as ftd
-inner join dim.dm_date_delivery as dmdd
-    on (ftd.key_delivery_date = dmdd.key_delivery_date)
-inner join dim.dm_customer as dmc
-    on (ftd.key_customer = dmc.key_customer)
-where
-    dmc.cust_internal = 'no'
-    and dmc.cust_deleted = 'no'
-```
+#### 
+TO BE ONBOARDED
 
 #### Article / Product Lookup
 ```sql
 from dim.dm_article as dma
 -- Key fields: art_supply_chain_name, art_p_cat_lev_1/2/3, art_p_cat_lev_3_id
 where dma.art_assortment_status = 'In'   -- active articles only
-```
-
-#### Customer Tags / Experiment Assignment
-```sql
-from dim.ft_customer_tag as ftct
-inner join dim.dm_tag as dmt
-    on (ftct.key_tag = dmt.key_tag)
-where dmt.tag_type = '<experiment_type>'
 ```
 
 ### Date & Week Math
@@ -195,8 +149,9 @@ Only join dm_date when you need derived fields (weeks_between, promo_calendar_we
 set key_start_date = 20260224;   -- YYYYMMDD integer
 set key_start_week = 202608;     -- YYYYWW integer
 
--- Reference in query:
+-- Reference in query example:
 where ftse.key_event_date >= $key_start_date
+where dmd.key_week >= $key_start_week
 ```
 
 ### Deduplication
@@ -207,14 +162,6 @@ qualify
         partition by <unique_key_columns>
         order by <prefer_most_recent_field> desc nulls last
     ) = 1
-```
-
-### Category Hierarchy (dm_article)
-```
-art_p_cat_lev_1      — top level (e.g., 'Fresh', 'Dry', 'Non-food')
-art_p_cat_lev_2      — mid level
-art_p_cat_lev_3      — leaf category (most granular, used in most analyses)
-art_p_cat_lev_3_id   — ID for joining (prefer over name for joins)
 ```
 
 ### App Event Analytics Tables
@@ -250,7 +197,7 @@ week_spine as (
 - **Don't use** `HAVING max(date) < current_date` to exclude partial weeks.
 
 ### Efficient Single-Scan Pattern for Large Event Tables
-ft_store_events is very large — avoid scanning it multiple times:
+ft_store_events and ft_store_selling_unit_events are very large — avoid scanning it multiple times:
 ```sql
 -- Single scan: flag long-press events inline
 all_events as (
@@ -272,29 +219,8 @@ all_events as (
 ```sql
 public.f_get_key_date(date)          -- convert date → key_date integer (YYYYMMDD)
 public.f_key_date_to_date(key_date)  -- convert key_date integer → date
-public.f_get_current_local_date()    -- current local date (use instead of current_date())
 public.f_get_market()                -- current market ('nl'/'de'/'fr')
-public.f_get_key_dim(null)           -- returns null-dimension key (for baseline price filter)
 ```
 
-### Reusable Edge Models
-
-Always check the EDGE schema before building a query from scratch — a ready-made model may already exist:
-```
-skill: read-dwh-data-catalog  |  args: <topic> --schema edge
-```
-Edge models cover: acquisition/retention, commercial KPIs, A/B test significance, CRM performance, pricing, and more. Use the catalog to discover what's available and get exact column names.
-
-### A/B Test Random Assignment Pattern
-```sql
--- MD5-based deterministic random assignment (50/50 split)
-right(regexp_replace(md5(concat(key_customer, '<test_id>' || '-ab-test')), '[^0-9]', ''), 2) < 50
-    as test_group   -- true = treatment, false = control
-```
-
-### Performance Rules
-- Filter on `key_*` surrogate key columns first (partition pruning)
-- Apply date/week range filters as early as possible in CTE chain
-- For `left join`: put filter conditions in `on` clause, NOT `where` (silently becomes inner join)
 - No `order by` inside CTEs — only in the final `select`
 - Prefer `inner join` for dimension lookups (all fact records should have matching dimensions)
