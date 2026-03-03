@@ -169,7 +169,7 @@ regenerate the token and replace `SNOWFLAKE_TOKEN` in `settings.json`.
    ```
 2. Open a browser → go to https://id.atlassian.com/manage-profile/security/api-tokens
 3. Sign in with your Picnic email
-4. Click **Create API token** → name it `claude-code`
+4. Click your **Account settings** (top right) →  **Security** →  scroll down to **Create API token**.
 5. **Copy the token immediately** — it is shown only once
 6. Ask the user to paste the token here
 
