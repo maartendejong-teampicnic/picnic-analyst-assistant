@@ -294,12 +294,12 @@ Then ask: "Continue to Phase 3?"
 ### Project context
 
 Ask: "Do you have an active project you'd like to add context for?
-(e.g. a product feature, experiment programme, or workstream)
-This helps agents understand domain-specific vocabulary and status."
+(e.g. a new DBT model, app feature or dashboard?)
+This helps kickstart agents to work with domain-specific vocabulary and status."
 
 If yes:
 1. Ask for the project name and a brief description (2–3 sentences)
-2. Ask: "Any key components, terminology, or ongoing work to document?"
+2. Ask: "Any key components, terminology, or resources to document?"
 3. Write `~/picnic-analyst-assistant/context/<project-slug>.md` with the provided content,
    using this template:
    ```markdown
