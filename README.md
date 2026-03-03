@@ -99,7 +99,6 @@ picnic-analyst-assistant/
 │
 ├── context/                           # reference context loaded by agents
 │   ├── picnic-business.md             # Picnic vocabulary (shared)
-│   ├── communication-style.md         # your style guide (gitignored)
 │   └── <project>.md                   # your project context (gitignored)
 │
 ├── tasks/                             # task outputs, one folder per task (gitignored)
@@ -129,7 +128,6 @@ picnic-analyst-assistant/
 | Picnic business vocabulary | `context/picnic-business.md` | ✅ |
 | Your identity (name, prefix, email) | `user-config.md` | personal |
 | Your task list | `TASKS.md` | personal |
-| Your communication style | `context/communication-style.md` | personal |
 | Your project context | `context/<project>.md` | personal |
 | Task and direct output | `tasks/`, `direct/` | personal |
 
