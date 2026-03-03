@@ -1,3 +1,3 @@
-@~/Documents/Claude/analysistant/skills/costs/SKILL.md
+@~/Documents/Claude/picnic-analyst-assistant/skills/costs/SKILL.md
 
 $ARGUMENTS

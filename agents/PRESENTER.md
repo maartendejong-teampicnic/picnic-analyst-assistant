@@ -9,12 +9,12 @@ findings into clear, well-structured presentations.
 ## Direct Mode
 
 When invoked via `/presenter` (not via the orchestrator):
-- **Read `~/Documents/Claude/analysistant/user-config.md`** to get `username_prefix`
+- **Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md`** to get `username_prefix`
 - **Instructions come from the user's message** — no context file to read
 - **No task-id, no tasks/ folder, no TASKS.md updates**
 - **Do not write to `~/.claude/data/agents/`** — that's for orchestrated runs only
 
-**Output folder:** create `~/Documents/Claude/analysistant/direct/{username_prefix}-YYYYMMDD-HHMM-presenter-<slug>/`
+**Output folder:** create `~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-presenter-<slug>/`
 where `<slug>` is 1–2 words from the request, and write `output.md` inside it.
 Save the .pptx to the same direct task folder (next to output.md); record its path in output.md.
 
@@ -28,7 +28,7 @@ Generated: <ISO timestamp>
 <slide list with titles and layout types>
 
 ## Output File
-Path: ~/Documents/Claude/analysistant/direct/{username_prefix}-YYYYMMDD-HHMM-presenter-<slug>/<filename>.pptx
+Path: ~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-presenter-<slug>/<filename>.pptx
 ```
 
 **Slide plan approval:** present the slide plan inline in chat; wait for ok before generating
@@ -41,8 +41,8 @@ All other core rules (one message per slide, BLUF narrative, no fabricated data)
 ## Startup sequence
 
 1. Read the context file at the path given in your spawn prompt — find `## Your Assignment`
-   (The file is at `~/Documents/Claude/analysistant/tasks/<task-id>/context.md`)
-2. **Knowledge loading:** Read `~/Documents/Claude/analysistant/knowledge/INDEX.yaml`.
+   (The file is at `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`)
+2. **Knowledge loading:** Read `~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes `PRESENTER` and `status` is `ready`.
    - `load: always` → read that file now.
    - `load: conditional` → read only if the task context matches the `condition` value.
@@ -64,7 +64,7 @@ All other core rules (one message per slide, BLUF narrative, no fabricated data)
 - **Approval before file creation is optional** for draft slides. The orchestrator may
   ask you to produce a draft for review first. Always mark `STATUS: draft` until
   the user approves the structure, then generate the final .pptx.
-- **Output directory (direct mode):** the active direct task folder (next to output.md); **(orchestrated mode):** `~/Documents/Claude/analysistant/tasks/<task-id>/`
+- **Output directory (direct mode):** the active direct task folder (next to output.md); **(orchestrated mode):** `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/`
 
 ---
 
@@ -97,8 +97,8 @@ Total: N slides
 ### think-cell charts (if applicable)
 
 If the task requires think-cell chart fills:
-1. Read `~/Documents/Claude/analysistant/context/setup-notes.md` for thinkcell status
-2. Use `thinkcell_tool.py` from `analysistant/skills/slides/`
+1. Read `~/Documents/Claude/picnic-analyst-assistant/context/setup-notes.md` for thinkcell status
+2. Use `thinkcell_tool.py` from `picnic-analyst-assistant/skills/slides/`
 3. Requires a named think-cell template — confirm template path with orchestrator first
 
 ---
@@ -122,7 +122,7 @@ What to validate: <what to check before approving — e.g. narrative flow, slide
 [slide list]
 
 ## Output File
-Path: ~/Documents/Claude/analysistant/tasks/<task-id>/<filename>.pptx
+Path: ~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/<filename>.pptx
 STATUS: not-started | complete
 ```
 
@@ -146,8 +146,8 @@ Do not attempt to improvise slide structure or tool conventions you haven't been
 ## Context files to read
 
 Always read (shared, always present):
-- `~/Documents/Claude/analysistant/context/picnic-business.md`
+- `~/Documents/Claude/picnic-analyst-assistant/context/picnic-business.md`
 
-Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+Also read any other files in `~/Documents/Claude/picnic-analyst-assistant/context/` that exist and are
 relevant to the task (project context, setup notes). Skip gracefully if absent — personal
 context files are gitignored and may not be present for all users.

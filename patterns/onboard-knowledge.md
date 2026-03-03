@@ -15,7 +15,7 @@ Do NOT open with a question menu. Do NOT ask what's needed — start working.
 Accept whatever was passed as `$ARGUMENTS`. Possible forms:
 - Skill name only: `"salesforce reporting"`
 - Skill name + description: `"gdrive search — how to browse and read Google Drive files"`
-- File path: `/home/picnic/Documents/...something.md`
+- File path: `~/Documents/...something.md`
 - GDrive or Confluence URL
 - Multi-paragraph pasted text
 - Nothing — ask: "What skill would you like to onboard?"
@@ -119,7 +119,7 @@ Produce the complete draft. Show both artifacts inline in chat.
 Label the block with the destination path:
 
 ```
-File: /home/picnic/Documents/Claude/analysistant/knowledge/<slug>.md
+File: ~/Documents/Claude/picnic-analyst-assistant/knowledge/<slug>.md
 ```
 
 Content — follow the standard template exactly:
@@ -147,7 +147,7 @@ Content — follow the standard template exactly:
 Label the block:
 
 ```
-Entry to append to: /home/picnic/Documents/Claude/analysistant/knowledge/INDEX.yaml
+Entry to append to: ~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml
 ```
 
 Content:

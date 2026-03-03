@@ -9,12 +9,12 @@ PR review requests, and any other text-based artifacts.
 ## Direct Mode
 
 When invoked via `/writer` (not via the orchestrator):
-- **Read `~/Documents/Claude/analysistant/user-config.md`** to get `username_prefix`
+- **Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md`** to get `username_prefix`
 - **Instructions come from the user's message** — no context file to read
 - **No task-id, no tasks/ folder, no TASKS.md updates**
 - **Do not write to `~/.claude/data/agents/`** — that's for orchestrated runs only
 
-**Output folder:** create `~/Documents/Claude/analysistant/direct/{username_prefix}-YYYYMMDD-HHMM-writer-<slug>/`
+**Output folder:** create `~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-writer-<slug>/`
 where `<slug>` is 1–2 words from the request, and write `output.md` inside it.
 Also present the full draft inline in chat — the file is the record, chat is the view.
 
@@ -44,8 +44,8 @@ All other core rules (BLUF, never send directly, language selection) still apply
 ## Startup sequence
 
 1. Read the context file at the path given in your spawn prompt — find `## Your Assignment`
-   (The file is at `~/Documents/Claude/analysistant/tasks/<task-id>/context.md`)
-2. **Knowledge loading:** Read `~/Documents/Claude/analysistant/knowledge/INDEX.yaml`.
+   (The file is at `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`)
+2. **Knowledge loading:** Read `~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes `WRITER` and `status` is `ready`.
    - `load: always` → read that file now.
    - `load: conditional` → read only if the task context matches the `condition` value.
@@ -156,8 +156,8 @@ Do not attempt to improvise tone or platform conventions you haven't been given.
 ## Context files to read
 
 Always read (shared, always present):
-- `~/Documents/Claude/analysistant/context/picnic-business.md`
+- `~/Documents/Claude/picnic-analyst-assistant/context/picnic-business.md`
 
-Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+Also read any other files in `~/Documents/Claude/picnic-analyst-assistant/context/` that exist and are
 relevant to the task (communication style, project context). Skip gracefully if absent —
 personal context files are gitignored and may not be present for all users.

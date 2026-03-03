@@ -9,18 +9,18 @@ model schemas, and process flows — as Excalidraw files.
 ## Direct Mode
 
 When invoked via `/designer` (not via the orchestrator):
-- **Read `~/Documents/Claude/analysistant/user-config.md`** to get `username_prefix`
+- **Read `~/Documents/Claude/picnic-analyst-assistant/user-config.md`** to get `username_prefix`
 - **Instructions come from the user's message** — no context file to read
 - **No task-id, no tasks/ folder, no TASKS.md updates**
 - **Do not write to `~/.claude/data/agents/`** — that's for orchestrated runs only
 
-**Output folder:** create `~/Documents/Claude/analysistant/direct/{username_prefix}-YYYYMMDD-HHMM-designer-<slug>/`
+**Output folder:** create `~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-designer-<slug>/`
 where `<slug>` is 1–2 words from the request, and write `output.md` inside it.
 Save the .excalidraw to the same direct task folder (next to output.md); record its path in output.md.
 
 **Session continuity:** Once a direct task folder is created, reuse it for all follow-up requests in the
 same session — do not create a new timestamped folder. If unsure which folder is active, check
-`~/Documents/Claude/analysistant/direct/` for the most recently created `*-designer-*` folder.
+`~/Documents/Claude/picnic-analyst-assistant/direct/` for the most recently created `*-designer-*` folder.
 
 **Override:** The `excalidraw.md` skill's default save path (`~/.claude/data/Output/`) does not apply
 in direct mode. Always save to the active direct task folder.
@@ -35,7 +35,7 @@ Generated: <ISO timestamp>
 <what was drawn: entities, relationships, layout>
 
 ## Output File
-Path: ~/Documents/Claude/analysistant/direct/{username_prefix}-YYYYMMDD-HHMM-designer-<slug>/<filename>.excalidraw
+Path: ~/Documents/Claude/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-designer-<slug>/<filename>.excalidraw
 ```
 
 **Description approval:** for simple requests, generate directly; for complex ones, describe
@@ -48,8 +48,8 @@ All other core rules (plan coordinates first, Picnic color system, no free-float
 ## Startup sequence
 
 1. Read the context file at the path given in your spawn prompt — find `## Your Assignment`
-   (The file is at `~/Documents/Claude/analysistant/tasks/<task-id>/context.md`)
-2. **Knowledge loading:** Read `~/Documents/Claude/analysistant/knowledge/INDEX.yaml`.
+   (The file is at `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/context.md`)
+2. **Knowledge loading:** Read `~/Documents/Claude/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes `DESIGNER` and `status` is `ready`.
    - `load: always` → read that file now.
    - `load: conditional` → read only if the task context matches the `condition` value.
@@ -58,7 +58,7 @@ All other core rules (plan coordinates first, Picnic color system, no free-float
    (This file lives outside `knowledge/` and is hardcoded here; it is not in INDEX.yaml.)
 4. Execute your assignment; write all output to the path in `## Your Assignment → Output file:`
    (It will be `~/.claude/data/agents/<task-id>/designer/output.md` — create dir if needed)
-5. Save generated .excalidraw files to `~/Documents/Claude/analysistant/tasks/<task-id>/` (same folder as the task context file)
+5. Save generated .excalidraw files to `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/` (same folder as the task context file)
 
 ---
 
@@ -68,7 +68,7 @@ All other core rules (plan coordinates first, Picnic color system, no free-float
   which elements, approximate x/y positions, flow direction. Then write the JSON.
 - **Apply the Picnic color system** as defined in `excalidraw.md`.
 - **No free-floating text.** Labels attach to shapes; arrows have clear source and target.
-- **Output directory (direct mode):** the active direct task folder (next to output.md); **(orchestrated mode):** `~/Documents/Claude/analysistant/tasks/<task-id>/`
+- **Output directory (direct mode):** the active direct task folder (next to output.md); **(orchestrated mode):** `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/`
 - **File naming:** `<task-id>-<diagram-name>.excalidraw` (orchestrated) or `<slug>-<diagram-name>.excalidraw` (direct)
 - **Approval optional for diagrams.** The orchestrator may request a text description
   of the planned diagram for review before generating the JSON. Follow orchestrator
@@ -86,7 +86,7 @@ All other core rules (plan coordinates first, Picnic color system, no free-float
 4. If approval requested: write text description of diagram to output file first
    (`STATUS: NEEDS_APPROVAL`); wait for orchestrator confirmation
 5. Generate Excalidraw JSON following the schema in excalidraw.md
-6. Save .excalidraw file to `~/Documents/Claude/analysistant/tasks/<task-id>/`
+6. Save .excalidraw file to `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/`
 7. Record file path in output file with `STATUS: complete`
 
 ### Diagram types and conventions
@@ -119,7 +119,7 @@ What to validate: <what to check before approving — e.g. layout, element label
 [text description of elements and layout]
 
 ## Output File
-Path: ~/Documents/Claude/analysistant/tasks/<task-id>/<filename>.excalidraw
+Path: ~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/<filename>.excalidraw
 STATUS: not-started | complete
 ```
 
@@ -142,8 +142,8 @@ Do not attempt to improvise visual conventions you haven't been given.
 ## Context files to read
 
 Always read (shared, always present):
-- `~/Documents/Claude/analysistant/context/picnic-business.md`
+- `~/Documents/Claude/picnic-analyst-assistant/context/picnic-business.md`
 
-Also read any other files in `~/Documents/Claude/analysistant/context/` that exist and are
+Also read any other files in `~/Documents/Claude/picnic-analyst-assistant/context/` that exist and are
 relevant to the task (project context). Skip gracefully if absent — personal context files
 are gitignored and may not be present for all users.

@@ -27,8 +27,8 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 ### Entry points (loaded automatically at startup)
 | File | Purpose |
 |------|---------|
-| `~/CLAUDE.md` | Single @import redirect → analysistant/CLAUDE.md |
-| `~/Documents/Claude/analysistant/CLAUDE.md` | Orchestration rules and hard rules |
+| `~/CLAUDE.md` | Single @import redirect → picnic-analyst-assistant/CLAUDE.md |
+| `~/Documents/Claude/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules |
 | `~/.claude/projects/-home-picnic/memory/MEMORY.md` | Auto-memory index (always loaded) |
 
 ### Commands (`~/.claude/commands/`)
@@ -48,7 +48,7 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 | `/architect` | patterns/architect.md | This mode |
 | `/onboard-knowledge` | patterns/onboard-knowledge.md | Guided skill onboarding (knowledge/ + INDEX.yaml) |
 
-### Agents (`analysistant/agents/`)
+### Agents (`picnic-analyst-assistant/agents/`)
 | Agent | Domain | Reads on startup |
 |-------|--------|-----------------|
 | ORCHESTRATOR | Coordination, routing | INDEX.yaml (always + conditional for ORCHESTRATOR role) + context files |
@@ -58,7 +58,7 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 | PRESENTER | PowerPoint .pptx | INDEX.yaml (always + conditional for PRESENTER role) + context/setup-notes.md |
 | DESIGNER | Excalidraw diagrams | INDEX.yaml (always + conditional for DESIGNER role) + ~/.claude/skills/excalidraw.md (hardcoded) |
 
-### Knowledge files (`analysistant/knowledge/`) — self-contained skill files, loaded by agents
+### Knowledge files (`picnic-analyst-assistant/knowledge/`) — self-contained skill files, loaded by agents
 Routing (which agents load which files) is declared in `INDEX.yaml`. See that file for the full routing map.
 
 | File | Domain |
@@ -76,7 +76,7 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `reporting-dashboard.md` | Usuals dashboard structure + formulas |
 | `INDEX.yaml` | Knowledge routing authority (`agents` + `load` per skill) |
 
-### Context files (`analysistant/context/`)
+### Context files (`picnic-analyst-assistant/context/`)
 | File | Domain | Read by | Type |
 |------|--------|---------|------|
 | `picnic-business.md` | Picnic vocabulary, markets, KPIs | ANALYST, ORCHESTRATOR | Shared (committed) |
@@ -84,7 +84,7 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `<project>.md` | Active project context (e.g. usuals-project.md) | ANALYST, WRITER, PRESENTER, DESIGNER | Personal (gitignored) |
 | `setup-notes.md` | Setup log, MCP status, tool notes | PRESENTER | Personal (gitignored) |
 
-### Pattern files (`analysistant/patterns/`) — architect only
+### Pattern files (`picnic-analyst-assistant/patterns/`) — architect only
 | File | Used by |
 |------|---------|
 | `setup.md` | `/setup` command — guided new-user onboarding |
@@ -103,13 +103,13 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `ads` | Shared | `~/.claude/skills/` |
 | `s3` | Shared | `~/.claude/skills/` |
 | `salesforce-query` | Shared | `~/.claude/skills/` |
-| `gdrive` | Local (personal) | `analysistant/skills/gdrive/` |
-| `slides` | Local | `analysistant/skills/slides/` |
-| `thinkcell` | Local | `analysistant/skills/slides/` |
+| `gdrive` | Local (personal) | `picnic-analyst-assistant/skills/gdrive/` |
+| `slides` | Local | `picnic-analyst-assistant/skills/slides/` |
+| `thinkcell` | Local | `picnic-analyst-assistant/skills/slides/` |
 
 ### Task & output folders
 ```
-analysistant/
+picnic-analyst-assistant/
 ├── TASKS.md                           ← task list (Active / Done)
 ├── CONTEXT.md                         ← blank context template
 ├── tasks/<task-id>/                   ← permanent record per task
@@ -146,9 +146,9 @@ When asked to "review the system" or "check for issues", work through these:
 ### Onboard a new colleague
 
 1. Share the repo URL with the colleague
-2. They clone it: `git clone <url> ~/Documents/Claude/analysistant/`
-3. They set up `~/CLAUDE.md`: single line `@Documents/Claude/analysistant/CLAUDE.md`
-4. They copy command wrappers: `cp ~/Documents/Claude/analysistant/commands/* ~/.claude/commands/`
+2. They clone it: `git clone <url> ~/Documents/Claude/picnic-analyst-assistant/`
+3. They set up `~/CLAUDE.md`: single line `@Documents/Claude/picnic-analyst-assistant/CLAUDE.md`
+4. They copy command wrappers: `cp ~/Documents/Claude/picnic-analyst-assistant/commands/* ~/.claude/commands/`
 5. They run `/setup` in Claude Code — walks through all 5 phases automatically:
    - Identity → writes `user-config.md`
    - MCP check → Snowflake, Confluence, Slack
@@ -194,14 +194,14 @@ Manual fallback (if needed):
 2. Add to ORCHESTRATOR.md: specialist agents table + routing table
 3. Create `~/.claude/commands/<role>.md`:
    ```
-   @/home/picnic/Documents/Claude/analysistant/agents/<ROLE>.md
+   @~/Documents/Claude/picnic-analyst-assistant/agents/<ROLE>.md
    $ARGUMENTS
    ```
 4. Update MEMORY.md: add to "Slash Commands" and note in agent list
 5. Update this file: add to Commands table and Agents table above
 
 ### Add a new local skill (Python tool)
-1. Create `analysistant/skills/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`
+1. Create `picnic-analyst-assistant/skills/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`
 2. Run `poetry install` in that directory
 3. Optionally create `~/.claude/commands/<name>.md` pointing to the SKILL.md
 4. Update MEMORY.md under "Local Skills"

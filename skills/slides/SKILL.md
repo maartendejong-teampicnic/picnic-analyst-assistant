@@ -15,7 +15,7 @@ Uses the Picnic branded template by default.
 ## Tool Path
 
 ```bash
-~/Documents/Claude/analysistant/skills/slides/slides.sh <deck.json>
+~/Documents/Claude/picnic-analyst-assistant/skills/slides/slides.sh <deck.json>
 ```
 
 ## Input format
@@ -88,7 +88,7 @@ The tool accepts a JSON file with this structure:
 2. Draft outline (titles only) and confirm before filling content
 3. Build the full JSON deck definition
 4. Save JSON to `~/.claude/data/Input/<deck_name>.json`
-5. Run: `~/Documents/Claude/analysistant/skills/slides/slides.sh ~/.claude/data/Input/<deck_name>.json`
+5. Run: `~/Documents/Claude/picnic-analyst-assistant/skills/slides/slides.sh ~/.claude/data/Input/<deck_name>.json`
 6. Output .pptx is saved to `~/.claude/data/Output/`
 7. Report the file path to Maarten for review in PowerPoint
 
@@ -96,10 +96,10 @@ The tool accepts a JSON file with this structure:
 
 ```bash
 # Build layout/text deck from JSON file
-~/Documents/Claude/analysistant/skills/slides/slides.sh ~/.claude/data/Input/my_deck.json
+~/Documents/Claude/picnic-analyst-assistant/skills/slides/slides.sh ~/.claude/data/Input/my_deck.json
 
 # Build with inline JSON (simple decks)
-~/Documents/Claude/analysistant/skills/slides/slides.sh --json '{"output": "~/out.pptx", "slides": [...]}'
+~/Documents/Claude/picnic-analyst-assistant/skills/slides/slides.sh --json '{"output": "~/out.pptx", "slides": [...]}'
 ```
 
 ---
@@ -109,7 +109,7 @@ The tool accepts a JSON file with this structure:
 For slides with real think-cell charts, use the **thinkcell tool** instead:
 
 ```bash
-~/Documents/Claude/analysistant/skills/slides/thinkcell.sh <deck.json>
+~/Documents/Claude/picnic-analyst-assistant/skills/slides/thinkcell.sh <deck.json>
 ```
 
 ### How it works

@@ -4,7 +4,7 @@ You are an analyst assistant at Picnic Technologies (NL/DE/FR grocery delivery).
 You help with the full range of analytical work: data analysis, A/B experimentation,
 GitHub PRs, Slack communication, and Confluence documentation.
 
-**User identity** is stored in `~/Documents/Claude/analysistant/user-config.md`
+**User identity** is stored in `~/Documents/Claude/picnic-analyst-assistant/user-config.md`
 (gitignored, per-user). Agents read it at startup to parameterize task IDs and output paths.
 New users: copy `user-config.md.example` → `user-config.md` and fill in your details,
 or run `/setup` for guided onboarding.
@@ -17,9 +17,9 @@ Use `/perform` to start a task. The orchestrator handles everything from there:
 reads the task, plans, routes to the right specialists, gates irreversible actions,
 and closes the task when done.
 
-Full orchestration logic: `~/Documents/Claude/analysistant/agents/ORCHESTRATOR.md`
+Full orchestration logic: `~/Documents/Claude/picnic-analyst-assistant/agents/ORCHESTRATOR.md`
 
-**Agent onboarding files:** `~/Documents/Claude/analysistant/agents/`
+**Agent onboarding files:** `~/Documents/Claude/picnic-analyst-assistant/agents/`
 - `ORCHESTRATOR.md` — coordination logic, approval gates, phase definitions
 - `ANALYST.md` — SQL, A/B design, metrics
 - `ENGINEER.md` — dbt models, GitHub PRs, CI
@@ -27,7 +27,7 @@ Full orchestration logic: `~/Documents/Claude/analysistant/agents/ORCHESTRATOR.m
 - `PRESENTER.md` — PowerPoint slide decks
 - `DESIGNER.md` — Excalidraw diagrams
 
-**Task folders:** `~/Documents/Claude/analysistant/tasks/<task-id>/`
+**Task folders:** `~/Documents/Claude/picnic-analyst-assistant/tasks/<task-id>/`
 One folder per task. `context.md` = active, `summary.md` present = done.
 
 **Transient working files:** `~/.claude/data/agents/<task-id>/<role>/output.md`

@@ -5,16 +5,33 @@ Your job: walk a new user through identity configuration, MCP verification,
 personal context creation, and shared skill installation.
 
 Acknowledge the role in 1–2 sentences (e.g. "I'm the setup guide — I'll walk you through
-configuring the Analyst Assistant so it's ready to use."), then begin Phase 1.
+configuring the Analyst Assistant so it's ready to use."), then begin Phase 0.
 
-Work through all 5 phases sequentially. At the end of each phase, confirm completion
+Work through all phases sequentially. At the end of each phase, confirm completion
 before moving to the next.
+
+---
+
+## Phase 0 — Entry Point
+
+**Goal:** Ensure `~/CLAUDE.md` is in place so Claude Code loads this system at every session start.
+
+Check if `~/CLAUDE.md` exists and contains exactly:
+```
+@Documents/Claude/picnic-analyst-assistant/CLAUDE.md
+```
+
+- ✅ Correct → confirm and continue
+- ⚠️ Wrong or missing → write the correct content to `~/CLAUDE.md` and confirm:
+  "Created `~/CLAUDE.md` — Claude Code will now load the Analyst Assistant automatically."
+
+Note: this file is your personal entry point and is **not** in the repo.
 
 ---
 
 ## Phase 1 — Identity
 
-**Goal:** Create `~/Documents/Claude/analysistant/user-config.md` with the user's identity.
+**Goal:** Create `~/Documents/Claude/picnic-analyst-assistant/user-config.md` with the user's identity.
 
 1. Ask the user for:
    - **Full name** (e.g. Maarten de Jong)
@@ -24,7 +41,7 @@ before moving to the next.
      (e.g. `mdejong`). This prefix appears in task IDs and output folder names.
      Ask them to confirm or change the suggestion.
 
-2. Check if `~/Documents/Claude/analysistant/user-config.md` already exists.
+2. Check if `~/Documents/Claude/picnic-analyst-assistant/user-config.md` already exists.
    If it does, show the current contents and ask: "Overwrite with new values?"
    Only proceed if they confirm.
 
@@ -98,7 +115,7 @@ If yes, ask:
 2. **Key stakeholders** — Who do you regularly message? (Name + role, 2–5 people)
 3. **Writing style** — Any preferences? (e.g. "brief, BLUF", "formal", "casual")
 
-Write `~/Documents/Claude/analysistant/context/communication-style.md`:
+Write `~/Documents/Claude/picnic-analyst-assistant/context/communication-style.md`:
 ```markdown
 # Communication Style
 
@@ -129,7 +146,7 @@ This helps agents understand domain-specific vocabulary and status."
 If yes:
 1. Ask for the project name and a brief description (2–3 sentences)
 2. Ask: "Any key components, terminology, or ongoing work to document?"
-3. Write `~/Documents/Claude/analysistant/context/<project-slug>.md` with the provided content,
+3. Write `~/Documents/Claude/picnic-analyst-assistant/context/<project-slug>.md` with the provided content,
    using this template:
    ```markdown
    # <Project Name>
@@ -148,7 +165,7 @@ If no: skip.
 
 ### TASKS.md
 
-Check if `~/Documents/Claude/analysistant/TASKS.md` exists.
+Check if `~/Documents/Claude/picnic-analyst-assistant/TASKS.md` exists.
 If not, create it:
 ```markdown
 # Tasks
@@ -163,7 +180,20 @@ Confirm: "TASKS.md created."
 
 ## Phase 4 — Shared Skills
 
-**Goal:** Install shared skills from `picnic-analytical-tools`.
+**Goal:** Check Python + Poetry are available, then install shared skills from `picnic-analytical-tools`.
+
+### Python + Poetry check
+
+Run: `python3 --version && poetry --version`
+
+- ✅ Both present → continue
+- ⚠️ Python missing → "Install Python 3.10+: https://www.python.org/downloads/"
+- ⚠️ Poetry missing → "Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`"
+
+If either ⚠️: print the fix instructions and ask whether to continue or skip to Phase 5.
+Local skills (gdrive, slides, costs) require Poetry to run.
+
+### Skill sync
 
 Tell the user: "Now I'll sync the shared skills from `picnic-analytical-tools`.
 Make sure the repo is cloned at `~/Documents/Github/picnic-analytical-tools`
@@ -193,6 +223,9 @@ If skip: note "Skipped — run `/sync-picnic-skills` manually when the repo is r
    Setup complete for <full_name> (<username_prefix>)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
+   Entry Point
+     <~/CLAUDE.md status>
+
    Identity
      ✅ user-config.md written
 
@@ -205,6 +238,10 @@ If skip: note "Skipped — run `/sync-picnic-skills` manually when the repo is r
      <communication-style.md status>
      <project context status>
      ✅ TASKS.md ready
+
+   Local Tools
+     <Python status>
+     <Poetry status>
 
    Shared Skills
      <sync status>
