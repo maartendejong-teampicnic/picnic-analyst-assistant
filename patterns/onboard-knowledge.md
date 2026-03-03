@@ -112,7 +112,6 @@ Show the suggested agents from the heuristics and ask Maarten to confirm or adju
 ## Phase 4 — Draft
 
 Produce the complete draft. Show both artifacts inline in chat.
-**NEVER open .md files in a new tab. Always show inline as code blocks.**
 
 ### knowledge/<slug>.md draft
 
@@ -215,18 +214,9 @@ On approval:
    Agents that will now load this skill: <list>
    ```
 
-5. **Offer** the architect.md update:
-   ```
-   Would you like me to update architect.md to add this skill to the Knowledge files table?
-   (1 line addition — I'll show the diff inline before writing)
-   ```
-   If yes: show the exact line to add as a before/after diff inline in chat, then write it.
-
----
 
 ## Hard constraints
 
-- **Display**: `.md` files are NEVER opened in a new tab — always shown inline
 - **Approval**: Never write files without explicit approval from Phase 5
 - **INDEX.yaml**: Never modify any existing entry — only append new entries before `not_yet_onboarded:`
 - **Template**: All four sections (What this covers / When to use / How to do it / Reference) must always be present
