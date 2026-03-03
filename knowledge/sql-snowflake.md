@@ -111,8 +111,37 @@ from <cte_name>
 
 ### Core Join Patterns
 
-#### 
-TO BE ONBOARDED
+#### Order + Orderline (purchase history)
+```sql
+from dim.ft_orderline_item as ftoli
+inner join dim.ft_order as fto
+    on (ftoli.key_order = fto.key_order)
+inner join dim.dm_order as dmo
+    on (fto.key_order = dmo.key_order)
+inner join dim.dm_customer as dmc
+    on (fto.key_customer = dmc.key_customer)
+where
+    dmo.order_actual = 'yes'
+    and dmc.cust_internal = 'no'
+    and dmc.cust_deleted = 'no'
+```
+
+#### Usuals adds (ft_store_selling_unit_events)
+For counting which articles customers added to basket from the Usuals page:
+```sql
+from dim.ft_store_selling_unit_events as ftssue
+inner join dim.dm_event_screen as dmes
+    on (ftssue.key_event_screen = dmes.key_event_screen)
+inner join dim.dm_selling_unit as dmsu
+    on (ftssue.key_selling_unit = dmsu.key_selling_unit)
+inner join dim.dm_customer as dmc
+    on (ftssue.key_customer = dmc.key_customer)
+where
+    ftssue.event_is_add_product_to_basket = 'yes'
+    and dmes.event_screen_name in ('purchases-page-root', 'purchases-page-root-category', 'aisle-deep-dive')
+    and dmc.cust_internal = 'no'
+    and dmc.cust_deleted = 'no'
+```
 
 #### Article / Product Lookup
 ```sql
@@ -224,3 +253,41 @@ public.f_get_market()                -- current market ('nl'/'de'/'fr')
 
 - No `order by` inside CTEs — only in the final `select`
 - Prefer `inner join` for dimension lookups (all fact records should have matching dimensions)
+
+---
+
+### Usuals Page
+
+#### Screen name filters (dm_event_screen.event_screen_name)
+| Screen name | What it captures |
+|-------------|-----------------|
+| `purchases-page-root` | Main Usuals page |
+| `purchases-page-root-category` | Category view on the Usuals page |
+| `aisle-deep-dive` | Section deep-dive |
+| `action-bottom-sheet` | Long-press context menu — add `and dmes.event_screen_tab_name = 'usuals'` to scope to Usuals-specific long-presses |
+
+#### Standard Usuals add filter
+Apply when counting article adds originating from the Usuals page (use with `ft_store_selling_unit_events`):
+```sql
+where ftssue.event_is_add_product_to_basket = 'yes'
+  and dmes.event_screen_name in (
+      'purchases-page-root',
+      'purchases-page-root-category',
+      'aisle-deep-dive'
+  )
+```
+
+#### Available edge models
+All Usuals models live in the `edge` schema. Check exact column names via `read-dwh-data-catalog <model_name>` before writing SQL — do not assume column names.
+
+| Model | What it contains | Notes |
+|-------|-----------------|-------|
+| `base_usuals_reporting__delivery_week` | Weekly IPD + GMD per market | Requires `analyst_finance` role |
+| `base_usuals_reporting__event_week` | Weekly app opens, page views, article views + adds | Main engagement model |
+| `base_usuals_reporting__pill_week` | Per-section campaign pill metrics | |
+| `base_usuals_reporting__suggestion_week` | AI suggestion metrics | |
+| `base_usuals_reporting__manual_favorites_week` | LIKE/UNLIKE adoption + behavior | 440+ lines of logic; check model before rewriting |
+| `usuals_section_mapping` | ADS-configured section ↔ assortment (L3) mapping | |
+| `usuals_section_clusters` | Section cluster assignments (CORE_FRESH / FRESH_FOOD / NON_FRESH) | |
+| `usuals_missing_assortment_category` | Daily: L3 categories not mapped to any section | Use for assortment monitoring |
+| `usuals_dynamic_section_ranking_applied_section_score` | Applied section scores | Only updates when rank changes and ≥5 deliveries since last update |
