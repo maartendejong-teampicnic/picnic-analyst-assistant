@@ -12,9 +12,11 @@ or run `/setup` for guided onboarding.
 
 ## How to work
 
-Use `/perform` to start a task. The orchestrator handles everything from there:
-reads the task, plans, routes to the right specialists,
-and closes the task when done.
+Any time a user starts a new instance, describe the three main options:
+- Use `/onboard-knowledge` to <CLAUDE FILL IN>
+- Use `/tasks` to read and create new tasks <CLAUDE REVISE>
+- Use `/perform` to start a task. The orchestrator handles everything from there:
+reads the task, plans, routes to the right specialists, and closes the task when done.
 
 Full orchestration logic: `~/picnic-analyst-assistant/agents/ORCHESTRATOR.md`
 
