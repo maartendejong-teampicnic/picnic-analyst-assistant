@@ -133,9 +133,8 @@ verification check. If empty or missing, walk through the setup steps first.
 **Check:** Is `SNOWFLAKE_TOKEN` set and non-empty in `mcpServers.snowflake.env`?
 
 **If not configured — walk through these steps with the user:**
-1. Open a browser → go to https://picnic.snowflakecomputing.com
-2. Sign in with SSO (Picnic Google account)
-3. Click your avatar (top right) → **My Profile**
+1. Open a browser → log into your Snowflake account (the way you normally access it, e.g. via app.snowflake.com or your bookmark)
+2. Click your avatar (top right) → **My Profile**
 4. Go to **Programmatic Access Tokens** → click **Generate Token**
 5. Name it `claude-code`, set expiry to maximum (1 year)
 6. **Copy the token immediately** — it is shown only once
