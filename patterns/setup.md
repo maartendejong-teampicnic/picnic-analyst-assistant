@@ -68,7 +68,7 @@ Attempt to fetch a Confluence page (try the user's team space or any known page 
 Check if `SLACK_BOT_TOKEN` is set in `~/.claude/settings.json`.
 - ✅ Key present and non-empty → configured (note: cannot verify scope without a test send)
 - ⚠️ Missing → "Slack is not configured. Add `SLACK_BOT_TOKEN` to `~/.claude/settings.json`.
-  The bot needs scopes: `chat:write`, `channels:read`, `channels:history`."
+  The bot needs scopes: `chat:write`, `channels:read`, `channels:history`, `lists:read`."
 
 Report a summary table:
 ```
@@ -211,8 +211,9 @@ If skip: note "Skipped — run `/sync-picnic-skills` manually when the repo is r
 
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    Next steps:
+   - Run /onboard-knowledge to add your first skill files (do this before /perform)
    - Add your first task to TASKS.md
-   - Run /perform [task-id] to start it
+   - Run /perform to start it
    - Fix any ⚠️ items above before using those tools
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    ```

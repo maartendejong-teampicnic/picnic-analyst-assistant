@@ -13,7 +13,7 @@ or run `/setup` for guided onboarding.
 
 ## How to work
 
-Use `/perform [task-id]` to start a task. The orchestrator handles everything from there:
+Use `/perform` to start a task. The orchestrator handles everything from there:
 reads the task, plans, routes to the right specialists, gates irreversible actions,
 and closes the task when done.
 
