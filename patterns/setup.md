@@ -72,34 +72,158 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 
 ---
 
-## Phase 2 — MCP Status Check
+## Phase 2 — MCP Setup & Verification
 
-**Goal:** Verify that MCP-backed tools (Snowflake, Confluence, Slack) are working.
+**Goal:** Configure MCP connections for Snowflake, Confluence, and Slack, then verify each is working.
 
-Run each check and report ✅ or ⚠️ with a fix instruction if needed.
+### Pre-check: settings.json
+
+Check if `~/.claude/settings.json` exists:
+- ✅ Exists → read the current `mcpServers` section and proceed to each tool below
+- ⚠️ Missing → create it now with this base template (Picnic-specific fixed values pre-filled):
+
+```json
+{
+  "env": {},
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "mcpServers": {
+    "snowflake": {
+      "command": "mcp_snowflake_server",
+      "args": [],
+      "env": {
+        "SNOWFLAKE_ACCOUNT": "BF99047-UJ82639",
+        "SNOWFLAKE_USER": "",
+        "SNOWFLAKE_AUTHENTICATOR": "PROGRAMMATIC_ACCESS_TOKEN",
+        "SNOWFLAKE_TOKEN": "",
+        "SNOWFLAKE_WAREHOUSE": "ANALYSIS",
+        "SNOWFLAKE_DATABASE": "PICNIC_NL_PROD",
+        "SNOWFLAKE_SCHEMA": "DIM",
+        "SNOWFLAKE_ROLE": "ANALYST"
+      }
+    },
+    "confluence": {
+      "command": "mcp-atlassian",
+      "args": [],
+      "env": {
+        "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
+        "CONFLUENCE_USERNAME": "",
+        "CONFLUENCE_API_TOKEN": ""
+      }
+    },
+    "slack": {
+      "command": "slack-mcp-server",
+      "args": [],
+      "env": {
+        "SLACK_MCP_XOXP_TOKEN": ""
+      }
+    }
+  }
+}
+```
+
+For each tool below: check if the relevant fields are already filled in. If yes, run the
+verification check. If empty or missing, walk through the setup steps first.
+
+---
 
 ### Snowflake
+
+**Check:** Is `SNOWFLAKE_TOKEN` set and non-empty in `mcpServers.snowflake.env`?
+
+**If not configured — walk through these steps with the user:**
+1. Open a browser → go to https://picnic.snowflakecomputing.com
+2. Sign in with SSO (Picnic Google account)
+3. Click your avatar (top right) → **My Profile**
+4. Go to **Programmatic Access Tokens** → click **Generate Token**
+5. Name it `claude-code`, set expiry to maximum (1 year)
+6. **Copy the token immediately** — it is shown only once
+7. Ask the user to paste the token here
+
+When you have the token, update `~/.claude/settings.json`:
+- Set `SNOWFLAKE_USER` to their email **in UPPERCASE** (e.g. `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
+- Set `SNOWFLAKE_TOKEN` to the pasted token
+
+**Verification** (run after configuring, or if already configured):
 Run via the `snowflake-query` skill:
 ```sql
 SELECT CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse
 ```
-- ✅ Returns a row → working
-- ⚠️ Error → "Snowflake MCP is not configured. In `~/.claude/settings.json`, verify the
-  `SNOWFLAKE_TOKEN` is set and not expired. Generate a new PAT in Snowflake UI →
-  Profile → Programmatic Access Tokens."
+- ✅ Returns a row → working. Report the user/role/warehouse values.
+- ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
+  in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
+
+Note: remind the user that PAT tokens expire (max 1 year). When Snowflake queries stop working,
+regenerate the token and replace `SNOWFLAKE_TOKEN` in `settings.json`.
+
+---
 
 ### Confluence
-Attempt to fetch a Confluence page (try the user's team space or any known page ID).
+
+**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
+
+**If not configured — walk through these steps with the user:**
+1. Install the MCP server:
+   ```bash
+   pip install mcp-atlassian
+   ```
+2. Open a browser → go to https://id.atlassian.com/manage-profile/security/api-tokens
+3. Sign in with your Picnic email
+4. Click **Create API token** → name it `claude-code`
+5. **Copy the token immediately** — it is shown only once
+6. Ask the user to paste the token here
+
+When you have the token, update `~/.claude/settings.json`:
+- Set `CONFLUENCE_USERNAME` to their email (lowercase)
+- Set `CONFLUENCE_API_TOKEN` to the pasted token
+
+**Verification** (run after configuring, or if already configured):
+Attempt to fetch a Confluence page using the MCP tool.
 - ✅ Returns content → working
-- ⚠️ Error → "Confluence MCP is not configured. Ensure `mcp-atlassian` is installed:
-  `pip install mcp-atlassian`. Check `~/.claude/settings.json` for the Confluence URL
-  and token."
+- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the
+  API token is correct. Restart Claude Code after any changes to `settings.json`."
+
+---
 
 ### Slack
-Check if `SLACK_BOT_TOKEN` is set in `~/.claude/settings.json`.
-- ✅ Key present and non-empty → configured (note: cannot verify scope without a test send)
-- ⚠️ Missing → "Slack is not configured. Add `SLACK_BOT_TOKEN` to `~/.claude/settings.json`.
-  The bot needs scopes: `chat:write`, `channels:read`, `channels:history`, `lists:read`."
+
+**Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
+
+**If not configured — walk through these steps with the user:**
+1. Ask if they have access to the Picnic Slack MCP app. If unsure, they should check with a
+   colleague who already has the assistant set up.
+2. To get a user token:
+   - Go to https://api.slack.com/apps → open the shared Picnic Claude assistant app
+   - Go to **OAuth & Permissions** → confirm **User Token Scopes** include:
+     `chat:write`, `channels:read`, `channels:history`, `lists:read`
+   - Under **OAuth Tokens for Your Workspace**, copy the **User OAuth Token** (starts with `xoxp-`)
+3. Ask the user to paste the token here
+
+When you have the token, update `~/.claude/settings.json`:
+- Set `SLACK_MCP_XOXP_TOKEN` to the pasted token
+
+**Verification:**
+Check if `SLACK_MCP_XOXP_TOKEN` is set and non-empty.
+- ✅ Present and non-empty → configured (scope cannot be verified without a test send)
+- ⚠️ Missing or placeholder → "Slack is not yet configured. It's optional — you can skip
+  it now and configure it later."
+
+Note: Slack is the least critical of the three. If the user can't access the Picnic Slack app
+yet, skip it and continue.
+
+---
+
+### After any settings.json changes
+
+If you updated `settings.json` during this phase, tell the user:
+> "You need to **restart Claude Code** for MCP changes to take effect.
+> After restarting, run `/setup` again — it will re-run the verification checks and pick up
+> where you left off."
+
+---
+
+### Phase 2 summary
 
 Report a summary table:
 ```
@@ -109,8 +233,8 @@ MCP Status:
   Slack       ✅ / ⚠️ (token configured — scope unverified)
 ```
 
-If any ⚠️: print the fix instructions; tell the user they can fix these later and
-re-run `/setup` to re-check. Then ask: "Continue to Phase 3?"
+If any ⚠️: tell the user they can fix these later and re-run `/setup` to re-check.
+Then ask: "Continue to Phase 3?"
 
 ---
 

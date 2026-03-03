@@ -218,7 +218,7 @@ Then run `/sync-picnic-skills` to refresh symlinks in `~/.claude/skills/`.
 2. `~/.claude/settings.json` → replace `SNOWFLAKE_TOKEN`
 3. Restart Claude Code; update MEMORY.md MCP status if needed
 
-### Update Slack Bot token
-1. `~/.claude/settings.json` → replace `SLACK_BOT_TOKEN`
+### Update Slack token
+1. `~/.claude/settings.json` → replace `SLACK_MCP_XOXP_TOKEN` (user OAuth token, starts with `xoxp-`)
 2. Ensure scopes include: `chat:write`, `channels:read`, `channels:history`, `lists:read`
 3. Restart Claude Code; update MEMORY.md Slack status
