@@ -1,6 +1,6 @@
 # Picnic Analyst Assistant
 
-A Claude Code framework for analyst work at Picnic Technologies. An orchestrator decomposes tasks across specialised agents — Analyst, Engineer, Writer, Presenter, Designer — each producing structured output the next agent builds on, from first analysis through final delivery.
+A Claude Code framework to create your own **Analyst Assistant** that combines shared resources with tailored knowledge about your own domain. 
 
 ---
 
@@ -8,15 +8,11 @@ A Claude Code framework for analyst work at Picnic Technologies. An orchestrator
 
 The system is built around a multi-agent pipeline coordinated by an **orchestrator**.
 
-When you run `/perform`, the ORCHESTRATOR reads your task brief, decomposes it into phases, and routes each phase to the right specialist agent. Each agent is focused on one domain and loads its own curated skill files from `knowledge/` at startup — SQL conventions, experiment methodology, communication style, and so on. Specialisation is what makes this effective: the more precisely an agent knows your conventions and context, the more consistent and useful its output. Agents also build on each other's work, so the writer picks up where the analyst left off, and the presenter turns that into slides without starting from scratch.
+The ORCHESTRATOR reads your task brief, decomposes the task into phases, and routes each phase to a specialist agent that produces structured output the next agent builds on. Each agent is trained on one specifc domain of your work and loads only the knowledge files relevant to that domain. Agents build on each other's work. For example, the ANALYST writes a Snowflake query for a new metric. The ENGINEER creates a turns the query into a DBT model, creates ticket and PR using the debrief of the ANALYST. The WRITER sends a Slack message to a colleague asking to review the PR. Once merged, the ANALYST edits the dashboard sheet to add the new metric in the correct format. As a result, each agent enters a task with focused context, producing high quality results.
 
-The system ships with agents covering the analyst workflow end-to-end. You can extend it by writing your own: add an agent file to `agents/` and register its skill files in `knowledge/INDEX.yaml`.
+The more precisely an agent knows your conventions and context, the more consistent and effective its output. <CLAUDE WRITE: stress the importance of the onboarding flow. State that it starts of knowing nothing, and it is up to you to learn it to work using your conventions. However, shared resources let it automatically read e.g. the datawarehouse catalog or repository conventions. Hence, it is capable, but needs to be steered based on your specific conventions. 
 
-Every irreversible action — sending a message, merging a PR, publishing a page — is surfaced to you for approval before it happens.
-
-For focused, single-domain work you can invoke any agent directly: `/analyst`, `/writer`, `/engineer`, etc.
-
-**Knowledge routing** is managed by `knowledge/INDEX.yaml`. Each entry defines which agents load a file and under what conditions. Adding a new skill means adding one `knowledge/<skill>.md` file — no agent definitions need editing.
+<CLAUDE REPHRASE but keep the structure the same. Name a enticing example skill for each agent>. If you want to have the ANALYST state it's findings in a specific way, tell it so. If your edge-models are from the same context, learn it the ENGINEER. If you want the title of your slides to be the conclusion, tell the PRESENTER. If you write your slack messages in a certain way, learn it to the WRITER. The more time you spent onboarding your **Analyst Assitant** the better results it will give (perhaps more funny phrasing as if it were a real person onboarding). 
 
 ---
 
