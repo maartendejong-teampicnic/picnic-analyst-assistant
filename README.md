@@ -1,8 +1,10 @@
 # Analyst Assistant @ Picnic
 
-A personal Claude Code setup for analysts at Picnic Technologies.
-Covers the full analytical workflow: SQL queries, A/B experiments, dbt PRs,
-Slack messages, Confluence pages, slide decks, and Excalidraw diagrams.
+A framework for building your personal analytical workspace in Claude Code.
+Out of the box it gives you the agent structure, orchestration logic, and onboarding
+tooling — but the **knowledge is yours to add**. Each analyst onboards their own
+skill files (SQL conventions, dbt workflow, Slack templates, etc.) using
+`/onboard-knowledge`. Nothing works well until you've done that.
 
 ---
 
@@ -56,7 +58,19 @@ The setup guide walks you through:
 - **Phase 4** — Shared skills: syncs tools from `picnic-analytical-tools`
 - **Phase 5** — Verification: confirms everything is working
 
-### 5. Add your first task
+### 5. Onboard your knowledge
+
+The `knowledge/` folder ships with one example file (`sql-snowflake.md`).
+Before `/perform` is useful, add skill files for your actual workflow:
+
+```
+/onboard-knowledge
+```
+
+Run it once per skill area (SQL conventions, dbt PR workflow, Slack templates, etc.).
+Each run walks you through intake → draft → write — typically 5–10 minutes per skill.
+
+### 6. Add your first task
 
 Edit `~/Documents/Claude/analysistant/TASKS.md` (created by `/setup`):
 
@@ -93,6 +107,7 @@ plans the work, and routes it to the right specialists.
 /onboard-knowledge → add a new skill file to knowledge/
 /gdrive            → browse Google Drive for context
 /costs             → check Claude API cost breakdown
+/excalidraw        → generate Excalidraw diagrams (needs sync-picnic-skills first)
 ```
 
 ---
