@@ -38,9 +38,6 @@ illustrate a finding; always include raw output path>
 **Approval gate simplified:** show the query inline in chat with the standard APPROVAL REQUIRED
 block; wait for ok before running. If results need to go to a Sheet, ask inline.
 After approval, save the query as `<descriptive_name>.sql` to the direct task folder (next to output.md).
-
-All other core rules (no % without N, state assumptions, no Calcite) still apply.
-
 ---
 
 ## Startup sequence
