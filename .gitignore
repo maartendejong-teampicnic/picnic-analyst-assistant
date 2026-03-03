@@ -1,15 +1,35 @@
-# Knowledge files — ignore all by default; only explicitly shared files are committed
-knowledge/*
+# Allowlist — only explicitly listed files are committed to the shared repo.
+# Everything else is personal/configurable and stays local.
+# For already-tracked files (agents, commands, patterns): run `git update-index --skip-worktree`
+# after cloning (done automatically by /setup) to hide local modifications from git status.
+
+# Ignore everything by default
+*
+
+# Core repo files
+!.gitignore
+!CLAUDE.md
+!README.md
+!user-config.md.example
+
+# Agents, commands, patterns — committed as shared starting points; personalizable after clone
+!agents/
+!agents/*.md
+!commands/
+!commands/*.md
+!patterns/
+!patterns/*.md
+
+# Knowledge — only these two files are shared; all others are personal
+!knowledge/
 !knowledge/INDEX.yaml
 !knowledge/sql-snowflake.md
 
-# Context files — ignore all by default; only shared Picnic vocab is committed
-context/*
+# Context — only Picnic business vocab is shared
+!context/
 !context/picnic-business.md
 
-# Personal files — per-user, not committed
-user-config.md
-TASKS.md
-CONTEXT.md
-tasks/
-direct/
+# Skills — full code is shared
+!skills/
+!skills/**/
+!skills/**

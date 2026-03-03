@@ -27,6 +27,20 @@ Check if `~/CLAUDE.md` exists and contains exactly:
 
 Note: this file is your personal entry point and is **not** in the repo.
 
+### Git isolation
+
+Run to tell git to ignore your local modifications to agents, commands, and patterns.
+These files are committed as shared starting points, but your personalizations should
+never be pushed back.
+
+```bash
+git -C ~/picnic-analyst-assistant update-index --skip-worktree \
+  $(git -C ~/picnic-analyst-assistant ls-files agents/ commands/ patterns/)
+```
+
+- ✅ No output → working. `git status` will now always be clean for these files.
+- ⚠️ Error → note it and continue; non-critical. User can run manually later.
+
 ---
 
 ## Phase 1 — Identity
