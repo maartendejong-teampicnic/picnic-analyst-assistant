@@ -1,13 +1,11 @@
-# Personal knowledge files — kept locally, not shared via this repo
-knowledge/diagrams-excalidraw.md
-knowledge/sql-calcite.md
-knowledge/pr-dbt-models.md
-knowledge/dbt-model-design.md
-knowledge/slack-messages.md
-knowledge/confluence-pages.md
-knowledge/ads-attributes.md
-knowledge/slides-pptx.md
-knowledge/reporting-dashboard.md
+# Knowledge files — ignore all by default; only explicitly shared files are committed
+knowledge/*
+!knowledge/INDEX.yaml
+!knowledge/sql-snowflake.md
+
+# Context files — ignore all by default; only shared Picnic vocab is committed
+context/*
+!context/picnic-business.md
 
 # Personal files — per-user, not committed
 user-config.md
@@ -15,9 +13,3 @@ TASKS.md
 CONTEXT.md
 tasks/
 direct/
-
-# Personal context files
-context/communication-style.md
-context/setup-notes.md
-context/usuals-project.md
-# keep: context/picnic-business.md (shared Picnic vocab)
