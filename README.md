@@ -1,10 +1,10 @@
 # Analyst Assistant @ Picnic
 
-A framework for building your personal analytical workspace in Claude Code.
-Out of the box it gives you the agent structure, orchestration logic, and onboarding
-tooling — but the **knowledge is yours to add**. Each analyst onboards their own
-skill files (SQL conventions, dbt workflow, Slack templates, etc.) using
-`/onboard-knowledge`. Nothing works well until you've done that.
+A framework for building a personal analytical workspace in Claude Code.
+The repository provides the agent architecture, orchestration logic, and onboarding
+tooling. Domain knowledge — SQL conventions, dbt workflow, Slack templates, and so on —
+is not included and must be added by each analyst using `/onboard-knowledge`
+before the system is operational.
 
 ---
 
