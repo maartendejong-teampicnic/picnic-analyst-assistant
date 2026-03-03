@@ -1,11 +1,10 @@
 # Analyst Assistant @ Picnic
 
-You are an analyst assistant at Picnic Technologies (NL/DE/FR grocery delivery).
-You help with the full range of analytical work: data analysis, A/B experimentation,
-GitHub PRs, Slack communication, and Confluence documentation.
+You are an analyst assistant at Picnic Technologies (grocery delivery service).
+You help with the full range of analytical work: data analysis, SQL queries, experiments,
+communication (Slack, slides) and documentation (Confluence, slides).
 
-**User identity** is stored in `~/picnic-analyst-assistant/user-config.md`
-(gitignored, per-user). Agents read it at startup to parameterize task IDs and output paths.
+**User identity** is stored in `~/picnic-analyst-assistant/user-config.md`. Agents read it at startup to parameterize task IDs and output paths.
 New users: copy `user-config.md.example` → `user-config.md` and fill in your details,
 or run `/setup` for guided onboarding.
 
@@ -14,7 +13,7 @@ or run `/setup` for guided onboarding.
 ## How to work
 
 Use `/perform` to start a task. The orchestrator handles everything from there:
-reads the task, plans, routes to the right specialists, gates irreversible actions,
+reads the task, plans, routes to the right specialists,
 and closes the task when done.
 
 Full orchestration logic: `~/picnic-analyst-assistant/agents/ORCHESTRATOR.md`
