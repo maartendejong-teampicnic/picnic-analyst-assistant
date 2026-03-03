@@ -10,7 +10,7 @@ against Picnic's Snowflake (PICNIC_NL/DE/FR_PROD). Not for Calcite SQL.
 
 ## How to do it
 
-### Step 0 — Discover tables with the catalog
+### Discover tables with the catalog
 
 **Before writing any SQL**, use the `read-dwh-data-catalog` skill to find the right table:
 ```
@@ -111,20 +111,10 @@ from <cte_name>
 
 ### Core Join Patterns
 
-#### Order + Orderline (purchase history)
-```sql
-from dim.ft_orderline_item as ftoli
-inner join dim.ft_order as fto
-    on (ftoli.key_order = fto.key_order)
-inner join dim.dm_order as dmo
-    on (fto.key_order = dmo.key_order)
-inner join dim.dm_customer as dmc
-    on (fto.key_customer = dmc.key_customer)
-where
-    dmo.order_actual = 'yes'
-    and dmc.cust_internal = 'no'
-    and dmc.cust_deleted = 'no'
 ```
+-- SAVE STANDERD JOIN PATTERNS HERE
+```
+
 
 #### Usuals adds (ft_store_selling_unit_events)
 For counting which articles customers added to basket from the Usuals page:
@@ -139,8 +129,6 @@ inner join dim.dm_customer as dmc
 where
     ftssue.event_is_add_product_to_basket = 'yes'
     and dmes.event_screen_name in ('purchases-page-root', 'aisle-deep-dive')
-    and dmc.cust_internal = 'no'
-    and dmc.cust_deleted = 'no'
 ```
 
 #### Article / Product Lookup
