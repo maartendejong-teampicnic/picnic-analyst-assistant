@@ -2,11 +2,11 @@
 
 ## What this covers
 Writing, running, and interpreting Snowflake SQL queries against Picnic's data warehouse.
-Covers conventions, table joins, date math, deduplication, event analytics, and edge models.
+Covers table joins and formatting conventions, and lists Usuals-specific knowledge. 
 
 ## When to use
 Any data question, metric calculation, A/B audience query, or dashboard feed query that runs
-against Picnic's Snowflake (PICNIC_NL/DE/FR_PROD). Not for Calcite SQL — see `sql-calcite.md`.
+against Picnic's Snowflake (PICNIC_NL/DE/FR_PROD). Not for Calcite SQL.
 
 ## How to do it
 
