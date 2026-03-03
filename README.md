@@ -8,17 +8,11 @@ A Claude Code framework for analyst work at Picnic Technologies. An orchestrator
 
 The system is built around a multi-agent pipeline coordinated by an **orchestrator**.
 
-When you run `/perform`, the ORCHESTRATOR reads your task brief, decomposes it into phases, and routes each phase to the right specialist:
+When you run `/perform`, the ORCHESTRATOR reads your task brief, decomposes it into phases, and routes each phase to the right specialist agent. Each agent is focused on one domain and loads its own curated skill files from `knowledge/` at startup — SQL conventions, experiment methodology, communication style, and so on. Specialisation is what makes this effective: the more precisely an agent knows your conventions and context, the more consistent and useful its output. Agents also build on each other's work, so the writer picks up where the analyst left off, and the presenter turns that into slides without starting from scratch.
 
-| Agent | Responsibilities |
-|-------|-----------------|
-| **ANALYST** | Snowflake queries, reporting sheets, ... |
-| **ENGINEER** | DBT models, Github PRs, ... |
-| **WRITER** | Slack messages, Confluence pages, ... |
-| **PRESENTER** | Storylines, PowerPoint slides, ... |
-| **DESIGNER** | Excalidraw diagrams, Figma sketches, ... |
+The system ships with agents covering the analyst workflow end-to-end. You can extend it by writing your own: add an agent file to `agents/` and register its skill files in `knowledge/INDEX.yaml`.
 
-Agents load the relevant **skill files** from `knowledge/` at startup and build on each other's outputs. Every irreversible action — sending a message, merging a PR, publishing a page — is surfaced to you for approval before it happens.
+Every irreversible action — sending a message, merging a PR, publishing a page — is surfaced to you for approval before it happens.
 
 For focused, single-domain work you can invoke any agent directly: `/analyst`, `/writer`, `/engineer`, etc.
 
