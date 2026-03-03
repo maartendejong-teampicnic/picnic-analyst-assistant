@@ -66,6 +66,7 @@ When writing a SQL query whose output will land in a Usuals Dashboard sheet:
 
 ### SQL Conventions (ALWAYS apply — no exceptions)
 
+- **Case**: everything lowercase — keywords, functions, column names, values — except `NULL`, `TRUE`, and `FALSE` which are always uppercase
 - **Aliases**: prefix + first letter of each word → `dm_delivery` = `dmd`, `ft_order` = `fto`, `ft_store_selling_unit_event` = `ftssue`
 - **Comparisons**: `<>` not `!=`; `where foo = false` not `where not foo`
 - **Joins**: `on (condition)` with parentheses always — never `using`
