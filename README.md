@@ -1,6 +1,6 @@
 # Analyst Assistant @ Picnic
 
-A framework for building a personal analytical workspace in Claude Code.
+A framework for building a personal *Picnic Analyst Assistant* in Claude Code.
 The repository provides the agent architecture, orchestration logic, and onboarding
 tooling. Domain knowledge — SQL conventions, dbt workflow, Slack templates, and so on —
 is not included and must be added by each analyst using `/onboard-knowledge`
