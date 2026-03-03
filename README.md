@@ -1,7 +1,7 @@
 # Picnic Analyst Assistant
 
 A Claude Code framework for analyst work at Picnic Technologies.
-An orchestrator decomposes tasks and routes them across specialised agents, each producing structured summaries that the next agent builds on — coordinated from planning through to delivery.
+An orchestrator decomposes complex multi-stage tasks and routes them across specialised agents, each producing structured summaries that the next agent builds on.
 
 ---
 
