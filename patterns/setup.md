@@ -20,12 +20,12 @@ Check state silently before deciding where to start:
 **A — Fresh install** (user-config.md does NOT exist):
 Print the welcome message below, then run Phase 0 → 4 in full.
 
-**B — Resuming after Snowflake restart** (user-config.md exists AND `SNOWFLAKE_TOKEN` is set and non-empty):
+**B — Resuming after Snowflake restart** (user-config.md exists :
 Do NOT print the welcome message. Print instead:
 ```
-Resuming setup — Phases 0–2 already complete. Picking up from Phase 3.
+Resuming setup — Phases 0–1 already complete. Picking up from Phase 2.
 ```
-Skip Phases 0, 1, and 2 entirely. Jump directly to Phase 3.
+Skip Phases 0, and 1 entirely. Jump directly to Phase 2, check all MCPs sequentially, list the ones alread configured and if there are any REQUIRED ones missing, continue from there.
 
 **C — Partial setup** (user-config.md exists but SNOWFLAKE_TOKEN is empty or settings.json is missing):
 Do NOT print the welcome message. Print instead:
@@ -100,11 +100,11 @@ Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
 ## Phase 1 — Identity
 
-**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity.
+**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity. 
 
 Ask in one message:
 > "What's your full name and Picnic email?
-> And which team are you on? (e.g. Consumer - Shopping, Product - Growth, Supply Chain - Forecasting)
+> And which team are you on? (e.g. Consumer - Shopping - Usuals)
 >
 > Example: Maarten de Jong · maarten.dejong@teampicnic.com · Consumer - Shopping - Usuals"
 
@@ -113,7 +113,7 @@ From the email, derive the username prefix automatically:
 - `maarten.dejong@teampicnic.com` → `mdejong`
 
 In the same reply or a follow-up, show the derived prefix and confirm:
-> "Username prefix: `mdejong` — looks good? Press Enter to confirm, or type a different one."
+> "Username prefix: `mdejong` — looks good? Type 'y' to confirm, or type a different one."
 
 Check if `./user-config.md` already exists. If it does, show the current
 contents and ask: "Overwrite with new values?" Only proceed if they confirm.
@@ -134,7 +134,7 @@ Print: `Identity saved. → Moving to connections.` then move to Phase 2.
 
 ## Phase 2 — Connections
 
-**Goal:** Configure MCP connections. Snowflake and GitHub are required. Confluence and Slack optional.
+**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional.
 
 ### What are MCPs?
 
@@ -223,6 +223,50 @@ Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regen
 
 ---
 
+### Required: Atlassian
+
+**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
+
+**If not configured:**
+1. Install the MCP server:
+   ```bash
+   pip install mcp-atlassian
+   ```
+2. Go to https://id.atlassian.com/manage-profile/security/api-tokens
+3. Sign in with your Picnic email
+4. Click **Create API token**, set expiry to maximum (1 year), click **Create**
+5. **Copy the token immediately** — it is shown only once
+6. Paste the token here
+
+When you have the token, add to `mcpServers` in `settings.json`:
+```json
+"confluence": {
+  "command": "mcp-atlassian",
+  "args": [],
+  "env": {
+    "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
+    "CONFLUENCE_USERNAME": "<email>",
+    "CONFLUENCE_API_TOKEN": "<token>"
+  }
+}
+```
+
+**Verification:** Use the Atlassian MCP to search for pages they contributed to using CQL:
+`contributor = currentUser() ORDER BY lastmodified DESC`
+If that returns no results (new employee), fall back to searching for "analytics".
+
+Print wow output:
+```
+⚡ Confluence connected
+   Found: (title of the first result returned)
+```
+(Use the actual page title returned.)
+
+- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the API token is correct."
+
+---
+
+
 ### Required: GitHub
 
 **Goal:** Ensure `gh` CLI is installed and authenticated.
@@ -241,10 +285,7 @@ Run: `gh auth status`
    ```bash
    gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
    ```
-3. Show latest open PR:
-   ```bash
-   gh pr list --repo PicnicSupermarket/picnic-dbt-models --state open --limit 1 --json title
-   ```
+
 
 Print wow output:
 ```
@@ -255,7 +296,6 @@ Print wow output:
      • <actual PR title> (<state>)
      • <actual PR title> (<state>)
 
-   Latest open PR: "<actual PR title>"
 ```
 (Use actual values from the commands. If no personal PRs found, skip that section gracefully.)
 
@@ -267,56 +307,12 @@ Note: `gh` credentials are stored by the CLI — no entry needed in `settings.js
 
 Ask once:
 > "Which optional tools would you like to set up?
->   A — Confluence (read/write pages)
->   B — Slack (read channels, send messages)
->   C — Skip for now
+>   A — Slack (read channels, send messages)
+>   B — Skip for now
 >
 > You can always re-run /setup to add them later."
 
 Work through each selected tool. Skip anything the user does not select.
-
----
-
-### Optional: Confluence
-
-**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
-
-**If not configured:**
-1. Install the MCP server:
-   ```bash
-   pip install mcp-atlassian
-   ```
-2. Go to https://id.atlassian.com/manage-profile/security/api-tokens
-3. Sign in with your Picnic email
-4. Click **Create API token**, give it a name, click **Create**
-5. **Copy the token immediately** — it is shown only once
-6. Paste the token here
-
-When you have the token, add to `mcpServers` in `settings.json`:
-```json
-"confluence": {
-  "command": "mcp-atlassian",
-  "args": [],
-  "env": {
-    "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
-    "CONFLUENCE_USERNAME": "<email>",
-    "CONFLUENCE_API_TOKEN": "<token>"
-  }
-}
-```
-
-**Verification:** Use the Confluence MCP to search for pages they contributed to using CQL:
-`contributor = currentUser() ORDER BY lastmodified DESC`
-If that returns no results (new employee), fall back to searching for "analytics".
-
-Print wow output:
-```
-⚡ Confluence connected
-   Found: (title of the first result returned)
-```
-(Use the actual page title returned.)
-
-- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the API token is correct."
 
 ---
 
@@ -348,7 +344,7 @@ Print: `⚡ Slack configured — token saved. You'll see it in action when you u
 
 ### After any settings.json changes — restart notice
 
-If `settings.json` was updated during this phase, print this block prominently and **stop**:
+If `settings.json` was updated during this phase, print this block prominently and **stop** before moving onto the next MCP:
 
 ```
 ⚡ New terminal required
@@ -368,9 +364,9 @@ Do not proceed to Phase 3. The user must restart first.
 
 ```
 Connections:
-  Snowflake    ✅  (ANALYST role · ANALYSIS warehouse)
-  GitHub       ✅  (PicnicSupermarket org)
-  Confluence   ✅  (or ⚠️ skipped)
+  Snowflake    ✅  
+  Atlassian    ✅  
+  GitHub       ✅  
   Slack        ✅  (or ⚠️ skipped)
 ```
 
@@ -444,9 +440,9 @@ Skills
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Next steps:
-  → Run /onboard-knowledge to add your first skill files (do this before /perform)
-  → Add your first task to TASKS.md
-  → Run /perform to start it
+  → Run /onboard-knowledge to add your first personalized knowledge files 
+  → Run /tasks to add your first task to the TASKS.md file
+  → Run /analyst and try out your Snowflake MCP connection 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
