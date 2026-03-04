@@ -27,8 +27,7 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 ### Entry points (loaded automatically at startup)
 | File | Purpose |
 |------|---------|
-| `~/CLAUDE.md` | Single @import redirect → picnic-analyst-assistant/CLAUDE.md |
-| `~/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules |
+| `~/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules — loaded automatically when Claude Code is opened from `~/picnic-analyst-assistant/` |
 | `~/.claude/projects/-home-picnic/memory/MEMORY.md` | Auto-memory index (always loaded) |
 
 ### Commands (`~/.claude/commands/`)
@@ -148,15 +147,17 @@ When asked to "review the system" or "check for issues", work through these:
 
 1. Share the repo URL with the colleague
 2. They clone it: `git clone <url> ~/picnic-analyst-assistant/`
-3. They set up `~/CLAUDE.md`: single line `@picnic-analyst-assistant/CLAUDE.md`
-4. They create the commands directory and copy wrappers: `mkdir -p ~/.claude/commands/ && cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/`
-5. They run `/setup` in Claude Code — walks through all 5 phases automatically:
+3. They copy the setup command: `mkdir -p ~/.claude/commands/ && cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/`
+4. They open Claude Code from `~/picnic-analyst-assistant/` and run `/setup` — walks through all phases automatically:
+   - Bootstrap → installs all commands, git isolation, TASKS.md
    - Identity → writes `user-config.md`
-   - MCP check → Snowflake, Confluence, Slack
-   - Personal context → communication style, project files, TASKS.md
+   - MCP check → Snowflake, GitHub, Confluence (optional), Slack (optional)
    - Shared skills → sync from picnic-analytical-tools
    - Verification → end-to-end test
-6. Done. They can run `/perform` immediately.
+5. Done. They can run `/perform` immediately.
+
+Note: the analyst context loads via project-level CLAUDE.md — no `~/CLAUDE.md` needed.
+They must open Claude Code from `~/picnic-analyst-assistant/` for analyst work.
 
 Note: personal files (`user-config.md`, `TASKS.md`, `tasks/`, `direct/`, personal context)
 are gitignored and never committed — their data stays private.

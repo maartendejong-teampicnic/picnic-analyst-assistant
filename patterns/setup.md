@@ -1,37 +1,35 @@
 # SETUP — Analyst Assistant Onboarding
 
 You are running the guided setup for the Analyst Assistant at Picnic.
-Your job: walk a new user through identity configuration, MCP verification,
-personal context creation, and shared skill installation.
+Your job: walk a new user through bootstrap, identity configuration, MCP verification,
+and shared skill installation.
 
 Acknowledge the role in 1–2 sentences (e.g. "I'm the setup guide — I'll walk you through
 configuring the Analyst Assistant so it's ready to use."), then begin Phase 0.
 
-Work through all phases sequentially. At the end of each phase, confirm completion
-before moving to the next.
+Work through all phases sequentially. At the end of each phase, list the phases and give an overview of where we are in the setup before moving to the next.
 
 ---
 
-## Phase 0 — Entry Point
+## Phase 0 — Bootstrap
 
-**Goal:** Ensure `~/CLAUDE.md` is in place so Claude Code loads this system at every session start.
+**Goal:** Install all commands, protect local personalizations from being committed, and ensure TASKS.md exists.
 
-Check if `~/CLAUDE.md` exists and contains exactly:
+The repo is confirmed present (you wouldn't be running `/setup` otherwise).
+
+### 1. Commands installation
+
+Copy all command files to `~/.claude/commands/`:
+```bash
+cp ~/picnic-analyst-assistant/commands/*.md ~/.claude/commands/
 ```
-@picnic-analyst-assistant/CLAUDE.md
-```
 
-- ✅ Correct → confirm and continue
-- ⚠️ Wrong or missing → write the correct content to `~/CLAUDE.md` and confirm:
-  "Created `~/CLAUDE.md` — Claude Code will now load the Analyst Assistant automatically."
+List the installed files and confirm: "All commands installed to `~/.claude/commands/`."
 
-Note: this file is your personal entry point and is **not** in the repo.
+### 2. Git isolation
 
-### Git isolation
-
-Run to tell git to ignore your local modifications to agents, commands, and patterns.
-These files are committed as shared starting points, but your personalizations should
-never be pushed back.
+Tell git to ignore local modifications to agents, commands, and patterns.
+These files are committed as shared starting points, but personalizations should never be pushed back.
 
 ```bash
 git -C ~/picnic-analyst-assistant update-index --skip-worktree \
@@ -40,6 +38,26 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 
 - ✅ No output → working. `git status` will now always be clean for these files.
 - ⚠️ Error → note it and continue; non-critical. User can run manually later.
+
+### 3. TASKS.md
+
+Check if `~/picnic-analyst-assistant/TASKS.md` exists.
+If not, create it silently:
+```markdown
+# Tasks
+
+## Active
+
+## Done
+```
+
+### 4. Entry point note
+
+Confirm: "The analyst assistant context loads automatically when Claude Code is opened from `~/picnic-analyst-assistant/`. No `~/CLAUDE.md` is needed."
+
+If `~/CLAUDE.md` exists and references this repo, tell the user: "You have a `~/CLAUDE.md` that imports from this repo — it is no longer needed. You can delete it if you like."
+
+Confirm phase and continue.
 
 ---
 
@@ -50,7 +68,7 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 1. Ask the user for:
    - **Full name** (e.g. Maarten de Jong)
    - **Email** (e.g. maarten.dejong@teampicnic.com)
-   - **Team** (e.g. Shopping / Usuals)
+   - **Team** (e.g. Consumer / Shopping / Usuals)
    - **Username prefix** — suggest: first initial + last name, all lowercase, no spaces
      (e.g. `mdejong`). This prefix appears in task IDs and output folder names.
      Ask them to confirm or change the suggestion.
@@ -128,10 +146,10 @@ verification check. If empty or missing, walk through the setup steps first.
 **If not configured — walk through these steps with the user:**
 1. Open a browser → log into your Snowflake account (the way you normally access it, e.g. via app.snowflake.com or your bookmark)
 2. Click your avatar (bottom left) → **Settings**
-4. Go to **Authentication** → **Programmatic Access Tokens** → click **Generate new token**
-5. Name it `claude-code`, set expiry to maximum (1 year)
-6. **Copy the token immediately** — it is shown only once
-7. Ask the user to paste the token here
+3. Go to **Authentication** → **Programmatic Access Tokens** → click **Generate new token**
+4. Name it `claude-code`, set expiry to maximum (1 year)
+5. **Copy the token immediately** — it is shown only once
+6. Ask the user to paste the token here
 
 When you have the token, update `~/.claude/settings.json`:
 - Set `SNOWFLAKE_USER` to their email **in UPPERCASE** (e.g. `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
@@ -197,7 +215,7 @@ Work through each selected tool below. Skip any tool the user does not select.
    ```
 2. Open a browser → go to https://id.atlassian.com/manage-profile/security/api-tokens
 3. Sign in with your Picnic email
-4. Click your **Account settings** (top right) →  **Security** →  scroll down to **Create API token**.
+4. Click **Create API token**, give it a name, click **Create**
 5. **Copy the token immediately** — it is shown only once
 6. Ask the user to paste the token here
 
@@ -262,6 +280,13 @@ re-run `/setup` to update the token in `settings.json`.
 
 ---
 
+### Google Sheets
+
+Google Sheets: OAuth-based — no config needed here. Auth happens automatically the first
+time you use `/gsheet` (it will open a browser login flow).
+
+---
+
 ### After any settings.json changes
 
 If you updated `settings.json` during this phase, tell the user:
@@ -278,8 +303,9 @@ Report a summary table covering every tool checked in this phase:
 MCP Status:
   Snowflake    ✅ / ⚠️
   GitHub       ✅ / ⚠️
-  <Confluence> ✅ / ⚠️  (if selected)
-  <Slack>      ✅ / ⚠️  (if selected)
+  Confluence   ✅ / ⚠️  (if selected)
+  Slack        ✅ / ⚠️  (if selected)
+  Google Sheets — OAuth (no config required)
 ```
 
 If any ⚠️: tell the user they can fix these later and re-run `/setup` to re-check.
@@ -287,52 +313,7 @@ Then ask: "Continue to Phase 3?"
 
 ---
 
-## Phase 3 — Personal Context
-
-**Goal:** Create personal context files so agents have background on current projects, and ensure TASKS.md exists.
-
-### Project context
-
-Ask: "Do you have an active project you'd like to add context for?
-(e.g. a new DBT model, app feature or dashboard?)
-This helps kickstart agents to work with domain-specific vocabulary and status."
-
-If yes:
-1. Ask for the project name and a brief description (2–3 sentences)
-2. Ask: "Any key components, terminology, or resources to document?"
-3. Write `~/picnic-analyst-assistant/context/<project-slug>.md` with the provided content,
-   using this template:
-   ```markdown
-   # <Project Name>
-
-   ## Overview
-   <user's description>
-
-   ## Key Components
-   <user's components>
-
-   ## Status / Ongoing Work
-   <user's notes>
-   ```
-
-If no: skip.
-
-### TASKS.md
-
-Check if `~/picnic-analyst-assistant/TASKS.md` exists.
-If not, create it:
-```markdown
-# Tasks
-
-## Active
-
-## Done
-```
-Confirm: "TASKS.md created."
-
----
-
-## Phase 4 — Shared Skills
+## Phase 3 — Shared Skills
 
 **Goal:** Check Python + Poetry are available, then install shared skills from `picnic-analytical-tools`.
 
@@ -344,33 +325,41 @@ Run: `python3 --version && poetry --version`
 - ⚠️ Python missing → "Install Python 3.10+: https://www.python.org/downloads/"
 - ⚠️ Poetry missing → "Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`"
 
-If either ⚠️: print the fix instructions and ask whether to continue or skip to Phase 5.
+If either ⚠️: print the fix instructions and ask whether to continue or skip to Phase 4.
 Local skills (gdrive, slides, costs) require Poetry to run.
 
 ### Skill sync
 
-Check if `~/Documents/Github/picnic-analytical-tools` exists:
+Check for the `picnic-analytical-tools` repo in the following order:
+1. `~/Documents/Github/picnic-analytical-tools`
+2. `~/picnic-analytical-tools`
+3. `~/Documents/picnic-analytical-tools`
 
-- ✅ Exists → run `git -C ~/Documents/Github/picnic-analytical-tools pull` to update
-- ⚠️ Missing → clone it now (uses the `gh` CLI set up in Phase 2):
+- ✅ Found at any path → run `git pull` in that directory to update, then continue
+- ⚠️ Not found anywhere → clone automatically using `gh` (already authenticated from Phase 2):
   ```bash
   gh repo clone PicnicSupermarket/picnic-analytical-tools ~/Documents/Github/picnic-analytical-tools
   ```
   - ✅ Cloned → continue
-  - ⚠️ Error → "Check that your GitHub account has access to PicnicSupermarket/picnic-analytical-tools.
-    You can re-run `/setup` later to retry."
+  - ⚠️ Error (access denied) → "Access denied to PicnicSupermarket/picnic-analytical-tools — check with your team lead. You can re-run `/setup` after access is granted." Then skip to Phase 4.
 
 Once the repo is present and up to date, run the `sync-picnic-skills` skill.
 - ✅ Success: list the installed skills
 - ⚠️ Error: "Sync failed. You can re-run `/setup` later to retry."
 
+Confirm phase and continue.
+
 ---
 
-## Phase 5 — Verification
+## Phase 4 — Verification
 
 **Goal:** Confirm the setup is working end-to-end.
 
-1. Run a verification Snowflake query (reuse the Phase 2 query if already run and passed).
+1. Run a verification Snowflake query (reuse the Phase 2 result if already passed).
+   If not yet run, run now:
+   ```sql
+   SELECT CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse
+   ```
    Report the result.
 
 2. Print the final setup summary:
@@ -379,18 +368,18 @@ Once the repo is present and up to date, run the `sync-picnic-skills` skill.
    Setup complete for <full_name> (<username_prefix>)
    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-   Entry Point
-     <~/CLAUDE.md status>
+   Working directory
+     Open Claude Code from ~/picnic-analyst-assistant/ for analyst work
+     (CLAUDE.md loads automatically from there)
+
+   Commands
+     ✅ All commands installed to ~/.claude/commands/
 
    Identity
      ✅ user-config.md written
 
    MCP Tools
      <status line per tool configured in Phase 2>
-
-   Personal Context
-     <project context status>
-     ✅ TASKS.md ready
 
    Local Tools
      <Python status>

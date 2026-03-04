@@ -16,23 +16,28 @@ The more precisely an agent knows your conventions and context, the more consist
 
 ## Setup
 
-### 1. Clone and install
-
-The repo must live at a fixed path — `~/CLAUDE.md` imports the orchestration rules from there.
+### 1. Clone the repo
 
 ```bash
 git clone <repo-url> ~/picnic-analyst-assistant
-mkdir -p ~/.claude/commands/
-cp ~/picnic-analyst-assistant/commands/* ~/.claude/commands/
 ```
 
-### 2. Run `/setup` in Claude Code
+### 2. Copy the setup command
+
+```bash
+mkdir -p ~/.claude/commands/
+cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/
+```
+
+### 3. Open Claude Code inside the repo, then run:
 
 ```
 /setup
 ```
 
-The setup guide walks you through everything: configuring your identity, verifying MCP connections (Snowflake, GitHub, Confluence, Slack), creating personal context files, and syncing shared skills. About 10 minutes total.
+The setup guide handles everything from there: installing all commands, configuring your identity, verifying MCP connections (Snowflake, GitHub, Confluence, Slack), and syncing shared skills.
+
+**Note:** Open Claude Code from `~/picnic-analyst-assistant/` for analyst work. This is how the analyst context loads — the repo's CLAUDE.md is picked up automatically based on your working directory.
 
 ---
 
