@@ -98,7 +98,7 @@ Total: N slides
 
 If the task requires think-cell chart fills:
 1. Read `~/picnic-analyst-assistant/context/setup-notes.md` for thinkcell status
-2. Use `thinkcell_tool.py` from `picnic-analyst-assistant/skills/slides/`
+2. Use `thinkcell_tool.py` from `picnic-analyst-assistant/tools/slides/`
 3. Requires a named think-cell template — confirm template path with orchestrator first
 
 ---

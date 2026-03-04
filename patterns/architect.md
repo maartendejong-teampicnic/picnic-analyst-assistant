@@ -16,7 +16,7 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 
 | Layer | What's in it | Git status |
 |-------|-------------|------------|
-| **Shared** | `CLAUDE.md`, `agents/`, `knowledge/`, `patterns/`, `skills/`, `commands/`, `context/picnic-business.md`, `README.md`, `user-config.md.example`, `.gitignore` | Committed — same for all users |
+| **Shared** | `CLAUDE.md`, `agents/`, `knowledge/`, `patterns/`, `tools/costs/`, `commands/`, `context/picnic-business.md`, `README.md`, `user-config.md.example`, `.gitignore` | Committed — same for all users |
 | **Personal** | `user-config.md`, `TASKS.md`, `CONTEXT.md`, `tasks/`, `direct/`, `context/communication-style.md`, `context/setup-notes.md`, `context/<project>.md` | Gitignored — per-user only |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
@@ -41,8 +41,8 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 | `/writer` | agents/WRITER.md | Direct writer mode |
 | `/presenter` | agents/PRESENTER.md | Direct presenter mode |
 | `/designer` | agents/DESIGNER.md | Direct designer mode |
-| `/gdrive` | skills/gdrive/SKILL.md | Google Drive browse/read |
-| `/costs` | skills/costs/SKILL.md | Claude API cost breakdown |
+| `/gdrive` | tools/gdrive/SKILL.md | Google Drive browse/read (personal — not in shared repo) |
+| `/costs` | tools/costs/SKILL.md | Claude API cost breakdown |
 | `/excalidraw` | ~/.claude/skills/excalidraw.md | Excalidraw diagram generation |
 | `/setup` | patterns/setup.md | Guided onboarding for new users |
 | `/architect` | patterns/architect.md | This mode |
@@ -103,9 +103,10 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `ads` | Shared | `~/.claude/skills/` |
 | `s3` | Shared | `~/.claude/skills/` |
 | `salesforce-query` | Shared | `~/.claude/skills/` |
-| `gdrive` | Local (personal) | `picnic-analyst-assistant/skills/gdrive/` |
-| `slides` | Local | `picnic-analyst-assistant/skills/slides/` |
-| `thinkcell` | Local | `picnic-analyst-assistant/skills/slides/` |
+| `costs` | Shared (picnic-analyst-assistant) | `picnic-analyst-assistant/tools/costs/` |
+| `gdrive` | Personal (not in shared repo) | `picnic-analyst-assistant/tools/gdrive/` |
+| `slides` | Personal (not in shared repo) | `picnic-analyst-assistant/tools/slides/` |
+| `thinkcell` | Personal (not in shared repo) | `picnic-analyst-assistant/tools/slides/` |
 
 ### Task & output folders
 ```
@@ -200,8 +201,8 @@ Manual fallback (if needed):
 4. Update MEMORY.md: add to "Slash Commands" and note in agent list
 5. Update this file: add to Commands table and Agents table above
 
-### Add a new local skill (Python tool)
-1. Create `picnic-analyst-assistant/skills/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`
+### Add a new local tool (Python tool)
+1. Create `picnic-analyst-assistant/tools/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`
 2. Run `poetry install` in that directory
 3. Optionally create `~/.claude/commands/<name>.md` pointing to the SKILL.md
 4. Update MEMORY.md under "Local Skills"

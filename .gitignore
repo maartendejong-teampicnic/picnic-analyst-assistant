@@ -17,6 +17,7 @@
 !agents/*.md
 !commands/
 !commands/*.md
+commands/gdrive.md
 !patterns/
 !patterns/*.md
 
@@ -29,7 +30,7 @@
 !context/
 !context/picnic-business.md
 
-# Skills — full code is shared
-!skills/
-!skills/**/
-!skills/**
+# Tools — only costs is shared; gdrive and slides are personal
+!tools/
+!tools/costs/
+!tools/costs/**

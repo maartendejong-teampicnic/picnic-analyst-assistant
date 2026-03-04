@@ -85,9 +85,7 @@ picnic-analyst-assistant/
 │   ├── onboard-knowledge.md
 │   └── setup.md
 │
-├── skills/                            # tool integrations
-│   ├── gdrive/
-│   ├── slides/
+├── tools/                             # tool integrations (shared)
 │   └── costs/
 │
 ├── commands/                          # slash command definitions
