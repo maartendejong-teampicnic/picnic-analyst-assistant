@@ -18,21 +18,26 @@ Check state silently before deciding where to start:
 **Choose a path based on what's found:**
 
 **A — Fresh install** (user-config.md does NOT exist):
-Print the welcome message below, then run Phase 0 → 4 in full.
+Print the welcome message below, then show the pre-flight block, then run Phase 0 → 4 in full.
 
-**B — Resuming after Snowflake restart** (user-config.md exists) :
-Do NOT print the welcome message. Print instead:
+**B — Resuming mid-setup** (user-config.md exists and SNOWFLAKE_TOKEN is non-empty):
+Do NOT print the welcome message or pre-flight block. Print instead:
 ```
-Resuming setup — Phases 0–1 already complete. Picking up from Phase 2.
+Resuming setup — Phases 0–1 already complete. Picking up from Phase 2 (Connections).
 ```
-Skip Phases 0, and 1 entirely. Jump directly to Phase 2, check all MCPs sequentially, list the ones alread configured and if there are any REQUIRED ones missing, continue from there.
+Skip Phases 0 and 1. Go directly to Phase 2 and process **every tool in sequence**:
+- For each tool already configured: run its verification, show the ✅ wow output, then ask
+  "Ready to continue to [next tool]?" before moving on.
+- For each tool NOT yet configured: walk through its setup steps as normal.
+This ensures you never skip a tool that was missed in a previous session.
 
 **C — Partial setup** (user-config.md exists but SNOWFLAKE_TOKEN is empty or settings.json is missing):
-Do NOT print the welcome message. Print instead:
+Do NOT print the welcome message. Show the pre-flight block, then print:
 ```
-Resuming setup — Phase 1 already complete. Picking up from Phase 2.
+Resuming setup — Phase 1 already complete. Picking up from Phase 2 (Connections).
 ```
-Run Phase 0 silently (it is idempotent — no user input, no repeated output). Skip Phase 1. Start Phase 2.
+Run Phase 0 silently (it is idempotent — no user input, no repeated output). Skip Phase 1.
+Go to Phase 2 and process every tool in sequence as described in Path B above.
 
 ---
 
@@ -50,6 +55,34 @@ I'll walk you through 4 short phases:
 
 Let's go.
 ```
+
+---
+
+## Pre-flight block (print on path A and C — NOT on path B)
+
+Print this block after the welcome message (path A) or resume message (path C), before running Phase 0:
+
+```
+─────────────────────────────────────────
+⚙  Setup will perform the following:
+   • Install command files to ~/.claude/commands/
+   • Update git index to protect your personal files
+   • Create or update ~/.claude/settings.json
+   • Run bash commands (git, gh, poetry)
+   • Prompt for tokens to paste (Snowflake)
+   • Restart will be required after settings changes
+
+For a smoother experience with fewer approval prompts:
+  → Press Shift+Tab in Claude Code to switch to
+    auto-approve mode before running setup.
+  → Or change settings.json "defaultMode" to
+    "bypassPermissions" temporarily.
+
+Type 'proceed' (or just press Enter) to start.
+─────────────────────────────────────────
+```
+
+Wait for the user to respond before continuing. Any response (including Enter/empty) counts as proceed.
 
 ---
 
@@ -94,13 +127,14 @@ Check if `./TASKS.md` exists in the current directory. If not, create it silentl
 If `~/CLAUDE.md` exists, delete it automatically and tell the user:
 "Deleted `~/CLAUDE.md` — the Analyst Assistant context now loads only when you open Claude Code from this folder. Opening from anywhere else still gives a regular Claude session, without the Analyst Assistant context."
 
-Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
+Print: `✅ Phase 0 complete.` then ask: "Ready to set up your identity? (Phase 1)"
+Wait for any confirmation before continuing.
 
 ---
 
 ## Phase 1 — Identity
 
-**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity. 
+**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity.
 
 Ask in one message:
 > "What's your full name and Picnic email?
@@ -128,13 +162,14 @@ email: <email>
 team: <Team Name>
 ```
 
-Print: `Identity saved. → Moving to connections.` then move to Phase 2.
+Print: `✅ Identity saved.` then ask: "Ready to set up connections? (Phase 2)"
+Wait for any confirmation before continuing.
 
 ---
 
 ## Phase 2 — Connections
 
-**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional. 
+**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional.
 
 ### What are MCPs?
 
@@ -221,51 +256,45 @@ SELECT
 
 Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regenerate and update `SNOWFLAKE_TOKEN`.
 
+Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceeding.
+
 ---
 
 ### Required: Atlassian
 
-**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
+**Check:** Run `claude mcp list` — is `atlassian` in the output?
 
 **If not configured:**
-1. Install the MCP server:
+1. Register the MCP server:
    ```bash
-   pip install mcp-atlassian
+   claude mcp add --transport http --scope global atlassian https://mcp.atlassian.com/v1/mcp
    ```
-2. Go to https://id.atlassian.com/manage-profile/security/api-tokens
-3. Sign in with your Picnic email
-4. Click **Create API token**, set expiry to maximum (1 year), click **Create**
-5. **Copy the token immediately** — it is shown only once
-6. Paste the token here
+2. Open `/mcp` in Claude Code → select **atlassian** → authenticate via browser (OAuth 2.1).
+   No tokens to manage — uses your existing Atlassian account permissions.
 
-When you have the token, add to `mcpServers` in `settings.json`:
-```json
-"confluence": {
-  "command": "mcp-atlassian",
-  "args": [],
-  "env": {
-    "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
-    "CONFLUENCE_USERNAME": "<email>",
-    "CONFLUENCE_API_TOKEN": "<token>"
-  }
-}
+**Verification:** Use the Atlassian MCP to search Confluence for pages you contributed to:
 ```
-
-**Verification:** Use the Atlassian MCP to search for pages they contributed to using CQL:
-`contributor = currentUser() ORDER BY lastmodified DESC`
-If that returns no results (new employee), fall back to searching for "analytics".
+CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
+```
+If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmodified DESC LIMIT 5`
 
 Print wow output:
 ```
-⚡ Confluence connected
-   Found: (title of the first result returned)
+⚡ Atlassian connected (Confluence + Jira)
+   Your recent contributions:
+     • <page title 1>
+     • <page title 2>
+     • <page title 3>
 ```
-(Use the actual page title returned.)
+(Use actual page titles from the CQL results.)
 
-- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the API token is correct."
+Note: Jira is also accessible via this connection — useful for creating tickets in the future.
+
+- ⚠️ Error → Run `claude mcp list` to check the server is registered. Re-run `/mcp` to re-authenticate.
+
+Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
 ---
-
 
 ### Required: GitHub
 
@@ -353,10 +382,11 @@ If `settings.json` was updated during this phase, print this block prominently a
 
    Steps:
      1. Open a new terminal and open Claude again
-     2. Run /setup — it will detect your progress and resume automatically
+     2. Run /setup — it will quickly re-verify tools already set up, then
+        continue from the next unconfigured tool
 ```
 
-Do not proceed to Phase 3. The user must restart first.
+Do not proceed to the next tool or Phase 3. The user must restart first.
 
 ---
 
@@ -364,13 +394,15 @@ Do not proceed to Phase 3. The user must restart first.
 
 ```
 Connections:
-  Snowflake    ✅  
-  Atlassian    ✅  
-  GitHub       ✅  
+  Snowflake    ✅
+  Atlassian    ✅
+  GitHub       ✅
   Slack        ✅  (or ⚠️ skipped)
 ```
 
-If any ⚠️: note they can fix these later by re-running `/setup`. Then move to Phase 3.
+If any ⚠️: note they can fix these later by re-running `/setup`.
+
+Ask: "Ready to sync skills? (Phase 3)" and wait for confirmation before proceeding.
 
 ---
 
@@ -441,9 +473,9 @@ Skills
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Next steps:
-  → Run /onboard-knowledge to add your first personalized knowledge files 
+  → Run /onboard-knowledge to add your first personalized knowledge files
   → Run /tasks to add your first task to the TASKS.md file
-  → Run /analyst and try out your Snowflake MCP connection 
+  → Run /analyst and try out your Snowflake MCP connection
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -453,7 +485,7 @@ Next steps:
 
 - **Never overwrite `user-config.md` without explicit confirmation** from the user.
 - **Never write personal context files without user input** — no templates with fake data.
-- **Auto-proceed between phases** unless user input is required or something fails.
-  Only stop for: user input (Phase 1, optional tool selection), failures, or restart notices.
+- **Always confirm before starting the next phase or the next tool within Phase 2.**
+  Any response (including "yes", "ok", Enter) counts as confirmation. Never auto-advance.
 - **Setup is resumable** — re-running `/setup` re-checks each phase and skips completed steps.
 - **If any phase fails or is skipped**, note it in the summary and continue where possible.

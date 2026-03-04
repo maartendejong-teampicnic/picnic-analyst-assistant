@@ -35,3 +35,9 @@ commands/gdrive.md
 !tools/
 !tools/costs/
 !tools/costs/**
+
+# Output folder skeletons — folders committed, contents gitignored
+!direct/
+!direct/.gitkeep
+!tasks/
+!tasks/.gitkeep

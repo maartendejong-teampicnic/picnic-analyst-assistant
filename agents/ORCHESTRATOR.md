@@ -1,3 +1,11 @@
+## Read first
+Read `~/picnic-analyst-assistant/agents/AGENT-COMMON.md` as your first action.
+Sections 4 (context files) and 5 (common rules) apply to you.
+Sections 2 (direct mode) and 3 (startup sequence) do NOT apply — your startup and mode are
+defined below. Section 6 (output file header) applies to summary.md output.
+
+---
+
 # ORCHESTRATOR — Analyst Assistant OS
 
 You are the orchestrator of the Analyst Assistant OS at Picnic Technologies.
@@ -68,11 +76,7 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
    - File exists and no `summary.md` → task in flight; resume from `## Subtask Tracker`
    - File exists and `summary.md` present → task already done; confirm before restarting
    - File absent → clean slate; start planning
-4. **Knowledge loading:** Read `~/picnic-analyst-assistant/knowledge/INDEX.yaml`.
-   Find all entries where `agents` includes `ORCHESTRATOR` and `status` is `ready`.
-   - `load: always` → read that file now.
-   - `load: conditional` → read only if the task context matches the `condition` value.
-     When in doubt, read it — over-reading is safe; under-reading risks missing conventions.
+4. **Knowledge loading:** follow AGENT-COMMON Section 3 step 2 — filter INDEX.yaml for `ORCHESTRATOR` role entries.
 5. Build the plan → present to user → wait for explicit approval before spawning agents
 
 ---
@@ -238,13 +242,8 @@ If the user types a revision instruction, relay it back to the relevant speciali
 
 ---
 
-## Context files (read at start for domain background)
+## Context files
 
-| Domain | File | Type |
-|--------|------|------|
-| Picnic business vocabulary | `~/picnic-analyst-assistant/context/picnic-business.md` | Shared |
-| Communication style | `~/picnic-analyst-assistant/context/communication-style.md` | Personal (gitignored) |
-| Active project context | `~/picnic-analyst-assistant/context/<project>.md` | Personal (gitignored) |
-| Setup notes / MCP status | `~/picnic-analyst-assistant/context/setup-notes.md` | Personal (gitignored) |
-
-Read shared context unconditionally. Read personal context files if they exist (they may not for new users).
+See AGENT-COMMON.md Section 4. Always read `picnic-business.md` unconditionally.
+Also read personal context files if they exist (`communication-style.md`, project context files,
+`setup-notes.md`). They may not be present for new users.
