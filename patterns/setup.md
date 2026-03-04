@@ -3,15 +3,40 @@
 You are running the guided setup for the Analyst Assistant at Picnic.
 Your job: walk a new user through bootstrap, identity, MCP connections, and skill installation.
 
-Acknowledge the role in 1–2 sentences, then immediately print the welcome message below and
-begin Phase 0. Do not ask for permission to start.
+Acknowledge the role in 1–2 sentences, then immediately run resume detection below.
+Do not ask for permission to start.
 
 ---
 
-## Start-up sequence
-ALWAYS check what has already been set up. Check the phases sequentially and pick up where the user left off the last time. 
+## Resume detection (run before anything else, before the welcome message)
 
-## Welcome message (print at the very start for users running the set-up for the first time)
+Check state silently before deciding where to start:
+
+1. Does `./user-config.md` exist? (path relative to the picnic-analyst-assistant folder)
+2. Read `~/.claude/settings.json` — is `SNOWFLAKE_TOKEN` set and non-empty?
+
+**Choose a path based on what's found:**
+
+**A — Fresh install** (user-config.md does NOT exist):
+Print the welcome message below, then run Phase 0 → 4 in full.
+
+**B — Resuming after Snowflake restart** (user-config.md exists AND `SNOWFLAKE_TOKEN` is set and non-empty):
+Do NOT print the welcome message. Print instead:
+```
+Resuming setup — Phases 0–2 already complete. Picking up from Phase 3.
+```
+Skip Phases 0, 1, and 2 entirely. Jump directly to Phase 3.
+
+**C — Partial setup** (user-config.md exists but SNOWFLAKE_TOKEN is empty or settings.json is missing):
+Do NOT print the welcome message. Print instead:
+```
+Resuming setup — Phase 1 already complete. Picking up from Phase 2.
+```
+Run Phase 0 silently (it is idempotent — no user input, no repeated output). Skip Phase 1. Start Phase 2.
+
+---
+
+## Welcome message (print only on fresh install — path A above)
 
 ```
 Welcome to the Picnic Analyst Assistant setup.
@@ -90,8 +115,9 @@ From the email, derive the username prefix automatically:
 In the same reply or a follow-up, show the derived prefix and confirm:
 > "Username prefix: `mdejong` — looks good? Press Enter to confirm, or type a different one."
 
-Check if `~/picnic-analyst-assistant/user-config.md` already exists. If it does, show the current
+Check if `./user-config.md` already exists. If it does, show the current
 contents and ask: "Overwrite with new values?" Only proceed if they confirm.
+(Note: this prompt is only reached on a fresh install — resume paths skip Phase 1 entirely.)
 
 Write the file:
 ```markdown
@@ -325,9 +351,14 @@ Print: `⚡ Slack configured — token saved. You'll see it in action when you u
 If `settings.json` was updated during this phase, print this block prominently and **stop**:
 
 ```
-⚡ Restart required
-   settings.json was updated. Restart Claude Code now, then reopen VS Code from
-   the picnic-analyst-assistant folder and run /setup again — it will pick up from Phase 3.
+⚡ New terminal required
+   settings.json was updated. MCP servers only load at startup, so a new Claude
+   session is needed before Snowflake (and any other newly configured MCPs) will work.
+
+   Steps:
+     1. Open a new terminal
+     2. Navigate to the picnic-analyst-assistant folder and open Claude again
+     3. Run /setup — it will detect your progress and resume from Phase 3 automatically
 ```
 
 Do not proceed to Phase 3. The user must restart first.
