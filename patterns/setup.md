@@ -1,48 +1,58 @@
 # SETUP — Analyst Assistant Onboarding
 
 You are running the guided setup for the Analyst Assistant at Picnic.
-Your job: walk a new user through bootstrap, identity configuration, MCP verification,
-and shared skill installation.
+Your job: walk a new user through bootstrap, identity, MCP connections, and skill installation.
 
-Acknowledge the role in 1–2 sentences (e.g. "I'm the setup guide — I'll walk you through
-configuring the Analyst Assistant so it's ready to use."), then begin Phase 0.
-
-Work through all phases sequentially. At the end of each phase, list the phases and give an overview of where we are in the setup before moving to the next.
+Acknowledge the role in 1–2 sentences, then immediately print the welcome message below and
+begin Phase 0. Do not ask for permission to start.
 
 ---
 
-## Phase 0 — Bootstrap
+## Welcome message (print at the very start, before any action)
 
-**Goal:** Install all commands, protect local personalizations from being committed, and ensure TASKS.md exists.
+```
+Welcome to the Picnic Analyst Assistant setup.
 
-The repo is confirmed present (you wouldn't be running `/setup` otherwise).
+I'll walk you through 4 short phases:
 
-### 1. Commands installation
+  Phase 0 — Install        Set up commands and protect your personal files  (~30s, automatic)
+  Phase 1 — Identity       Your name, email, and task prefix                (~1 min)
+  Phase 2 — Connections    Snowflake, GitHub, and optional tools            (5–10 min)
+  Phase 3 — Skills         Sync shared tools from the tools repo            (~1 min)
 
-Copy all command files to `~/.claude/commands/`:
+Let's go.
+```
+
+---
+
+## Phase 0 — Install
+
+**Fully automatic — no user input needed. Run all steps, then move to Phase 1.**
+
+### 1. Install commands
+
 ```bash
 cp ~/picnic-analyst-assistant/commands/*.md ~/.claude/commands/
 ```
 
-List the installed files and confirm: "All commands installed to `~/.claude/commands/`."
+List the installed files. Print: `✅ All commands installed.`
 
 ### 2. Git isolation
 
-Tell git to ignore local modifications to agents, commands, and patterns.
-These files are committed as shared starting points, but personalizations should never be pushed back.
+Protect personalizations in agents/, commands/, and patterns/ from being accidentally committed:
 
 ```bash
 git -C ~/picnic-analyst-assistant update-index --skip-worktree \
   $(git -C ~/picnic-analyst-assistant ls-files agents/ commands/ patterns/)
 ```
 
-- ✅ No output → working. `git status` will now always be clean for these files.
-- ⚠️ Error → note it and continue; non-critical. User can run manually later.
+- ✅ No output → working. `git status` will always be clean for these files.
+- ⚠️ Error → note it and continue; non-critical.
 
 ### 3. TASKS.md
 
-Check if `~/picnic-analyst-assistant/TASKS.md` exists.
-If not, create it silently:
+Check if `~/picnic-analyst-assistant/TASKS.md` exists. If not, create it silently:
+
 ```markdown
 # Tasks
 
@@ -51,13 +61,12 @@ If not, create it silently:
 ## Done
 ```
 
-### 4. Entry point note
+### 4. Entry point check
 
-Confirm: "The analyst assistant context loads automatically when Claude Code is opened from `~/picnic-analyst-assistant/`. No `~/CLAUDE.md` is needed."
+If `~/CLAUDE.md` exists and references this repo, tell the user:
+"You have a `~/CLAUDE.md` that imports from this repo — it is no longer needed. You can delete it if you like."
 
-If `~/CLAUDE.md` exists and references this repo, tell the user: "You have a `~/CLAUDE.md` that imports from this repo — it is no longer needed. You can delete it if you like."
-
-Confirm phase and continue.
+Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
 ---
 
@@ -65,49 +74,53 @@ Confirm phase and continue.
 
 **Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity.
 
-1. Ask the user for:
-   - **Full name** (e.g. Maarten de Jong)
-   - **Email** (e.g. maarten.dejong@teampicnic.com)
-   - **Team** (e.g. Consumer / Shopping / Usuals)
-   - **Username prefix** — suggest: first initial + last name, all lowercase, no spaces
-     (e.g. `mdejong`). This prefix appears in task IDs and output folder names.
-     Ask them to confirm or change the suggestion.
+Ask in one message:
+> "What's your full name and Picnic email?
+> And which team are you on? (e.g. Consumer / Shopping / Ads)
+>
+> Example: Maarten de Jong · maarten.dejong@teampicnic.com · Consumer"
 
-2. Check if `~/picnic-analyst-assistant/user-config.md` already exists.
-   If it does, show the current contents and ask: "Overwrite with new values?"
-   Only proceed if they confirm.
+From the email, derive the username prefix automatically:
+- Logic: first char of first name + lastname, all lowercase, no spaces
+- `maarten.dejong@teampicnic.com` → `mdejong`
 
-3. Write the file:
-   ```markdown
-   # User Config
-   username_prefix: <prefix>
-   full_name: <Full Name>
-   email: <email>
-   team: <Team Name>
-   ```
+In the same reply or a follow-up, show the derived prefix and confirm:
+> "Username prefix: `mdejong` — looks good? Press Enter to confirm, or type a different one."
 
-4. Confirm: "Identity saved to `user-config.md`."
+Check if `~/picnic-analyst-assistant/user-config.md` already exists. If it does, show the current
+contents and ask: "Overwrite with new values?" Only proceed if they confirm.
+
+Write the file:
+```markdown
+# User Config
+username_prefix: <prefix>
+full_name: <Full Name>
+email: <email>
+team: <Team Name>
+```
+
+Print: `Identity saved. → Moving to connections.` then move to Phase 2.
 
 ---
 
-## Phase 2 — MCP Setup & Verification
+## Phase 2 — Connections
 
-**Goal:** Configure MCP connections. Snowflake and GitHub are required for all users. Confluence and Slack are optional — configure only the tools you use.
+**Goal:** Configure MCP connections. Snowflake and GitHub are required. Confluence and Slack optional.
 
 ### What are MCPs?
-MCPs (Model Context Protocol servers) let Claude Code call external systems — databases,
-wikis, messaging tools — directly during a session. Each server is configured in
-`~/.claude/settings.json` under `mcpServers`, with a `command` (the server binary) and
-`env` (credentials). GitHub is an exception: it uses the `gh` CLI, not mcpServers.
 
-After any change to `settings.json`, Claude Code must be restarted for the change to
-take effect. `/setup` is resumable — re-running it skips steps that are already complete.
+MCPs (Model Context Protocol servers) let Claude Code call external systems — databases, wikis,
+messaging tools — directly during a session. Each server lives in `~/.claude/settings.json`
+under `mcpServers`. GitHub uses the `gh` CLI instead.
+
+After any change to `settings.json`, Claude Code must be restarted for changes to take effect.
+`/setup` is resumable — re-running it skips steps already complete.
 
 ### Pre-check: settings.json
 
 Check if `~/.claude/settings.json` exists:
-- ✅ Exists → read the current `mcpServers` section and proceed to each tool below
-- ⚠️ Missing → create it now with this base template (Picnic-specific fixed values pre-filled):
+- ✅ Exists → read current `mcpServers` and continue
+- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled):
 
 ```json
 {
@@ -134,22 +147,21 @@ Check if `~/.claude/settings.json` exists:
 }
 ```
 
-For each tool below: check if the relevant fields are already filled in. If yes, run the
-verification check. If empty or missing, walk through the setup steps first.
+For each tool below: if already configured, run verification. If empty or missing, walk through setup first.
 
 ---
 
-### Snowflake
+### Required: Snowflake
 
 **Check:** Is `SNOWFLAKE_TOKEN` set and non-empty in `mcpServers.snowflake.env`?
 
-**If not configured — walk through these steps with the user:**
-1. Open a browser → log into your Snowflake account (the way you normally access it, e.g. via app.snowflake.com or your bookmark)
+**If not configured:**
+1. Open a browser → log into your Snowflake account
 2. Click your avatar (bottom left) → **Settings**
-3. Go to **Authentication** → **Programmatic Access Tokens** → click **Generate new token**
+3. Go to **Authentication** → **Programmatic Access Tokens** → **Generate new token**
 4. Name it `claude-code`, set expiry to maximum (1 year)
 5. **Copy the token immediately** — it is shown only once
-6. Ask the user to paste the token here
+6. Paste the token here
 
 When you have the token, update `~/.claude/settings.json`:
 - Set `SNOWFLAKE_USER` to their email **in UPPERCASE** (e.g. `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
@@ -158,49 +170,82 @@ When you have the token, update `~/.claude/settings.json`:
 **Verification** (run after configuring, or if already configured):
 Run via the `snowflake-query` skill:
 ```sql
-SELECT CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse
+SELECT
+  CURRENT_USER() AS you,
+  CURRENT_ROLE() AS role,
+  CURRENT_WAREHOUSE() AS warehouse,
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible
 ```
-- ✅ Returns a row → working. Report the user/role/warehouse values.
+
+- ✅ Returns a row → print the wow output:
+  ```
+  ⚡ Snowflake connected
+     You: MAARTEN.DEJONG@TEAMPICNIC.COM
+     Role: ANALYST · Warehouse: ANALYSIS
+     Tables accessible: 1,247
+  ```
+  (Use actual values from the query result.)
+
 - ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
   in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
 
-Note: remind the user that PAT tokens expire (max 1 year). When Snowflake queries stop working,
-regenerate the token and replace `SNOWFLAKE_TOKEN` in `settings.json`.
+Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regenerate and update `SNOWFLAKE_TOKEN`.
 
 ---
 
-### Mandatory: GitHub
+### Required: GitHub
 
 **Goal:** Ensure `gh` CLI is installed and authenticated.
 
 Run: `gh auth status`
-- ✅ Logged in → confirm and continue
-- ⚠️ Not authenticated → run `gh auth login` and follow the prompts:
+- ✅ Logged in → continue
+- ⚠️ Not authenticated → run `gh auth login`:
   1. Select **GitHub.com**
   2. Choose **HTTPS**
   3. Authenticate via browser — sign in with your Picnic GitHub account
-  4. After login, re-run `gh auth status` to confirm
+  4. Re-run `gh auth status` to confirm
 
-Verify repo access:
-```bash
-gh repo view PicnicSupermarket/picnic-dbt-models --json name
+**Verification:**
+1. Verify org access: `gh api orgs/PicnicSupermarket --jq '.login'`
+2. Show their own recent PRs:
+   ```bash
+   gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
+   ```
+3. Show latest open PR:
+   ```bash
+   gh pr list --repo PicnicSupermarket/picnic-dbt-models --state open --limit 1 --json title
+   ```
+
+Print wow output:
 ```
-- ✅ Returns repo info → working
+⚡ GitHub connected
+   Organisation: PicnicSupermarket — access confirmed
+
+   Your recent PRs in picnic-dbt-models:
+     • feat: add usuals retention metric (merged)
+     • fix: null handling in order model (merged)
+
+   Latest open PR: "feat: add new retention model for NL"
+```
+(Use actual values from the commands. If no personal PRs found, skip that section gracefully.)
+
 - ⚠️ Access denied → "Check with your team lead to be added to the PicnicSupermarket org."
 
 Note: `gh` credentials are stored by the CLI — no entry needed in `settings.json`.
 
 ---
 
-### Optional tools — select what you need
+### Optional tools
 
-Ask the user: "Which optional tools would you like to configure?
-  - **Confluence** — read and write Confluence pages (useful for documentation work)
-  - **Slack** — read channels and send messages from Claude
+Ask once:
+> "Which optional tools would you like to set up?
+>   A — Confluence (read/write wiki pages)
+>   B — Slack (read channels, send messages)
+>   C — Skip for now
+>
+> You can always re-run /setup to add them later."
 
-You can configure them now or skip and re-run `/setup` later to add them."
-
-Work through each selected tool below. Skip any tool the user does not select.
+Work through each selected tool. Skip anything the user does not select.
 
 ---
 
@@ -208,23 +253,18 @@ Work through each selected tool below. Skip any tool the user does not select.
 
 **Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env`?
 
-**If not configured — walk through these steps with the user:**
+**If not configured:**
 1. Install the MCP server:
    ```bash
    pip install mcp-atlassian
    ```
-2. Open a browser → go to https://id.atlassian.com/manage-profile/security/api-tokens
+2. Go to https://id.atlassian.com/manage-profile/security/api-tokens
 3. Sign in with your Picnic email
 4. Click **Create API token**, give it a name, click **Create**
 5. **Copy the token immediately** — it is shown only once
-6. Ask the user to paste the token here
+6. Paste the token here
 
-When you have the token, update `~/.claude/settings.json`:
-- Set `CONFLUENCE_USERNAME` to their email (lowercase)
-- Set `CONFLUENCE_API_TOKEN` to the pasted token
-
-If `mcpServers.confluence` does not yet exist in `settings.json`, add the following block
-to the `mcpServers` object:
+When you have the token, add to `mcpServers` in `settings.json`:
 ```json
 "confluence": {
   "command": "mcp-atlassian",
@@ -237,85 +277,76 @@ to the `mcpServers` object:
 }
 ```
 
-**Verification** (run after configuring, or if already configured):
-Attempt to fetch a Confluence page using the MCP tool.
-- ✅ Returns content → working
-- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the
-  API token is correct. Restart Claude Code after any changes to `settings.json`."
+**Verification:** Use the Confluence MCP to search for "analytics" — return the first result's title.
+
+Print wow output:
+```
+⚡ Confluence connected
+   Found: "Analytics & Data — Home" (Picnic Confluence)
+```
+(Use the actual page title returned.)
+
+- ⚠️ Error → "Check that `mcp-atlassian` is installed (`pip show mcp-atlassian`) and the API token is correct."
 
 ---
 
 ### Optional: Slack
 
-**Check:** Is `mcpServers.slack` present and `SLACK_MCP_XOXP_TOKEN` set and non-empty?
+**Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
 
-**If not configured — walk through these steps with the user:**
-1. Check with a colleague who already has Slack set up — they can share the Picnic Claude
-   app details and confirm your token scopes.
-2. Go to the Picnic Claude Slack app → **OAuth & Permissions** → confirm **User Token Scopes**
-   include: `chat:write`, `channels:read`, `channels:history`, `lists:read`
+**If not configured:**
+1. Check with a colleague who has Slack set up — they can share Picnic Claude app details
+2. Go to the Picnic Claude Slack app → **OAuth & Permissions** → confirm scopes include:
+   `chat:write`, `channels:read`, `channels:history`, `lists:read`
 3. Under **OAuth Tokens for Your Workspace**, copy the **User OAuth Token** (starts with `xoxp-`)
-4. Ask the user to paste the token here
+4. Paste the token here
 
-When you have the token:
-- Add the following block to `mcpServers` in `settings.json`:
-  ```json
-  "slack": {
-    "command": "slack-mcp-server",
-    "args": [],
-    "env": {
-      "SLACK_MCP_XOXP_TOKEN": "<token>"
-    }
+Add to `mcpServers` in `settings.json`:
+```json
+"slack": {
+  "command": "slack-mcp-server",
+  "args": [],
+  "env": {
+    "SLACK_MCP_XOXP_TOKEN": "<token>"
   }
-  ```
-- Confirm the block is saved
-
-**Verification:**
-Check that `SLACK_MCP_XOXP_TOKEN` is set and non-empty.
-- ✅ Present → configured (scope cannot be verified without a test send)
-- ⚠️ Not yet → "You can add it later by re-running `/setup`."
-
-Note: Slack token needs manual renewal when it expires. When Slack calls stop working,
-re-run `/setup` to update the token in `settings.json`.
-
----
-
-### Google Sheets
-
-Google Sheets: OAuth-based — no config needed here. Auth happens automatically the first
-time you use `/gsheet` (it will open a browser login flow).
-
----
-
-### After any settings.json changes
-
-If you updated `settings.json` during this phase, tell the user:
-> "You need to **restart Claude Code** for MCP changes to take effect.
-> After restarting, run `/setup` again — it will re-run the verification checks and pick up
-> where you left off."
-
----
-
-### Phase 2 summary
-
-Report a summary table covering every tool checked in this phase:
-```
-MCP Status:
-  Snowflake    ✅ / ⚠️
-  GitHub       ✅ / ⚠️
-  Confluence   ✅ / ⚠️  (if selected)
-  Slack        ✅ / ⚠️  (if selected)
-  Google Sheets — OAuth (no config required)
+}
 ```
 
-If any ⚠️: tell the user they can fix these later and re-run `/setup` to re-check.
-Then ask: "Continue to Phase 3?"
+Print: `⚡ Slack configured — token saved. You'll see it in action when you use /writer.`
 
 ---
 
-## Phase 3 — Shared Skills
+### After any settings.json changes — restart notice
 
-**Goal:** Check Python + Poetry are available, then install shared skills from `picnic-analytical-tools`.
+If `settings.json` was updated during this phase, print this block prominently and **stop**:
+
+```
+⚡ Restart required
+   settings.json was updated. Restart Claude Code now, then reopen VS Code from
+   ~/picnic-analyst-assistant/ and run /setup again — it will pick up from Phase 3.
+```
+
+Do not proceed to Phase 3. The user must restart first.
+
+---
+
+### Connections summary (print before moving on)
+
+```
+Connections:
+  Snowflake    ✅  (ANALYST role · ANALYSIS warehouse)
+  GitHub       ✅  (PicnicSupermarket org)
+  Confluence   ✅  (or ⚠️ skipped)
+  Slack        ✅  (or ⚠️ skipped)
+```
+
+If any ⚠️: note they can fix these later by re-running `/setup`. Then move to Phase 3.
+
+---
+
+## Phase 3 — Skills
+
+**Goal:** Install shared tools from `picnic-analytical-tools`.
 
 ### Python + Poetry check
 
@@ -325,77 +356,60 @@ Run: `python3 --version && poetry --version`
 - ⚠️ Python missing → "Install Python 3.10+: https://www.python.org/downloads/"
 - ⚠️ Poetry missing → "Install Poetry: `curl -sSL https://install.python-poetry.org | python3 -`"
 
-If either ⚠️: print the fix instructions and ask whether to continue or skip to Phase 4.
-Local skills (gdrive, slides, costs) require Poetry to run.
+If either ⚠️: print fix instructions and ask whether to continue or skip to Phase 4.
 
 ### Skill sync
 
-Check for the `picnic-analytical-tools` repo in the following order:
+Check for the `picnic-analytical-tools` repo in this order:
 1. `~/Documents/Github/picnic-analytical-tools`
 2. `~/picnic-analytical-tools`
 3. `~/Documents/picnic-analytical-tools`
 
-- ✅ Found at any path → run `git pull` in that directory to update, then continue
-- ⚠️ Not found anywhere → clone automatically using `gh` (already authenticated from Phase 2):
+- ✅ Found → run `git pull` in that directory, then continue
+- ⚠️ Not found → clone automatically:
   ```bash
   gh repo clone PicnicSupermarket/picnic-analytical-tools ~/Documents/Github/picnic-analytical-tools
   ```
-  - ✅ Cloned → continue
-  - ⚠️ Error (access denied) → "Access denied to PicnicSupermarket/picnic-analytical-tools — check with your team lead. You can re-run `/setup` after access is granted." Then skip to Phase 4.
+  - ⚠️ Access denied → "Check with your team lead. Re-run `/setup` after access is granted." Skip to Phase 4.
 
-Once the repo is present and up to date, run the `sync-picnic-skills` skill.
-- ✅ Success: list the installed skills
-- ⚠️ Error: "Sync failed. You can re-run `/setup` later to retry."
+Once present and up to date, run the `sync-picnic-skills` skill.
 
-Confirm phase and continue.
+- ✅ Success → print the list of installed skills
+- ⚠️ Error → "Sync failed. Re-run `/setup` later to retry."
+
+Move to Phase 4.
 
 ---
 
-## Phase 4 — Verification
+## Phase 4 — Done
 
-**Goal:** Confirm the setup is working end-to-end.
+Print the final summary:
 
-1. Run a verification Snowflake query (reuse the Phase 2 result if already passed).
-   If not yet run, run now:
-   ```sql
-   SELECT CURRENT_USER() AS user, CURRENT_ROLE() AS role, CURRENT_WAREHOUSE() AS warehouse
-   ```
-   Report the result.
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Setup complete for <full_name> (<username_prefix>)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2. Print the final setup summary:
-   ```
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Setup complete for <full_name> (<username_prefix>)
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Working directory
+  Always open Claude Code from ~/picnic-analyst-assistant/
+  (CLAUDE.md loads automatically — opens from any other folder won't activate the assistant)
 
-   Working directory
-     Open Claude Code from ~/picnic-analyst-assistant/ for analyst work
-     (CLAUDE.md loads automatically from there)
+Commands     ✅  installed to ~/.claude/commands/
+Identity     ✅  user-config.md written
 
-   Commands
-     ✅ All commands installed to ~/.claude/commands/
+Connections
+  <status line per tool from Phase 2>
 
-   Identity
-     ✅ user-config.md written
+Skills
+  <sync status + list from Phase 3>
 
-   MCP Tools
-     <status line per tool configured in Phase 2>
-
-   Local Tools
-     <Python status>
-     <Poetry status>
-
-   Shared Skills
-     <sync status>
-
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   Next steps:
-   - Run /onboard-knowledge to add your first skill files (do this before /perform)
-   - Add your first task to TASKS.md
-   - Run /perform to start it
-   - Fix any ⚠️ items above before using those tools
-   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   ```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Next steps:
+  → Run /onboard-knowledge to add your first skill files (do this before /perform)
+  → Add your first task to TASKS.md
+  → Run /perform to start it
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
 
 ---
 
@@ -403,6 +417,7 @@ Confirm phase and continue.
 
 - **Never overwrite `user-config.md` without explicit confirmation** from the user.
 - **Never write personal context files without user input** — no templates with fake data.
-- **If any phase fails or is skipped**, note it in the summary and continue.
-  Setup is resumable: re-running `/setup` re-checks each phase.
-- **Do not auto-proceed through phases** — confirm between phases.
+- **Auto-proceed between phases** unless user input is required or something fails.
+  Only stop for: user input (Phase 1, optional tool selection), failures, or restart notices.
+- **Setup is resumable** — re-running `/setup` re-checks each phase and skips completed steps.
+- **If any phase fails or is skipped**, note it in the summary and continue where possible.

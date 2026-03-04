@@ -25,55 +25,36 @@ The following must already be installed before continuing:
 
 ## Getting started
 
-### 1. Open VS Code in WSL
+### 1. Open a VS Code terminal
 
-From your laptop, open a WSL terminal and type:
+From any WSL terminal, type `code .` to open VS Code connected to WSL. Then open a terminal inside VS Code: **Terminal → New Terminal**.
 
-```bash
-code .
-```
-
-This opens VS Code connected to your WSL environment.
-
-### 2. Open a terminal in VS Code
-
-In VS Code: **Terminal → New Terminal**. This terminal runs inside WSL.
-
-### 3. Clone the repo
+### 2. Clone the repo and copy the entry point
 
 ```bash
 gh repo clone maartendejong-teampicnic/picnic-analyst-assistant ~/picnic-analyst-assistant
+mkdir -p ~/.claude/commands/ && cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/
 ```
 
-### 4. Bootstrap
-
-Copy the setup command, then reopen VS Code from inside the repo:
+### 3. Open VS Code from the repo and run `/setup`
 
 ```bash
-mkdir -p ~/.claude/commands/
-cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/
 cd ~/picnic-analyst-assistant && code .
 ```
 
-### 5. Run setup
+This reopens VS Code from inside the repo — **this is the activation step**. Claude Code loads the analyst assistant automatically from `CLAUDE.md` in whatever folder VS Code is opened from. You must open from `~/picnic-analyst-assistant/` every time you want to use the assistant.
 
-In Claude Code (the Claude panel in VS Code), run:
-
-```
-/setup
-```
-
-The setup guide walks you through the rest: installing all commands, configuring your identity, verifying MCP connections (Snowflake, GitHub, Confluence, Slack), and syncing shared skills.
+Then in the Claude Code panel, type `/setup`. The setup guide handles the rest.
 
 ---
 
 ### Going forward
 
-Always open VS Code from the repo folder so the analyst context loads automatically:
-
-```bash
-cd ~/picnic-analyst-assistant && code .
-```
+> ⚠️ **Always open VS Code from `~/picnic-analyst-assistant/`** to activate the analyst assistant:
+> ```bash
+> cd ~/picnic-analyst-assistant && code .
+> ```
+> If you open VS Code from your home directory or another folder, the analyst context will not load.
 
 ---
 
