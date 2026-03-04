@@ -14,30 +14,66 @@ The more precisely an agent knows your conventions and context, the more consist
 
 ---
 
-## Setup
+## Prerequisites
 
-### 1. Clone the repo
+The following must already be installed before continuing:
+
+- **Claude Code + VS Code** — [Claude Code installation guide](https://picnic.atlassian.net/wiki/spaces/ADP/pages/4627071060)
+- **GitHub, Snowflake, and dev tooling** — [Developer security setup](https://picnic.atlassian.net/wiki/spaces/DEVSEC/pages/5599363243)
+
+---
+
+## Getting started
+
+### 1. Open VS Code in WSL
+
+From your laptop, open a WSL terminal and type:
 
 ```bash
-git clone <repo-url> ~/picnic-analyst-assistant
+code .
 ```
 
-### 2. Copy the setup command
+This opens VS Code connected to your WSL environment.
+
+### 2. Open a terminal in VS Code
+
+In VS Code: **Terminal → New Terminal**. This terminal runs inside WSL.
+
+### 3. Clone the repo
+
+```bash
+gh repo clone maartendejong-teampicnic/picnic-analyst-assistant ~/picnic-analyst-assistant
+```
+
+### 4. Bootstrap
+
+Copy the setup command, then reopen VS Code from inside the repo:
 
 ```bash
 mkdir -p ~/.claude/commands/
 cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/
+cd ~/picnic-analyst-assistant && code .
 ```
 
-### 3. Open Claude Code inside the repo, then run:
+### 5. Run setup
+
+In Claude Code (the Claude panel in VS Code), run:
 
 ```
 /setup
 ```
 
-The setup guide handles everything from there: installing all commands, configuring your identity, verifying MCP connections (Snowflake, GitHub, Confluence, Slack), and syncing shared skills.
+The setup guide walks you through the rest: installing all commands, configuring your identity, verifying MCP connections (Snowflake, GitHub, Confluence, Slack), and syncing shared skills.
 
-**Note:** Open Claude Code from `~/picnic-analyst-assistant/` for analyst work. This is how the analyst context loads — the repo's CLAUDE.md is picked up automatically based on your working directory.
+---
+
+### Going forward
+
+Always open VS Code from the repo folder so the analyst context loads automatically:
+
+```bash
+cd ~/picnic-analyst-assistant && code .
+```
 
 ---
 
@@ -133,6 +169,4 @@ picnic-analyst-assistant/
 
 ## Onboarding a colleague
 
-1. Share the repo URL
-2. They clone to `~/picnic-analyst-assistant` and copy the commands (step 1 above)
-3. They run `/setup` in Claude Code — everything else is guided
+Share this README. They follow the Getting started steps from the top — prerequisites, clone, bootstrap, `/setup`.
