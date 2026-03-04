@@ -134,7 +134,7 @@ Print: `Identity saved. → Moving to connections.` then move to Phase 2.
 
 ## Phase 2 — Connections
 
-**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional.
+**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional. 
 
 ### What are MCPs?
 
@@ -176,7 +176,7 @@ Check if `~/.claude/settings.json` exists:
 }
 ```
 
-For each tool below: if already configured, run verification. If empty or missing, walk through setup first.
+For each tool below: if already configured, run the personalized **verification** of the connection. If a connection for a REQUIRED tool has not been made or is missing, walk through setting up the connection.
 
 ---
 
@@ -427,7 +427,8 @@ Setup complete for <full_name> (<username_prefix>)
 
 Working directory
   Always open Claude Code from the picnic-analyst-assistant folder
-  (CLAUDE.md loads automatically — opening from any other folder gives a plain Claude session)
+  CLAUDE.md loads automatically — opening from any other folder enters a
+  regular Claude session, without the **Analyst Assistant** context.)
 
 Commands     ✅  installed to ~/.claude/commands/
 Identity     ✅  user-config.md written
