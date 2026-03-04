@@ -72,13 +72,16 @@ Print this block after the welcome message (path A) or resume message (path C), 
    • Prompt for tokens to paste (Snowflake)
    • Restart will be required after settings changes
 
-For a smoother experience with fewer approval prompts:
-  → Press Shift+Tab in Claude Code to switch to
-    auto-approve mode before running setup.
+For a smoother experience, I can set auto-approve mode
+so setup runs without permission prompts.
 
+  → Run in auto-approve mode? (y/n)
+    Yes = sets defaultMode to "bypassPermissions" in settings.json
+    No  = keeps default mode (you'll be prompted per action)
+
+Type your choice (y/n), then press Enter to start.
+(Any other input, or just Enter, is treated as 'n'.)
 ─────────────────────────────────────────
-
-Ready to move to Phase 0 - Install?.
 ```
 
 Wait for the user to respond before continuing. Any response (including Enter/empty) counts as proceed.
@@ -183,8 +186,11 @@ After any change to `settings.json`, Claude Code must be restarted for changes t
 ### Pre-check: settings.json
 
 Check if `~/.claude/settings.json` exists:
-- ✅ Exists → read current `mcpServers` and continue
-- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled):
+- ✅ Exists → read current `mcpServers` and continue. If the user answered **y** to the
+  auto-approve question in the pre-flight block, also set `"defaultMode": "bypassPermissions"`
+  in the `permissions` block (create the block if it doesn't exist).
+- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled),
+  using `"defaultMode": "bypassPermissions"` if the user answered **y**, or `"default"` if **n**:
 
 ```json
 {
@@ -233,23 +239,48 @@ When you have the token, update `~/.claude/settings.json`:
 - Set `SNOWFLAKE_TOKEN` to the pasted token
 
 **Verification** (run after configuring, or if already configured):
-Run via the `snowflake-query` skill:
+Run via the `snowflake-query` skill. First try the full query with the fun stat:
 ```sql
 SELECT
   CURRENT_USER() AS you,
   CURRENT_ROLE() AS role,
   CURRENT_WAREHOUSE() AS warehouse,
-  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible,
+  (SELECT COUNT(*)
+   FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
+   WHERE USER_NAME = CURRENT_USER()
+     AND START_TIME > DATEADD(month, -12, CURRENT_TIMESTAMP())
+     AND (QUERY_TAG IS NULL OR QUERY_TAG = '')
+  ) AS untitled_queries
 ```
 
-- ✅ Returns a row → print the wow output:
+If that errors (ANALYST role may lack access to `SNOWFLAKE.ACCOUNT_USAGE`), silently fall back
+to the basic 4-column query (same query without the `untitled_queries` subquery).
+
+- ✅ Returns a row → print the wow output.
+
+  Extract the user's first name from `user-config.md` `full_name` field (Phase 1 has already
+  written this file, so it is always available here).
+
+  With fun stat:
   ```
   ⚡ Snowflake connected
-     You: FIRSTNAME.LASTNAME@TEAMPICNIC.COM
+     Welcome back, <First Name>!
      Role: ANALYST · Warehouse: ANALYSIS
-     Tables accessible: 1,247
+     Tables accessible: 1,471
+     Untitled queries (last 12 months): 847 — a true explorer 🧭
   ```
-  (Use actual values from the query result — substitute the real user and table count.)
+
+  Without fun stat (fallback):
+  ```
+  ⚡ Snowflake connected
+     Welcome back, <First Name>!
+     Role: ANALYST · Warehouse: ANALYSIS
+     Tables accessible: 1,471
+  ```
+
+  (Use actual values from the query result — format table count and untitled_queries with
+  thousands separators.)
 
 - ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
   in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
@@ -262,17 +293,33 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
 
 ### Required: Atlassian
 
-**Check:** Run `claude mcp list` — is `atlassian` in the output?
+**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env` in `settings.json`?
 
 **If not configured:**
-1. Register the MCP server:
+1. Install the package if not already present:
    ```bash
-   claude mcp add --transport http --scope global atlassian https://mcp.atlassian.com/v1/mcp
+   pip install mcp-atlassian
    ```
-2. Open `/mcp` in Claude Code → select **atlassian** → authenticate via browser (OAuth 2.1).
-   No tokens to manage — uses your existing Atlassian account permissions.
+2. Open a browser → `https://id.atlassian.com/manage-profile/security`
+3. Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately
+4. Paste the token when prompted; `CONFLUENCE_USERNAME` is their Picnic email from Phase 1
+   (lowercase, exactly as entered — e.g. `firstname.lastname@teampicnic.com`)
 
-**Verification:** Use the Atlassian MCP to search Confluence for pages you contributed to:
+Add to `mcpServers` in `settings.json`:
+```json
+"confluence": {
+  "command": "mcp-atlassian",
+  "args": [],
+  "env": {
+    "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
+    "CONFLUENCE_USERNAME": "<email from Phase 1>",
+    "CONFLUENCE_API_TOKEN": "<pasted token>"
+  }
+}
+```
+
+**Verification** (run after configuring, or if already configured):
+Use the `confluence` MCP to search for pages you contributed to:
 ```
 CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
 ```
@@ -290,7 +337,8 @@ Print wow output:
 
 Note: Jira is also accessible via this connection — useful for creating tickets in the future.
 
-- ⚠️ Error → Run `claude mcp list` to check the server is registered. Re-run `/mcp` to re-authenticate.
+- ⚠️ Error → Check that `mcp-atlassian` is installed (`pip install mcp-atlassian`) and that the
+  API token and username in `settings.json` are correct.
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
