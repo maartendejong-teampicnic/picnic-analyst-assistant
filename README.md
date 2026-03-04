@@ -99,11 +99,12 @@ picnic-analyst-assistant/
 
 | What | Where | Shared |
 |------|-------|--------|
-| Agent logic, skill files, patterns | `agents/`, `knowledge/`, `patterns/` | ✅ |
+| Agent logic and patterns | `agents/`, `patterns/` | ✅ |
+| Snowflake SQL conventions + routing | `knowledge/sql-snowflake.md`, `knowledge/INDEX.yaml` | ✅ |
 | Picnic business vocabulary | `context/picnic-business.md` | ✅ |
 | Your identity (name, prefix, email) | `user-config.md` | personal |
 | Your task list | `TASKS.md` | personal |
-| Your knowledge files | `knowledge/<skill>.md` (except `sql-snowflake.md`) | personal |
+| Your knowledge files | `knowledge/<skill>.md` (add via `/onboard-knowledge`) | personal |
 | Your project context | `context/<project>.md` | personal |
 | Task and direct output | `tasks/`, `direct/` | personal |
 
