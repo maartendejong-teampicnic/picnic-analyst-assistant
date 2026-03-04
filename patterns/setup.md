@@ -373,7 +373,12 @@ Check for the `picnic-analytical-tools` repo in this order:
   ```
   - ⚠️ Access denied → "Check with your team lead. Re-run `/setup` after access is granted." Skip to Phase 4.
 
-Once present and up to date, run the `sync-picnic-skills` skill.
+Once present and up to date, sync the skills:
+
+Read `<repo-path>/claude-code/skills/sync-picnic-skills/SKILL.md`
+(where `<repo-path>` is the picnic-analytical-tools location found above)
+and follow the instructions in that file. This installs all shared skills by
+creating symlinks from the repo into `~/.claude/skills/`.
 
 - ✅ Success → print the list of installed skills
 - ⚠️ Error → "Sync failed. Re-run `/setup` later to retry."
