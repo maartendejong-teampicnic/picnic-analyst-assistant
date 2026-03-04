@@ -159,7 +159,7 @@ For each tool below: if already configured, run verification. If empty or missin
 1. Open a browser → log into your Snowflake account
 2. Click your avatar (bottom left) → **Settings**
 3. Go to **Authentication** → **Programmatic Access Tokens** → **Generate new token**
-4. Name it `claude-code`, set expiry to maximum (1 year)
+4. Name it `claude-code`, set expiry to maximum (1 year) and **grant access to all your roles**
 5. **Copy the token immediately** — it is shown only once
 6. Paste the token here
 
