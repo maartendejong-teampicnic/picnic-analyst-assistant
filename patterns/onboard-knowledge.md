@@ -2,7 +2,7 @@
 
 ## Role
 When invoked via `/onboard-knowledge`, enter knowledge onboarding mode.
-Your job: guide Maarten through teaching Claude a new skill — producing a
+Your job: guide the user through teaching Claude new knowledge — producing a
 `knowledge/<slug>.md` file and an `INDEX.yaml` entry.
 
 Acknowledge the role in 1 sentence, then proceed immediately to Phase 1.
@@ -42,8 +42,8 @@ From available material, derive each field below. Mark each as CONFIDENT or GAP:
 | Load strategy | From decision rule below |
 | Condition (if conditional) | From domain or source material |
 
-### Slug style — match existing files
-`sql-snowflake`, `pr-dbt-models`, `ab-testing`, `ads-attributes`, `reporting-dashboard`
+### Slug style examples
+`sql-snowflake`, `sql-calcite`, `pr-dbt-models`, `pr-store-config`, `ads-attributes`, `reporting-dashboard`
 
 ### Load strategy rule
 ```
@@ -54,21 +54,21 @@ When uncertain → conditional (lean conditional)
 ```
 
 Concretely:
-- ANALYST: `always` only for Snowflake SQL; everything else `conditional`
-- ENGINEER: `always` for PR workflow + dbt design; `conditional` for anything else
+- ANALYST: `always` only for Snowflake SQL + dashboards; everything else `conditional`
+- ENGINEER: `always` for PR workflow + dbt or edge models; `conditional` for anything else
 - WRITER: `always` for Slack + Confluence; `conditional` for anything else
 - PRESENTER: `always` for slides
-- DESIGNER: `always` for Excalidraw
+- DESIGNER: `always` for Excalidraw + sketches
 - ORCHESTRATOR: `conditional` for everything
 
 ### Agent routing heuristics
 | Domain | Suggested agents |
 |--------|-----------------|
-| SQL, queries, metrics, experiments | ANALYST |
-| dbt models, GitHub PRs, CI, config files | ENGINEER |
+| SQL, Snowflake queries, metrics, experiments, analyses | ANALYST |
+| dbt models, GitHub PRs | ENGINEER |
 | Slack messages, Confluence pages, written docs | WRITER |
 | PowerPoint, presentations | PRESENTER |
-| Diagrams, flowcharts, architecture | DESIGNER |
+| Diagrams, flowcharts, architecture, sketches | DESIGNER |
 | Coordination, routing, synthesis | ORCHESTRATOR |
 | Cross-cutting / multiple domains | multiple agents |
 
@@ -87,7 +87,7 @@ Never ask about something already confidently derived.
 > "What should this skill be called? I'll use this as the human-readable name and derive the slug."
 
 **Q2 — Agent routing** (almost always a gap — ask with routing suggestion):
-Show the suggested agents from the heuristics and ask Maarten to confirm or adjust.
+Show the suggested agents from the heuristics and ask the user to confirm or adjust.
 > "I'd suggest routing this to [X] based on the domain. Is that right, or should I change it?
 > Options: ANALYST / ENGINEER / WRITER / PRESENTER / DESIGNER / ORCHESTRATOR (multiple OK)"
 
@@ -197,7 +197,7 @@ On revision request: apply the change and re-show the updated draft with the app
 On approval:
 
 1. **Check for slug conflict**: verify `knowledge/<slug>.md` does not already exist.
-   If it does: warn Maarten and ask to overwrite or use a different slug before proceeding.
+   If it does: warn the user and ask to overwrite or use a different slug before proceeding.
 
 2. **Write** `knowledge/<slug>.md` with the full file content from Phase 4.
 
@@ -205,7 +205,7 @@ On approval:
    - Insert before the `not_yet_onboarded:` block (preserve that block unchanged)
    - Preserve existing formatting and indentation exactly
 
-4. **Confirm** to Maarten:
+4. **Confirm** to the user:
    ```
    Done. Created:
    - knowledge/<slug>.md
