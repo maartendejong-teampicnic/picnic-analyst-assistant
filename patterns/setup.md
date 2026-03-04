@@ -305,7 +305,12 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
 
 ### Required: Atlassian
 
-**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env` in `settings.json`?
+> **Important:** Use the `mcp-atlassian` Python package configured in `settings.json` — do NOT
+> use `claude mcp add` for Atlassian. The `claude mcp add` approach only supports reading Confluence
+> and Jira; it does not support creating Jira tickets.
+
+**Check:** Are `CONFLUENCE_API_TOKEN` and `JIRA_API_TOKEN` both set and non-empty in
+`mcpServers.confluence.env` in `settings.json`?
 
 **If not configured:**
 1. Install the package if not already present:
@@ -314,10 +319,10 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
    ```
 2. Open a browser → `https://id.atlassian.com/manage-profile/security`
 3. Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately
-4. Paste the token when prompted; `CONFLUENCE_USERNAME` is their Picnic email from Phase 1
-   (lowercase, exactly as entered — e.g. `firstname.lastname@teampicnic.com`)
+4. Paste the token when prompted; `CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email
+   from Phase 1 (lowercase, exactly as entered — e.g. `firstname.lastname@teampicnic.com`)
 
-Add to `mcpServers` in `settings.json`:
+Add to `mcpServers` in `settings.json` (the same API token works for both Confluence and Jira):
 ```json
 "confluence": {
   "command": "mcp-atlassian",
@@ -325,17 +330,29 @@ Add to `mcpServers` in `settings.json`:
   "env": {
     "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
     "CONFLUENCE_USERNAME": "<email from Phase 1>",
-    "CONFLUENCE_API_TOKEN": "<pasted token>"
+    "CONFLUENCE_API_TOKEN": "<pasted token>",
+    "JIRA_URL": "https://picnic.atlassian.net",
+    "JIRA_USERNAME": "<email from Phase 1>",
+    "JIRA_API_TOKEN": "<pasted token>"
   }
 }
 ```
 
 **Verification** (run after configuring, or if already configured):
-Use the `confluence` MCP to search for pages you contributed to:
+
+Step 1 — Confluence: use the `confluence` MCP to search for pages the user contributed to:
 ```
 CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
 ```
 If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmodified DESC LIMIT 5`
+
+Step 2 — Jira: create a test ticket using the `confluence` MCP:
+- Find a Jira project the user has access to (search recent issues assigned to them, or list
+  available projects and pick a team backlog or personal project).
+- Create an issue with:
+  - Summary: `Claude Code setup test — <Full Name>`
+  - Description: `This ticket was automatically created during Claude Code setup to verify the Jira MCP connection. Safe to close.`
+  - Issue type: `Task` (fall back to whatever types are available if Task does not exist)
 
 Print wow output:
 ```
@@ -344,13 +361,16 @@ Print wow output:
      • <page title 1>
      • <page title 2>
      • <page title 3>
+
+   Test Jira ticket created: <PROJECT-123>
+   https://picnic.atlassian.net/browse/<PROJECT-123>
+   (Safe to close — just proves the connection works)
 ```
-(Use actual page titles from the CQL results.)
+(Use actual page titles and the real ticket key + URL from the create response.)
 
-Note: Jira is also accessible via this connection — useful for creating tickets in the future.
-
-- ⚠️ Error → Check that `mcp-atlassian` is installed (`pip install mcp-atlassian`) and that the
-  API token and username in `settings.json` are correct.
+- ⚠️ Error → Check that `mcp-atlassian` is installed (`pip install mcp-atlassian`) and that
+  `settings.json` has both Confluence and Jira env vars set correctly. Do NOT use
+  `claude mcp add atlassian` — that approach does not support Jira ticket creation.
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
