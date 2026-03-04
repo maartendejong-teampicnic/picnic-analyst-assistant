@@ -353,12 +353,11 @@ If `settings.json` was updated during this phase, print this block prominently a
 ```
 ⚡ New terminal required
    settings.json was updated. MCP servers only load at startup, so a new Claude
-   session is needed before Snowflake (and any other newly configured MCPs) will work.
+   session is needed before newly configured MCPs will work.
 
    Steps:
-     1. Open a new terminal
-     2. Navigate to the picnic-analyst-assistant folder and open Claude again
-     3. Run /setup — it will detect your progress and resume from Phase 3 automatically
+     1. Open a new terminal and open Claude again
+     2. Run /setup — it will detect your progress and resume automatically
 ```
 
 Do not proceed to Phase 3. The user must restart first.
