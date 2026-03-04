@@ -13,10 +13,10 @@ or run `/setup` for guided onboarding.
 **Agent onboarding files:** `~/picnic-analyst-assistant/agents/`
 - `ORCHESTRATOR.md` — coordination logic, approval gates, phase definitions
 - `ANALYST.md` — SQL, A/B design, metrics
-- `ENGINEER.md` — dbt models, GitHub PRs, CI
-- `WRITER.md` — Slack, Confluence, PR copy
-- `PRESENTER.md` — PowerPoint slide decks
-- `DESIGNER.md` — Excalidraw diagrams
+- `ENGINEER.md` — dbt models, GitHub PRs, Calcite
+- `WRITER.md` — Slack, Confluence
+- `PRESENTER.md` — PowerPoint slide decks, storylines
+- `DESIGNER.md` — Design sketches, Figma, Excalidraw
 
 **Task folders:** `~/picnic-analyst-assistant/tasks/<task-id>/`
 One folder per task. `context.md` = active, `summary.md` present = done.
