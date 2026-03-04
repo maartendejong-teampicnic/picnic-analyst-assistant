@@ -76,9 +76,9 @@ Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
 Ask in one message:
 > "What's your full name and Picnic email?
-> And which team are you on? (e.g. Consumer / Shopping / Ads)
+> And which team are you on? (e.g. Consumer - Shopping - Usuals)
 >
-> Example: Maarten de Jong · maarten.dejong@teampicnic.com · Consumer"
+> Example: Maarten de Jong · maarten.dejong@teampicnic.com · Consumer - Shopping - Usuals"
 
 From the email, derive the username prefix automatically:
 - Logic: first char of first name + lastname, all lowercase, no spaces
@@ -229,8 +229,6 @@ Print wow output:
 ```
 (Use actual values from the commands. If no personal PRs found, skip that section gracefully.)
 
-- ⚠️ Access denied → "Check with your team lead to be added to the PicnicSupermarket org."
-
 Note: `gh` credentials are stored by the CLI — no entry needed in `settings.json`.
 
 ---
@@ -239,9 +237,10 @@ Note: `gh` credentials are stored by the CLI — no entry needed in `settings.js
 
 Ask once:
 > "Which optional tools would you like to set up?
->   A — Confluence (read/write wiki pages)
+>   A — Confluence (read/write pages)
 >   B — Slack (read channels, send messages)
->   C — Skip for now
+    C — Other
+>   D — Skip for now
 >
 > You can always re-run /setup to add them later."
 
