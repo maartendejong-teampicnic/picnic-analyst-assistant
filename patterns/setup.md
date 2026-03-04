@@ -313,14 +313,18 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
 `mcpServers.confluence.env` in `settings.json`?
 
 **If not configured:**
-1. Install the package if not already present:
-   ```bash
-   pip install mcp-atlassian
-   ```
-2. Open a browser → `https://id.atlassian.com/manage-profile/security`
-3. Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately
-4. Paste the token when prompted; `CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email
-   from Phase 1 (lowercase, exactly as entered — e.g. `firstname.lastname@teampicnic.com`)
+
+First, silently install the package (no user input needed):
+```bash
+pip install mcp-atlassian
+```
+
+Then ask the user for their API token:
+> "Open a browser → https://id.atlassian.com/manage-profile/security
+> Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
+> Paste the token here when you have it."
+
+`CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email from Phase 1 — no need to ask again.
 
 Add to `mcpServers` in `settings.json` (the same API token works for both Confluence and Jira):
 ```json
