@@ -276,12 +276,14 @@ When you have the token, add to `mcpServers` in `settings.json`:
 }
 ```
 
-**Verification:** Use the Confluence MCP to search for "analytics" — return the first result's title.
+**Verification:** Use the Confluence MCP to search for pages they contributed to using CQL:
+`contributor = currentUser() ORDER BY lastmodified DESC`
+If that returns no results (new employee), fall back to searching for "analytics".
 
 Print wow output:
 ```
 ⚡ Confluence connected
-   Found: "Analytics & Data — Home" (Picnic Confluence)
+   Found: (title of the first result returned)
 ```
 (Use the actual page title returned.)
 
