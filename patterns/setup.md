@@ -32,7 +32,7 @@ Let's go.
 ### 1. Install commands
 
 ```bash
-cp ~/picnic-analyst-assistant/commands/*.md ~/.claude/commands/
+cp ./commands/*.md ~/.claude/commands/
 ```
 
 List the installed files. Print: `✅ All commands installed.`
@@ -42,8 +42,8 @@ List the installed files. Print: `✅ All commands installed.`
 Protect personalizations in agents/, commands/, and patterns/ from being accidentally committed:
 
 ```bash
-git -C ~/picnic-analyst-assistant update-index --skip-worktree \
-  $(git -C ~/picnic-analyst-assistant ls-files agents/ commands/ patterns/)
+git update-index --skip-worktree \
+  $(git ls-files agents/ commands/ patterns/)
 ```
 
 - ✅ No output → working. `git status` will always be clean for these files.
@@ -51,7 +51,7 @@ git -C ~/picnic-analyst-assistant update-index --skip-worktree \
 
 ### 3. TASKS.md
 
-Check if `~/picnic-analyst-assistant/TASKS.md` exists. If not, create it silently:
+Check if `./TASKS.md` exists in the current directory. If not, create it silently:
 
 ```markdown
 # Tasks
@@ -63,8 +63,8 @@ Check if `~/picnic-analyst-assistant/TASKS.md` exists. If not, create it silentl
 
 ### 4. Entry point check
 
-If `~/CLAUDE.md` exists and references this repo, tell the user:
-"You have a `~/CLAUDE.md` that imports from this repo — it is no longer needed. You can delete it if you like."
+If `~/CLAUDE.md` exists, delete it automatically and tell the user:
+"Deleted `~/CLAUDE.md` — the analyst context now loads only when you open Claude Code from this folder. Opening from anywhere else gives a plain Claude session, which is intentional."
 
 Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
@@ -324,7 +324,7 @@ If `settings.json` was updated during this phase, print this block prominently a
 ```
 ⚡ Restart required
    settings.json was updated. Restart Claude Code now, then reopen VS Code from
-   ~/picnic-analyst-assistant/ and run /setup again — it will pick up from Phase 3.
+   the picnic-analyst-assistant folder and run /setup again — it will pick up from Phase 3.
 ```
 
 Do not proceed to Phase 3. The user must restart first.
@@ -397,8 +397,8 @@ Setup complete for <full_name> (<username_prefix>)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Working directory
-  Always open Claude Code from ~/picnic-analyst-assistant/
-  (CLAUDE.md loads automatically — opening from any other folder won't activate the assistant)
+  Always open Claude Code from the picnic-analyst-assistant folder
+  (CLAUDE.md loads automatically — opening from any other folder gives a plain Claude session)
 
 Commands     ✅  installed to ~/.claude/commands/
 Identity     ✅  user-config.md written
