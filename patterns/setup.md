@@ -80,11 +80,10 @@ so setup runs without permission prompts.
     No  = keeps default mode (you'll be prompted per action)
 
 Type your choice (y/n), then press Enter to start.
-(Any other input, or just Enter, is treated as 'n'.)
 ─────────────────────────────────────────
 ```
 
-Wait for the user to respond before continuing. Any response (including Enter/empty) counts as proceed.
+Wait for the user to respond before continuing. Adjust the settings accordingly.
 
 ---
 
