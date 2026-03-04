@@ -164,7 +164,8 @@ For each tool below: if already configured, run verification. If empty or missin
 6. Paste the token here
 
 When you have the token, update `~/.claude/settings.json`:
-- Set `SNOWFLAKE_USER` to their email **in UPPERCASE** (e.g. `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
+- Set `SNOWFLAKE_USER` to their email from Phase 1, converted to **UPPERCASE**
+  (e.g. `firstname.lastname@teampicnic.com` → `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
 - Set `SNOWFLAKE_TOKEN` to the pasted token
 
 **Verification** (run after configuring, or if already configured):
@@ -392,7 +393,7 @@ Setup complete for <full_name> (<username_prefix>)
 
 Working directory
   Always open Claude Code from ~/picnic-analyst-assistant/
-  (CLAUDE.md loads automatically — opens from any other folder won't activate the assistant)
+  (CLAUDE.md loads automatically — opening from any other folder won't activate the assistant)
 
 Commands     ✅  installed to ~/.claude/commands/
 Identity     ✅  user-config.md written

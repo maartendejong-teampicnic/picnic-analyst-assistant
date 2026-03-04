@@ -9,6 +9,7 @@
 # Core repo files
 !.gitignore
 !CLAUDE.md
+!CONTEXT.md
 !README.md
 !user-config.md.example
 
