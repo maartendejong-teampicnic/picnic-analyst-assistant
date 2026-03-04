@@ -76,16 +76,16 @@ Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
 Ask in one message:
 > "What's your full name and Picnic email?
-> And which team are you on? (e.g. Consumer - Shopping - Usuals)
+> And which team are you on? (e.g. Consumer - Shopping, Product - Growth, Supply Chain - Forecasting)
 >
-> Example: Maarten de Jong · maarten.dejong@teampicnic.com · Consumer - Shopping - Usuals"
+> Example: Anna van Berg · anna.vanberg@teampicnic.com · Consumer - Shopping - Usuals"
 
 From the email, derive the username prefix automatically:
-- Logic: first char of first name + lastname, all lowercase, no spaces
-- `maarten.dejong@teampicnic.com` → `mdejong`
+- Logic: first char of first name + lastname, all lowercase, no spaces or dots
+- `anna.vanberg@teampicnic.com` → `avanberg`
 
 In the same reply or a follow-up, show the derived prefix and confirm:
-> "Username prefix: `mdejong` — looks good? Press Enter to confirm, or type a different one."
+> "Username prefix: `avanberg` — looks good? Press Enter to confirm, or type a different one."
 
 Check if `~/picnic-analyst-assistant/user-config.md` already exists. If it does, show the current
 contents and ask: "Overwrite with new values?" Only proceed if they confirm.
