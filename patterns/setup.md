@@ -180,11 +180,11 @@ SELECT
 - ✅ Returns a row → print the wow output:
   ```
   ⚡ Snowflake connected
-     You: MAARTEN.DEJONG@TEAMPICNIC.COM
+     You: FIRSTNAME.LASTNAME@TEAMPICNIC.COM
      Role: ANALYST · Warehouse: ANALYSIS
      Tables accessible: 1,247
   ```
-  (Use actual values from the query result.)
+  (Use actual values from the query result — substitute the real user and table count.)
 
 - ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
   in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
@@ -222,10 +222,10 @@ Print wow output:
    Organisation: PicnicSupermarket — access confirmed
 
    Your recent PRs in picnic-dbt-models:
-     • feat: add usuals retention metric (merged)
-     • fix: null handling in order model (merged)
+     • <actual PR title> (<state>)
+     • <actual PR title> (<state>)
 
-   Latest open PR: "feat: add new retention model for NL"
+   Latest open PR: "<actual PR title>"
 ```
 (Use actual values from the commands. If no personal PRs found, skip that section gracefully.)
 
@@ -239,8 +239,7 @@ Ask once:
 > "Which optional tools would you like to set up?
 >   A — Confluence (read/write pages)
 >   B — Slack (read channels, send messages)
-    C — Other
->   D — Skip for now
+>   C — Skip for now
 >
 > You can always re-run /setup to add them later."
 
