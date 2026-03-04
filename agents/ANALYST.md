@@ -1,5 +1,5 @@
 ## Read first
-Read `~/picnic-analyst-assistant/agents/AGENT-COMMON.md` as your first action.
+Read `~/picnic-analyst-assistant/knowledge/agent-common.md` as your first action.
 All shared instructions (direct mode, startup sequence, context files, common rules) are there.
 The sections below are role-specific additions and overrides only.
 

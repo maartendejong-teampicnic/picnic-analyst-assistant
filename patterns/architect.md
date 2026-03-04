@@ -12,12 +12,13 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 
 ## System Map
 
-### Shared vs. personal layers
+### File tiers
 
-| Layer | What's in it | Git status |
-|-------|-------------|------------|
-| **Shared** | `CLAUDE.md`, `CONTEXT.md`, `agents/`, `knowledge/INDEX.yaml`, `knowledge/sql-snowflake.md`, `patterns/`, `tools/costs/`, `commands/`, `context/picnic-business.md`, `README.md`, `user-config.md.example`, `.gitignore` | Committed — same for all users |
-| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (except sql-snowflake.md), `context/communication-style.md`, `context/setup-notes.md`, `context/<project>.md` | Gitignored — per-user only |
+| Tier | What's in it | Git behaviour |
+|------|-------------|---------------|
+| **Framework** | `CLAUDE.md`, `CONTEXT.md`, `README.md`, `user-config.md.example`, `.gitignore`, `patterns/` | Committed and tracked — do not edit |
+| **Working files** | `agents/`, `commands/`, `context/`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
+| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (personal), `context/<project>.md` | Gitignored — never committed |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
 get `username_prefix` for task IDs and `direct/` output folder names.
@@ -31,40 +32,31 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 | `~/.claude/projects/-home-picnic/memory/MEMORY.md` | Auto-memory index (always loaded) |
 
 ### Commands (`~/.claude/commands/`)
-| Command | Backed by | Purpose |
-|---------|-----------|---------|
-| `/perform` | agents/ORCHESTRATOR.md | Multi-agent task orchestration |
-| `/tasks` | reads TASKS.md | Display task list |
-| `/analyst` | agents/ANALYST.md | Direct analyst mode |
-| `/engineer` | agents/ENGINEER.md | Direct engineer mode |
-| `/writer` | agents/WRITER.md | Direct writer mode |
-| `/presenter` | agents/PRESENTER.md | Direct presenter mode |
-| `/designer` | agents/DESIGNER.md | Direct designer mode |
-| `/gdrive` | tools/gdrive/SKILL.md | Google Drive browse/read (personal — not in shared repo) |
-| `/costs` | tools/costs/SKILL.md | Claude API cost breakdown |
-| `/excalidraw` | ~/.claude/skills/excalidraw.md | Excalidraw diagram generation |
-| `/setup` | patterns/setup.md | Guided onboarding for new users |
-| `/architect` | patterns/architect.md | This mode |
-| `/onboard-knowledge` | patterns/onboard-knowledge.md | Guided skill onboarding (knowledge/ + INDEX.yaml) |
+One `.md` file per command — each is a thin wrapper pointing at an agent or pattern file.
+See `commands/` for the current list. Framework commands (setup, architect, onboard-knowledge)
+are backed by `patterns/`. Agent commands (perform, analyst, engineer, writer, …) are backed
+by `agents/`.
+
+Adding a command: create `commands/<name>.md` with `@~/picnic-analyst-assistant/agents/<ROLE>.md`
+and `$ARGUMENTS`. Re-run `cp ./commands/*.md ~/.claude/commands/` to install it.
 
 ### Agents (`picnic-analyst-assistant/agents/`)
-| Agent | Domain | Reads on startup |
-|-------|--------|-----------------|
-| ORCHESTRATOR | Coordination, routing | INDEX.yaml (always + conditional for ORCHESTRATOR role) + context files |
-| ANALYST | SQL, A/B testing, metrics | INDEX.yaml (always + conditional for ANALYST role) + context/picnic-business.md |
-| ENGINEER | dbt, GitHub PRs, Calcite SQL | INDEX.yaml (always + conditional for ENGINEER role) + context/usuals-project.md |
-| WRITER | Slack, Confluence, PR copy | INDEX.yaml (always + conditional for WRITER role) + context/communication-style.md |
-| PRESENTER | PowerPoint .pptx | INDEX.yaml (always + conditional for PRESENTER role) + context/setup-notes.md |
-| DESIGNER | Excalidraw diagrams | INDEX.yaml (always + conditional for DESIGNER role) + ~/.claude/skills/excalidraw.md (hardcoded) |
+See `agents/` for the current list. Each agent file defines one specialist role.
+All agents share a common preamble: they read `knowledge/agent-common.md` first (via
+the "Read first" block at the top of every agent file), then load role-specific knowledge
+via `knowledge/INDEX.yaml`.
+
+Adding an agent: see "Add a new specialist agent" runbook below.
 
 ### Knowledge files (`picnic-analyst-assistant/knowledge/`) — self-contained skill files, loaded by agents
 Routing (which agents load which files) is declared in `INDEX.yaml`. See that file for the full routing map.
 
-**Shared** (committed to repo, available to all users):
+**Shared starting points** (committed; skip-worktree'd after `/setup` so edits stay local):
 
 | File | Domain |
 |------|--------|
 | `INDEX.yaml` | Knowledge routing authority (`agents` + `load` per skill) |
+| `agent-common.md` | Shared agent instructions (direct mode, startup, common rules) |
 | `sql-snowflake.md` | Snowflake SQL conventions + table patterns |
 
 **Personal** (gitignored — specific to each user's setup, added via `/onboard-knowledge`):
@@ -87,8 +79,7 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 |------|--------|---------|------|
 | `picnic-business.md` | Picnic vocabulary, markets, KPIs | ANALYST, ORCHESTRATOR | Shared (committed) |
 | `communication-style.md` | Slack/Confluence style, stakeholder map | WRITER | Personal (gitignored) |
-| `<project>.md` | Active project context (e.g. usuals-project.md) | ANALYST, WRITER, PRESENTER, DESIGNER | Personal (gitignored) |
-| `setup-notes.md` | Setup log, MCP status, tool notes | PRESENTER | Personal (gitignored) |
+| `<project>.md` | Active project context (e.g. usuals-project.md) | ANALYST, WRITER | Personal (gitignored) |
 
 ### Pattern files (`picnic-analyst-assistant/patterns/`) — architect only
 | File | Used by |
@@ -199,16 +190,27 @@ Manual fallback (if needed):
 5. Update this file: add to Context files table above
 
 ### Add a new specialist agent
-1. Create `agents/<ROLE>.md` — use an existing agent as template:
-   - Direct Mode section, startup sequence, core rules, workflow, output schema, knowledge/context files
-2. Add to ORCHESTRATOR.md: specialist agents table + routing table
-3. Create `~/.claude/commands/<role>.md`:
+Three files — nothing else:
+
+1. Create `agents/<ROLE>.md` — copy an existing agent as template.
+   Keep the "Read first" block at the top (it loads `knowledge/agent-common.md`).
+   Add role-specific direct mode, startup sequence, core rules, and output schema.
+
+2. Create `commands/<role>.md`:
    ```
    @~/picnic-analyst-assistant/agents/<ROLE>.md
-   $ARGUMENTS
+
+   **DIRECT MODE** — invoked via `/<role>`, not via the orchestrator.
+   Follow the Direct Mode section above. Instructions: $ARGUMENTS
    ```
-4. Update MEMORY.md: add to "Slash Commands" and note in agent list
-5. Update this file: add to Commands table and Agents table above
+   Then install: `cp commands/<role>.md ~/.claude/commands/`
+
+3. Add one row to `ORCHESTRATOR.md` specialist agents table:
+   ```
+   | **<ROLE>** | <output type> | <when to spawn> |
+   ```
+
+No other files need updating — not CLAUDE.md, not INDEX.yaml, not architect.md.
 
 ### Add a new local tool (Python tool)
 1. Create `picnic-analyst-assistant/tools/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`

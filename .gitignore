@@ -1,30 +1,38 @@
 # Allowlist — only explicitly listed files are committed to the shared repo.
 # Everything else is personal/configurable and stays local.
-# For already-tracked files (agents, commands, patterns): run `git update-index --skip-worktree`
-# after cloning (done automatically by /setup) to hide local modifications from git status.
+#
+# Two-tier model:
+#   Framework files (CLAUDE.md, README.md, patterns/) — committed, tracked, do not edit.
+#   Working files (agents/, commands/, context/, knowledge/, tools/) — committed as starting
+#   points, then skip-worktree'd by /setup so your edits are never tracked.
 
 # Ignore everything by default
 *
 
-# Core repo files
+# Framework — committed and tracked; do not edit
 !.gitignore
 !CLAUDE.md
 !CONTEXT.md
 !README.md
 !user-config.md.example
-
-# Agents, commands, patterns — committed as shared starting points; personalizable after clone
-!agents/
-!agents/*.md
-!commands/
-!commands/*.md
-commands/gdrive.md
 !patterns/
 !patterns/*.md
 
-# Knowledge — only these two files are shared; all others are personal
+# Working files — committed as starting points; skip-worktree'd after /setup so edits stay local
+!agents/
+!agents/*.md
+agents/DESIGNER.md
+agents/PRESENTER.md
+!commands/
+!commands/*.md
+commands/gdrive.md
+commands/designer.md
+commands/presenter.md
+
+# Knowledge — INDEX.yaml and agent-common.md are shared starting points; all other skill files are personal
 !knowledge/
 !knowledge/INDEX.yaml
+!knowledge/agent-common.md
 !knowledge/sql-snowflake.md
 
 # Context — only Picnic business vocab is shared

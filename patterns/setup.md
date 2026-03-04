@@ -100,14 +100,15 @@ List the installed files. Print: `✅ All commands installed.`
 
 ### 2. Git isolation
 
-Protect personalizations in agents/, commands/, and patterns/ from being accidentally committed:
+Mark all working files as skip-worktree so your edits are never accidentally committed.
+Framework files (CLAUDE.md, README.md, patterns/) remain tracked — do not edit those.
 
 ```bash
 git update-index --skip-worktree \
-  $(git ls-files agents/ commands/ patterns/)
+  $(git ls-files agents/ commands/ context/ knowledge/ tools/ direct/ tasks/)
 ```
 
-- ✅ No output → working. `git status` will always be clean for these files.
+- ✅ No output → working. `git status` will always be clean for your working files.
 - ⚠️ Error → note it and continue; non-critical.
 
 ### 3. TASKS.md

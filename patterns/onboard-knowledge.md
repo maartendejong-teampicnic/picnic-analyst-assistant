@@ -57,8 +57,6 @@ Concretely:
 - ANALYST: `always` only for Snowflake SQL + dashboards; everything else `conditional`
 - ENGINEER: `always` for PR workflow + dbt or edge models; `conditional` for anything else
 - WRITER: `always` for Slack + Confluence; `conditional` for anything else
-- PRESENTER: `always` for slides
-- DESIGNER: `always` for Excalidraw + sketches
 - ORCHESTRATOR: `conditional` for everything
 
 ### Agent routing heuristics
@@ -67,8 +65,6 @@ Concretely:
 | SQL, Snowflake queries, metrics, experiments, analyses | ANALYST |
 | dbt models, GitHub PRs | ENGINEER |
 | Slack messages, Confluence pages, written docs | WRITER |
-| PowerPoint, presentations | PRESENTER |
-| Diagrams, flowcharts, architecture, sketches | DESIGNER |
 | Coordination, routing, synthesis | ORCHESTRATOR |
 | Cross-cutting / multiple domains | multiple agents |
 
@@ -89,7 +85,7 @@ Never ask about something already confidently derived.
 **Q2 — Agent routing** (almost always a gap — ask with routing suggestion):
 Show the suggested agents from the heuristics and ask the user to confirm or adjust.
 > "I'd suggest routing this to [X] based on the domain. Is that right, or should I change it?
-> Options: ANALYST / ENGINEER / WRITER / PRESENTER / DESIGNER / ORCHESTRATOR (multiple OK)"
+> Options: any agent in agents/ — common ones: ANALYST / ENGINEER / WRITER / ORCHESTRATOR (multiple OK)"
 
 **Q3 — Load strategy** (only if the rule above doesn't yield a confident answer):
 > "Should agents load this skill:

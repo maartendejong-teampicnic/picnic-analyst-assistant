@@ -6,6 +6,9 @@
 # Context files (picnic-business.md, etc.) are NOT listed here.
 # They are project reference, not skills, and are hardcoded in each agent file.
 #
+# agent-common.md is NOT listed here either — it is loaded by every agent via the
+# "Read first" block at the top of each agent file, not via INDEX.yaml routing.
+#
 # How to add a new skill:
 #   1. Create knowledge/<skill-name>.md using the standard template
 #   2. Add an entry below — that's it. No other files need changing.

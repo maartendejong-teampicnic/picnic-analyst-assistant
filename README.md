@@ -54,12 +54,11 @@ picnic-analyst-assistant/
 │   ├── ORCHESTRATOR.md
 │   ├── ANALYST.md
 │   ├── ENGINEER.md
-│   ├── WRITER.md
-│   ├── PRESENTER.md
-│   └── DESIGNER.md
+│   └── WRITER.md
 │
 ├── knowledge/                         # skill files loaded by agents at runtime
 │   ├── INDEX.yaml                     # routing: which agent loads which file
+│   ├── agent-common.md                # shared agent instructions (direct mode, startup, rules)
 │   └── sql-snowflake.md               # shared Snowflake SQL conventions (example format)
 │
 ├── patterns/                          # meta-maintenance
@@ -90,23 +89,45 @@ picnic-analyst-assistant/
 └── user-config.md                     # your identity: name, prefix, email, team (gitignored)
 ```
 
-**Shared** — committed to the repo, the same for every team member.
-**Gitignored** — your private configuration and outputs, never committed.
-
 ---
 
-## Shared vs. personal
+## File tiers
 
-| What | Where | Shared |
-|------|-------|--------|
-| Agent logic and patterns | `agents/`, `patterns/` | ✅ |
-| Snowflake SQL conventions + routing | `knowledge/sql-snowflake.md`, `knowledge/INDEX.yaml` | ✅ |
-| Picnic business vocabulary | `context/picnic-business.md` | ✅ |
-| Your identity (name, prefix, email) | `user-config.md` | personal |
-| Your task list | `TASKS.md` | personal |
-| Your knowledge files | `knowledge/<skill>.md` (add via `/onboard-knowledge`) | personal |
-| Your project context | `context/<project>.md` | personal |
-| Task and direct output | `tasks/`, `direct/` | personal |
+The repo uses a three-tier model — know which tier a file is in before editing it.
+
+### Framework — do not edit
+These files define how the system works. Edits here affect everyone who clones the repo.
+
+| File / folder | Purpose |
+|---------------|---------|
+| `CLAUDE.md` | Orchestration rules, loaded automatically by Claude Code |
+| `README.md` | This file |
+| `CONTEXT.md` | Blank task context template used by the orchestrator |
+| `user-config.md.example` | Identity template for new users |
+| `.gitignore` | Allowlist that controls what is committed |
+| `patterns/` | Setup, architect, and onboard-knowledge patterns |
+
+### Working files — yours to customise
+These are committed as starting points so you get them on `git clone`. After `/setup` runs,
+they are marked skip-worktree — any edits you make stay local and will never be committed.
+
+| File / folder | Purpose |
+|---------------|---------|
+| `agents/` | Agent onboarding files — adapt prompts and rules to your workflow |
+| `commands/` | Slash command definitions — add, rename, or remove commands |
+| `context/` | Reference context loaded by agents — add your project files here |
+| `knowledge/` | Skill files — extend INDEX.yaml and add your own via `/onboard-knowledge` |
+| `tools/costs/` | Claude API cost tracking tool |
+
+### Private — never committed
+Created locally; gitignored.
+
+| File / folder | Purpose |
+|---------------|---------|
+| `user-config.md` | Your identity (name, email, username prefix, team) |
+| `TASKS.md` | Your task list |
+| `tasks/` | Per-task output folders |
+| `direct/` | Direct-mode output folders |
 
 ---
 

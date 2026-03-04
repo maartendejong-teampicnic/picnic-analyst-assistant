@@ -1,5 +1,5 @@
 ## Read first
-Read `~/picnic-analyst-assistant/agents/AGENT-COMMON.md` as your first action.
+Read `~/picnic-analyst-assistant/knowledge/agent-common.md` as your first action.
 Sections 4 (context files) and 5 (common rules) apply to you.
 Sections 2 (direct mode) and 3 (startup sequence) do NOT apply — your startup and mode are
 defined below. Section 6 (output file header) applies to summary.md output.
@@ -54,8 +54,6 @@ Each task lives in its own folder:
 ├── analyst.md      ← ANALYST output: queries, results, A/B design
 ├── engineer.md     ← ENGINEER output: PR details, diffs, CI status
 ├── writer.md       ← WRITER output: Slack drafts, Confluence content, PR copy
-├── presenter.md    ← PRESENTER output: slide plan, .pptx path
-├── designer.md     ← DESIGNER output: diagram description, .excalidraw path
 └── summary.md      ← orchestrator synthesis: what was produced, links, outcome
 ```
 
@@ -102,8 +100,6 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
 | **ANALYST** | SQL queries, analysis results, A/B design | data questions, metrics, experiments |
 | **ENGINEER** | dbt models, GitHub PRs, CI validation | code changes, dbt, Calcite SQL in store-config |
 | **WRITER** | Slack drafts, Confluence pages, PR body copy | any written communication |
-| **PRESENTER** | .pptx slide files | executive presentations, slide decks |
-| **DESIGNER** | .excalidraw diagram files | architecture diagrams, flowcharts, schemas |
 
 Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
 
@@ -177,8 +173,6 @@ g. Update `## Subtask Tracker` in `tasks/<task-id>/context.md` after each agent
   ## Artifacts
   - PR: <url if applicable>
   - Sheet: <url if applicable>
-  - Slides: <path if applicable>
-  - Diagram: <path if applicable>
 
   ## Agents used
   <list of roles that ran>

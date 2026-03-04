@@ -11,12 +11,9 @@ or run `/setup` for guided onboarding.
 ---
 
 **Agent onboarding files:** `~/picnic-analyst-assistant/agents/`
-- `ORCHESTRATOR.md` — coordination logic, approval gates, phase definitions
-- `ANALYST.md` — SQL, A/B design, metrics
-- `ENGINEER.md` — dbt models, GitHub PRs, Calcite
-- `WRITER.md` — Slack, Confluence
-- `PRESENTER.md` — PowerPoint slide decks, storylines
-- `DESIGNER.md` — Design sketches, Figma, Excalidraw
+Each file defines one specialist role. The repo ships with ORCHESTRATOR, ANALYST, ENGINEER,
+and WRITER as starting points — add your own or customise existing ones freely.
+All agent files share a common preamble via `knowledge/agent-common.md` (loaded first by every agent).
 
 **Task folders:** `~/picnic-analyst-assistant/tasks/<task-id>/`
 One folder per task. `context.md` = active, `summary.md` present = done.
