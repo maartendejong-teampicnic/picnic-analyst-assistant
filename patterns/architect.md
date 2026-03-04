@@ -17,7 +17,7 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 | Tier | What's in it | Git behaviour |
 |------|-------------|---------------|
 | **Framework** | `CLAUDE.md`, `CONTEXT.md`, `README.md`, `user-config.md.example`, `.gitignore`, `patterns/` | Committed and tracked — do not edit |
-| **Working files** | `agents/`, `commands/`, `context/`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
+| **Working files** | `agents/`, `commands/`, `context/`, `agents/INDEX.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
 | **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (personal), `context/<project>.md` | Gitignored — never committed |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
@@ -45,6 +45,9 @@ See `agents/` for the current list. Each agent file defines one specialist role.
 All agents share a common preamble: they read `knowledge/agent-common.md` first (via
 the "Read first" block at the top of every agent file), then load role-specific knowledge
 via `knowledge/INDEX.yaml`.
+
+`agents/INDEX.yaml` is the agent registry — ORCHESTRATOR reads it at startup to discover
+available agents and their capabilities. Adding a new agent = adding an entry here.
 
 Adding an agent: see "Add a new specialist agent" runbook below.
 
@@ -87,6 +90,7 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `setup.md` | `/setup` command — guided new-user onboarding |
 | `architect.md` | `/architect` command |
 | `onboard-knowledge.md` | `/onboard-knowledge` command |
+| `add-agent.md` | `/add-agent` command — guided new specialist agent creation |
 
 ### Skills
 | Skill | Type | Location |
@@ -190,27 +194,22 @@ Manual fallback (if needed):
 5. Update this file: add to Context files table above
 
 ### Add a new specialist agent
-Three files — nothing else:
+Three steps — nothing else:
 
 1. Create `agents/<ROLE>.md` — copy an existing agent as template.
    Keep the "Read first" block at the top (it loads `knowledge/agent-common.md`).
    Add role-specific direct mode, startup sequence, core rules, and output schema.
 
-2. Create `commands/<role>.md`:
-   ```
-   @~/picnic-analyst-assistant/agents/<ROLE>.md
+2. Create `commands/<role>.md` — copy an existing command wrapper as template.
+   Install: `cp commands/<role>.md ~/.claude/commands/`
 
-   **DIRECT MODE** — invoked via `/<role>`, not via the orchestrator.
-   Follow the Direct Mode section above. Instructions: $ARGUMENTS
-   ```
-   Then install: `cp commands/<role>.md ~/.claude/commands/`
+3. Add one entry to `agents/INDEX.yaml` with `role`, `file`, `output_type`, `spawns_when`.
 
-3. Add one row to `ORCHESTRATOR.md` specialist agents table:
-   ```
-   | **<ROLE>** | <output type> | <when to spawn> |
-   ```
+No other files need updating. ORCHESTRATOR and CONTEXT.md discover agents dynamically.
+If the new agent needs knowledge files: follow "Add a new knowledge skill" above,
+using the new agent's role name in the `agents` field of `knowledge/INDEX.yaml`.
 
-No other files need updating — not CLAUDE.md, not INDEX.yaml, not architect.md.
+Tip: use `/add-agent` for a fully guided version of these steps.
 
 ### Add a new local tool (Python tool)
 1. Create `picnic-analyst-assistant/tools/<name>/` with: `pyproject.toml`, `<name>_tool.py`, `<name>.sh`, `SKILL.md`

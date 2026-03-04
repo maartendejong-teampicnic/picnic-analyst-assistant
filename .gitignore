@@ -21,6 +21,7 @@
 # Working files — committed as starting points; skip-worktree'd after /setup so edits stay local
 !agents/
 !agents/*.md
+!agents/INDEX.yaml
 agents/DESIGNER.md
 agents/PRESENTER.md
 !commands/

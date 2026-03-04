@@ -74,7 +74,9 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
    - File exists and no `summary.md` → task in flight; resume from `## Subtask Tracker`
    - File exists and `summary.md` present → task already done; confirm before restarting
    - File absent → clean slate; start planning
-4. **Knowledge loading:** follow AGENT-COMMON Section 3 step 2 — filter INDEX.yaml for `ORCHESTRATOR` role entries.
+4. Read `~/picnic-analyst-assistant/agents/INDEX.yaml` — this gives you the available specialist
+   agents and their capabilities. Also follow AGENT-COMMON Section 3 step 2 for knowledge loading
+   (filter `knowledge/INDEX.yaml` for `ORCHESTRATOR` role entries).
 5. Build the plan → present to user → wait for explicit approval before spawning agents
 
 ---
@@ -95,11 +97,10 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
 
 ## Specialist agents
 
-| Role | Output type | Spawns when task involves… |
-|------|------------|---------------------------|
-| **ANALYST** | SQL queries, analysis results, A/B design | data questions, metrics, experiments |
-| **ENGINEER** | dbt models, GitHub PRs, CI validation | code changes, dbt, Calcite SQL in store-config |
-| **WRITER** | Slack drafts, Confluence pages, PR body copy | any written communication |
+Read `~/picnic-analyst-assistant/agents/INDEX.yaml` at startup (step 4 in Startup sequence).
+Use the `agents` list to build your specialist table: `spawns_when` tells you when to use each
+role; `output_type` tells you what it produces; `file` tells you which agent file to reference
+in the spawn prompt.
 
 Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
 
@@ -147,7 +148,8 @@ c. Spawn via Agent tool with prompt:
    ~/picnic-analyst-assistant/tasks/<task-id>/context.md. Execute your assignment exactly.
    Write all output to ~/.claude/data/agents/<task-id>/<role>/output.md
    (create the directory if it doesn't exist).
-   Read ~/picnic-analyst-assistant/agents/<ROLE>.md for your full onboarding.
+   Read ~/picnic-analyst-assistant/agents/<ROLE_FILE> for your full onboarding.
+   (where <ROLE_FILE> is the `file` field from agents/INDEX.yaml — e.g. ANALYST.md)
    ```
 d. After agent completes, read `~/.claude/data/agents/<task-id>/<role>/output.md`
 e. If `STATUS: NEEDS_APPROVAL` → surface full draft to user (see gate format)
@@ -184,12 +186,9 @@ g. Update `## Subtask Tracker` in `tasks/<task-id>/context.md` after each agent
 
 ### Phase 4 — Close
 - Copy each agent's working output to the task folder:
-  ```
-  ~/.claude/data/agents/<task-id>/analyst/output.md  → tasks/<task-id>/analyst.md
-  ~/.claude/data/agents/<task-id>/engineer/output.md → tasks/<task-id>/engineer.md
-  ~/.claude/data/agents/<task-id>/writer/output.md   → tasks/<task-id>/writer.md
-  (etc. — only roles that actually ran)
-  ```
+  - Discover which roles ran by globbing `~/.claude/data/agents/<task-id>/*/`
+  - For each role dir found, copy `output.md` → `tasks/<task-id>/<role>.md`
+  - (only copy roles that actually produced output)
 - Delete transient working dir: `~/.claude/data/agents/<task-id>/`
 - Set task status: `Done` in TASKS.md
 - Report: "Task <task-id> complete. Full record at `tasks/<task-id>/`."
