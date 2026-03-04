@@ -75,11 +75,10 @@ Print this block after the welcome message (path A) or resume message (path C), 
 For a smoother experience with fewer approval prompts:
   → Press Shift+Tab in Claude Code to switch to
     auto-approve mode before running setup.
-  → Or change settings.json "defaultMode" to
-    "bypassPermissions" temporarily.
 
-Type 'proceed' (or just press Enter) to start.
 ─────────────────────────────────────────
+
+Ready to move to Phase 0 - Install?.
 ```
 
 Wait for the user to respond before continuing. Any response (including Enter/empty) counts as proceed.
