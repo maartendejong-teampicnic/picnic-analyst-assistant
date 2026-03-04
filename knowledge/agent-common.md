@@ -28,8 +28,8 @@ Determine which mode you are in before proceeding:
 ```bash
 mkdir -p ~/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-{role}-{slug}/
 ```
-where `{role}` is your role name (analyst, writer, engineer, presenter, designer) and
-`{slug}` is 1–2 words from the request, lowercased and hyphenated.
+where `{role}` is your agent name (analyst, writer, engineer, ...) and
+`{slug}` is 2-3 words describing the specific request, lowercased and hyphenated.
 
 Use the **Write tool** to create `output.md` inside that folder.
 Also present key findings inline in chat — the file is the record, chat is the view.
