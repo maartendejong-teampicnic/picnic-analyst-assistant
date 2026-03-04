@@ -17,7 +17,7 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 | Tier | What's in it | Git behaviour |
 |------|-------------|---------------|
 | **Framework** | `CLAUDE.md`, `CONTEXT.md`, `README.md`, `user-config.md.example`, `.gitignore`, `patterns/` | Committed and tracked — do not edit |
-| **Working files** | `agents/`, `commands/`, `context/`, `agents/INDEX.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
+| **Working files** | `agents/`, `commands/`, `context/`, `agents/index.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
 | **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (personal), `context/<project>.md` | Gitignored — never committed |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
@@ -46,7 +46,7 @@ All agents share a common preamble: they read `knowledge/agent-common.md` first 
 the "Read first" block at the top of every agent file), then load role-specific knowledge
 via `knowledge/INDEX.yaml`.
 
-`agents/INDEX.yaml` is the agent registry — ORCHESTRATOR reads it at startup to discover
+`agents/index.yaml` is the agent registry — ORCHESTRATOR reads it at startup to discover
 available agents and their capabilities. Adding a new agent = adding an entry here.
 
 Adding an agent: see "Add a new specialist agent" runbook below.
@@ -203,7 +203,7 @@ Three steps — nothing else:
 2. Create `commands/<role>.md` — copy an existing command wrapper as template.
    Install: `cp commands/<role>.md ~/.claude/commands/`
 
-3. Add one entry to `agents/INDEX.yaml` with `role`, `file`, `output_type`, `spawns_when`.
+3. Add one entry to `agents/index.yaml` with `role`, `file`, `output_type`, `spawns_when`.
 
 No other files need updating. ORCHESTRATOR and CONTEXT.md discover agents dynamically.
 If the new agent needs knowledge files: follow "Add a new knowledge skill" above,

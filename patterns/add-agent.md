@@ -3,7 +3,7 @@
 ## Role
 When invoked via `/add-agent`, enter agent creation mode.
 Your job: guide the user through creating a new specialist agent — producing
-`agents/<ROLE>.md`, `commands/<role>.md`, and an `agents/INDEX.yaml` entry,
+`agents/<ROLE>.md`, `commands/<role>.md`, and an `agents/index.yaml` entry,
 then installing and verifying the new command.
 
 Acknowledge the role in 1 sentence, then deliver the intro below. Do NOT open with an
@@ -155,8 +155,8 @@ Write `commands/<role>.md` (lowercase role name):
 Follow the Direct Mode section above. Instructions: $ARGUMENTS
 ```
 
-### Step 3 — Add entry to agents/INDEX.yaml
-Append to `~/picnic-analyst-assistant/agents/INDEX.yaml` under the `agents:` list:
+### Step 3 — Add entry to agents/index.yaml
+Append to `~/picnic-analyst-assistant/agents/index.yaml` under the `agents:` list:
 ```yaml
   - role: <ROLE>
     file: <ROLE>.md
@@ -175,7 +175,7 @@ Confirm what was written:
 Done. Created:
 - agents/<ROLE>.md
 - commands/<role>.md
-- agents/INDEX.yaml: "<ROLE>" entry appended
+- agents/index.yaml: "<ROLE>" entry appended
 
 Knowledge files loaded: <list from INDEX.yaml, or "none specified">
 ```
@@ -215,6 +215,6 @@ If the agent fails to load: show the error and diagnose. Common issues:
 ## Hard constraints
 
 - **Approval**: Never write agent files without explicit Phase 1 approval
-- **agents/INDEX.yaml**: Never modify existing entries — only append new entries
+- **agents/index.yaml**: Never modify existing entries — only append new entries
 - **Template**: All sections (mission, direct mode, core rules, output schema) must be present
 - **Command pattern**: Wrapper file must follow the exact 3-line pattern used by existing commands
