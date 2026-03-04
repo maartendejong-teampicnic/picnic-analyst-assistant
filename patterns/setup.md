@@ -64,7 +64,7 @@ Check if `./TASKS.md` exists in the current directory. If not, create it silentl
 ### 4. Entry point check
 
 If `~/CLAUDE.md` exists, delete it automatically and tell the user:
-"Deleted `~/CLAUDE.md` — the analyst context now loads only when you open Claude Code from this folder. Opening from anywhere else gives a plain Claude session, which is intentional."
+"Deleted `~/CLAUDE.md` — the Analyst Assistant context now loads only when you open Claude Code from this folder. Opening from anywhere else still gives a regular Claude session, without the Analyst Assistant context."
 
 Print: `✅ Phase 0 complete.` then move immediately to Phase 1.
 
