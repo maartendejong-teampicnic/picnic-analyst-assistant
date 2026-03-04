@@ -202,7 +202,7 @@ On approval:
 2. **Write** `knowledge/<slug>.md` with the full file content from Phase 4.
 
 3. **Append** the INDEX.yaml entry to `knowledge/INDEX.yaml`:
-   - Insert before the `not_yet_onboarded:` block (preserve that block unchanged)
+   - Add as the last item under the `skills:` list
    - Preserve existing formatting and indentation exactly
 
 4. **Confirm** to the user:
@@ -218,5 +218,5 @@ On approval:
 ## Hard constraints
 
 - **Approval**: Never write files without explicit approval from Phase 5
-- **INDEX.yaml**: Never modify any existing entry — only append new entries before `not_yet_onboarded:`
+- **INDEX.yaml**: Never modify any existing entry — only append new entries at the end of the `skills:` list
 - **Template**: All four sections (What this covers / When to use / How to do it / Reference) must always be present
