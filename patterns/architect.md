@@ -16,8 +16,8 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 
 | Layer | What's in it | Git status |
 |-------|-------------|------------|
-| **Shared** | `CLAUDE.md`, `agents/`, `knowledge/`, `patterns/`, `tools/costs/`, `commands/`, `context/picnic-business.md`, `README.md`, `user-config.md.example`, `.gitignore` | Committed — same for all users |
-| **Personal** | `user-config.md`, `TASKS.md`, `CONTEXT.md`, `tasks/`, `direct/`, `context/communication-style.md`, `context/setup-notes.md`, `context/<project>.md` | Gitignored — per-user only |
+| **Shared** | `CLAUDE.md`, `CONTEXT.md`, `agents/`, `knowledge/INDEX.yaml`, `knowledge/sql-snowflake.md`, `patterns/`, `tools/costs/`, `commands/`, `context/picnic-business.md`, `README.md`, `user-config.md.example`, `.gitignore` | Committed — same for all users |
+| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (except sql-snowflake.md), `context/communication-style.md`, `context/setup-notes.md`, `context/<project>.md` | Gitignored — per-user only |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
 get `username_prefix` for task IDs and `direct/` output folder names.
@@ -60,9 +60,17 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 ### Knowledge files (`picnic-analyst-assistant/knowledge/`) — self-contained skill files, loaded by agents
 Routing (which agents load which files) is declared in `INDEX.yaml`. See that file for the full routing map.
 
+**Shared** (committed to repo, available to all users):
+
 | File | Domain |
 |------|--------|
+| `INDEX.yaml` | Knowledge routing authority (`agents` + `load` per skill) |
 | `sql-snowflake.md` | Snowflake SQL conventions + table patterns |
+
+**Personal** (gitignored — specific to each user's setup, added via `/onboard-knowledge`):
+
+| File | Domain |
+|------|--------|
 | `sql-calcite.md` | Calcite SQL dialect + virtual table catalogue |
 | `pr-dbt-models.md` | PR workflow: dbt-models + store-config |
 | `dbt-model-design.md` | dbt model SQL/YAML/MD craft |
@@ -73,7 +81,6 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `slides-pptx.md` | Slide conventions + tool API |
 | `diagrams-excalidraw.md` | Excalidraw agent instructions |
 | `reporting-dashboard.md` | Usuals dashboard structure + formulas |
-| `INDEX.yaml` | Knowledge routing authority (`agents` + `load` per skill) |
 
 ### Context files (`picnic-analyst-assistant/context/`)
 | File | Domain | Read by | Type |
