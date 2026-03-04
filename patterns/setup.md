@@ -20,7 +20,7 @@ Check state silently before deciding where to start:
 **A — Fresh install** (user-config.md does NOT exist):
 Print the welcome message below, then run Phase 0 → 4 in full.
 
-**B — Resuming after Snowflake restart** (user-config.md exists :
+**B — Resuming after Snowflake restart** (user-config.md exists) :
 Do NOT print the welcome message. Print instead:
 ```
 Resuming setup — Phases 0–1 already complete. Picking up from Phase 2.
