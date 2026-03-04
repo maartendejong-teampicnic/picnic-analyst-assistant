@@ -27,7 +27,7 @@ get `username_prefix` for task IDs and `direct/` output folder names.
 ### Entry points (loaded automatically at startup)
 | File | Purpose |
 |------|---------|
-| `~/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules — loaded automatically when Claude Code is opened from `~/picnic-analyst-assistant/` |
+| `~/Documents/Claude/picnic-analyst-assistant/CLAUDE.md` | Orchestration rules and hard rules — loaded automatically when Claude Code is opened from `~/Documents/Claude/picnic-analyst-assistant/`. Opening from any other folder gives a plain Claude session. |
 | `~/.claude/projects/-home-picnic/memory/MEMORY.md` | Auto-memory index (always loaded) |
 
 ### Commands (`~/.claude/commands/`)
@@ -155,7 +155,7 @@ When asked to "review the system" or "check for issues", work through these:
 1. Share the repo URL with the colleague
 2. They clone it: `git clone <url> ~/picnic-analyst-assistant/`
 3. They copy the setup command: `mkdir -p ~/.claude/commands/ && cp ~/picnic-analyst-assistant/commands/setup.md ~/.claude/commands/`
-4. They open Claude Code from `~/picnic-analyst-assistant/` and run `/setup` — walks through all phases automatically:
+4. They open Claude Code from `~/Documents/Claude/picnic-analyst-assistant/` and run `/setup` — walks through all phases automatically:
    - Bootstrap → installs all commands, git isolation, TASKS.md
    - Identity → writes `user-config.md`
    - MCP check → Snowflake, GitHub, Confluence (optional), Slack (optional)
@@ -163,8 +163,9 @@ When asked to "review the system" or "check for issues", work through these:
    - Verification → end-to-end test
 5. Done. They can run `/perform` immediately.
 
-Note: the analyst context loads via project-level CLAUDE.md — no `~/CLAUDE.md` needed.
-They must open Claude Code from `~/picnic-analyst-assistant/` for analyst work.
+Note: the analyst context loads via project-level CLAUDE.md — no `~/CLAUDE.md` needed (it must NOT exist).
+They must open Claude Code from `~/Documents/Claude/picnic-analyst-assistant/` for analyst work.
+Opening from any other folder gives a plain Claude session without analyst context — that's intentional.
 
 Note: personal files (`user-config.md`, `TASKS.md`, `tasks/`, `direct/`, personal context)
 are gitignored and never committed — their data stays private.
