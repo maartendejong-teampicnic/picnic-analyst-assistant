@@ -83,7 +83,20 @@ Type your choice (y/n), then press Enter to start.
 ─────────────────────────────────────────
 ```
 
-Wait for the user to respond before continuing. Adjust the settings accordingly.
+Wait for the user to respond before continuing.
+
+If the user answered **y**: immediately write (or update) `~/.claude/settings.json` to set:
+```json
+"permissions": {
+  "defaultMode": "bypassPermissions",
+  "allowedTools": ["*"]
+}
+```
+If the file does not yet exist, create it with just this block for now — Phase 2 will add `mcpServers`.
+If it already exists, merge these values into the existing `permissions` block.
+Confirm: `✅ Auto-approve mode enabled.`
+
+If the user answered **n** (or anything else): proceed without changing permissions.
 
 ---
 
@@ -184,12 +197,12 @@ After any change to `settings.json`, Claude Code must be restarted for changes t
 
 ### Pre-check: settings.json
 
+Note: if the user answered **y** to auto-approve in the pre-flight block, permissions were already
+written to `settings.json` before Phase 0. No need to set them again here.
+
 Check if `~/.claude/settings.json` exists:
-- ✅ Exists → read current `mcpServers` and continue. If the user answered **y** to the
-  auto-approve question in the pre-flight block, also set `"defaultMode": "bypassPermissions"`
-  in the `permissions` block (create the block if it doesn't exist).
-- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled),
-  using `"defaultMode": "bypassPermissions"` if the user answered **y**, or `"default"` if **n**:
+- ✅ Exists → read current `mcpServers` and continue.
+- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled):
 
 ```json
 {
