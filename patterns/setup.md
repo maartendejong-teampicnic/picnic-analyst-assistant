@@ -8,7 +8,10 @@ begin Phase 0. Do not ask for permission to start.
 
 ---
 
-## Welcome message (print at the very start, before any action)
+## Start-up sequence
+ALWAYS check what has already been set up. Check the phases sequentially and pick up where the user left off the last time. 
+
+## Welcome message (print at the very start for users running the set-up for the first time)
 
 ```
 Welcome to the Picnic Analyst Assistant setup.
