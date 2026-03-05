@@ -27,11 +27,12 @@ Check each step in order. Start executing from the first step that is not yet co
 
 After checking all steps:
 - If all steps are complete → jump straight to Phase 4 (re-verify).
-- If any step is complete (i.e. you are not starting from 0a) → print one line:
-  `Resuming setup — picking up from step <X>...` then proceed from there.
-- If no step is complete → print the welcome message, then the pre-flight block, then start from Phase 0.
+- If step 0a is NOT complete → this is a fresh install. Print the welcome message, then the pre-flight block, then start from Phase 0.
+  **This is true even if later steps (e.g. GitHub auth) happen to already be configured on the machine.**
+- If step 0a IS complete but not all steps are done → print one line:
+  `Resuming setup — picking up from step <X>...` then proceed from the first incomplete step.
 
-**Welcome message and pre-flight block are skipped if any step beyond Phase 0 is already complete.**
+**Welcome message and pre-flight block are shown when step 0a is not yet complete (fresh install), and skipped on genuine resume.**
 
 ---
 
