@@ -46,7 +46,7 @@ I'll walk you through 5 short phases:
   Phase 1 — Identity       Your name, email, and prefix                  (~1 min)
   Phase 2 — Connections    Add tokens for Snowflake, Atlassian, GitHub   (~5 min)
   Phase 3 — Skills         Sync shared Picnic tools                      (~1 min)
-  Phase 4 — Verify         Test all connections in one shot              (~2 min)
+  Phase 4 — Verify         Test all connections                          (~2 min)
 
 Let's go.
 ```
