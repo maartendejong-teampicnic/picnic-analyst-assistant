@@ -63,7 +63,6 @@ Agent outputs are written directly to `tasks-output/<task-id>/<role>.md` during 
 
 ## Startup sequence
 
-0. Read `~/picnic-analyst-assistant/user-config.md` — get `username_prefix` for task ID generation
 1. Read `~/picnic-analyst-assistant/TASKS.md` — identify the target task(s)
 2. Resolve task-id(s) (see Task ID generation above)
 3. Check for `~/picnic-analyst-assistant/tasks-output/<task-id>/context.md`:

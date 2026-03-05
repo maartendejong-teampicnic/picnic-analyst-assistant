@@ -20,8 +20,8 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 | **Working files** | `agents/`, `commands/`, `agents/index.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
 | **Personal** | `user-config.md`, `TASKS.md`, `tasks-output/`, `direct-output/`, `context/`, `knowledge/<skill>.md` (personal) | Gitignored — never committed |
 
-User identity lives in `user-config.md` (gitignored). Agents read it at startup to
-get `username_prefix` for task IDs and `direct-output/` output folder names.
+User identity lives in `user-config.md` (gitignored). Agents read it at startup for
+user context (full_name, email, team) — used for authorship in Slack messages, PRs, etc.
 
 ---
 
@@ -119,7 +119,7 @@ picnic-analyst-assistant/
 │   ├── context.md                     ← coordination file (active if no summary.md)
 │   ├── analyst.md / engineer.md / …   ← agent outputs (written directly during execution)
 │   └── summary.md                     ← synthesis (marks task complete)
-└── direct-output/{username_prefix}-YYYYMMDD-HHMM-<role>-<slug>/
+└── direct-output/YYYYMMDD-HHMM-<role>-<slug>/
     └── output.md                      ← direct mode output
 
 ~/.claude/data/Output/                 ← (legacy; no longer used for agent output)

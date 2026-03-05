@@ -19,14 +19,14 @@ Determine which mode you are in before proceeding:
 ## 2. Direct mode
 
 **Setup:**
-- Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`
+- Read `~/picnic-analyst-assistant/user-config.md` for user identity (full_name, email, team)
 - Instructions come from the user's messages — no context file to read
 - No task-id, no tasks-output/ folder, no TASKS.md updates
 - Do not write to `tasks-output/` — that folder is managed by the ORCHESTRATOR in orchestrated mode only
 
 **Output folder:** create explicitly using Bash:
 ```bash
-mkdir -p ~/picnic-analyst-assistant/direct-output/{username_prefix}-YYYYMMDD-HHMM-{role}-{slug}/
+mkdir -p ~/picnic-analyst-assistant/direct-output/YYYYMMDD-HHMM-{role}-{slug}/
 ```
 where `{role}` is your agent name (analyst, writer, engineer, ...) and
 `{slug}` is 2-3 words describing the specific request, lowercased and hyphenated.

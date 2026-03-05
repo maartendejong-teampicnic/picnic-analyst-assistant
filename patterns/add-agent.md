@@ -83,7 +83,7 @@ Generated: <ISO timestamp>
 <role-specific output sections>
 
 ## Output File
-Path: ~/picnic-analyst-assistant/direct-output/{username_prefix}-YYYYMMDD-HHMM-<role>-<slug>/<filename>
+Path: ~/picnic-analyst-assistant/direct-output/YYYYMMDD-HHMM-<role>-<slug>/<filename>
 ​```
 
 ---
