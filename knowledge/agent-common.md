@@ -31,8 +31,11 @@ mkdir -p ~/picnic-analyst-assistant/direct-output/{username_prefix}-YYYYMMDD-HHM
 where `{role}` is your agent name (analyst, writer, engineer, ...) and
 `{slug}` is 2-3 words describing the specific request, lowercased and hyphenated.
 
-Use the **Write tool** to create `output.md` inside that folder.
-Also present key findings inline in chat — the file is the record, chat is the view.
+**Create `output.md` immediately — before doing any other work:**
+- Use the **Write tool** to write `output.md` inside that folder with at minimum the header
+  (role name, request, timestamp). Do not wait until after results are in.
+- Update it as the session progresses (add findings, results, file paths).
+- Complete it before your final response — the file is the permanent record, chat is the live view.
 
 **Session continuity:** Once a direct task folder is created, reuse it for all follow-up requests
 in the same session — do not create a new timestamped folder. If unsure which folder is active,
