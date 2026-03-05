@@ -18,10 +18,10 @@ Check steps in order from top to bottom. Stop at the first step that is NOT comp
 | 0b — TASKS.md created | `./TASKS.md` exists |
 | 0c — CLAUDE.md exists | `./CLAUDE.md` exists |
 | 1 — Identity set | `./user-config.md` exists |
-| 2a — Snowflake configured | `SNOWFLAKE_TOKEN` is non-empty in `~/.claude/settings.json` |
-| 2b — Atlassian configured | `CONFLUENCE_API_TOKEN` is non-empty in `~/.claude/settings.json` |
+| 2a — Snowflake configured | `snowflake` MCP registered with token — run: `python3 -c "import json; d=json.load(open('$HOME/.claude.json')); all_mcp={**d.get('mcpServers',{}), **{m:v for p in d.get('projects',{}).values() for m,v in p.get('mcpServers',{}).items()}}; print('done' if all_mcp.get('snowflake',{}).get('env',{}).get('SNOWFLAKE_TOKEN') else 'missing')"` → prints `done` |
+| 2b — Atlassian configured | `confluence` MCP registered with token — same check with `'confluence'` and `'CONFLUENCE_API_TOKEN'` |
 | 2c — GitHub configured | `gh auth status` returns logged-in |
-| 2d — Slack configured | `SLACK_MCP_XOXP_TOKEN` is set in `~/.claude/settings.json` OR `user-config.md` contains `slack_setup: skipped` |
+| 2d — Slack configured | `slack` MCP registered in `~/.claude.json` OR `user-config.md` contains `slack_setup: skipped` |
 | 3 — Skills synced | `~/.claude/skills/picnic-query-snowflake` symlink exists |
 | 4 — Connections verified | Always run if step 3 is done (verification is read-only and quick) |
 
@@ -247,59 +247,40 @@ Wait for any confirmation before continuing.
 
 ## Phase 2 — Connections
 
-**Goal:** Configure all MCP connections. Collect tokens and write `settings.json` only — no verification here.
+**Goal:** Configure all MCP connections using `claude mcp add-json` — no verification here.
 Verification happens in Phase 4, after the restart and skills sync.
 
 ### What are MCPs?
 
 MCPs (Model Context Protocol servers) let Claude Code call external systems — databases, wikis,
-messaging tools — directly during a session. Each server lives in `~/.claude/settings.json`
-under `mcpServers`. GitHub uses the `gh` CLI instead.
+messaging tools — directly during a session. MCP configs are stored in `~/.claude.json` and
+registered via `claude mcp add-json`. GitHub uses the `gh` CLI instead.
 
-After any change to `settings.json`, Claude Code must be restarted for changes to take effect.
+After registering new MCPs, Claude Code must be restarted for them to load.
 `/setup` is resumable — re-running it skips steps already complete.
 
-### Pre-check: settings.json
-
-Note: if the user answered **y** to auto-approve in the pre-flight block, permissions were already
-written to `settings.json`. No need to set them again here.
-
-Check if `~/.claude/settings.json` exists:
-- ✅ Exists → read current `mcpServers` and continue.
-- ⚠️ Missing → create it now with this base template (Picnic fixed values pre-filled):
-
-```json
-{
-  "env": {},
-  "permissions": {
-    "defaultMode": "default"
-  },
-  "mcpServers": {
-    "snowflake": {
-      "command": "mcp_snowflake_server",
-      "args": [],
-      "env": {
-        "SNOWFLAKE_ACCOUNT": "BF99047-UJ82639",
-        "SNOWFLAKE_USER": "",
-        "SNOWFLAKE_AUTHENTICATOR": "PROGRAMMATIC_ACCESS_TOKEN",
-        "SNOWFLAKE_TOKEN": "",
-        "SNOWFLAKE_WAREHOUSE": "ANALYSIS",
-        "SNOWFLAKE_DATABASE": "PICNIC_NL_PROD",
-        "SNOWFLAKE_SCHEMA": "DIM",
-        "SNOWFLAKE_ROLE": "ANALYST"
-      }
-    }
-  }
-}
-```
+> **Important:** Never manually edit `~/.claude.json` for MCP configs. Always use
+> `claude mcp add-json` — it writes to the correct file and format that Claude Code reads.
+> `~/.claude/settings.json` is for permissions only, not MCP servers.
 
 ---
 
-### Step 2a — Snowflake (configure only)
+### Step 2a — Snowflake
 
-**Check:** Is `SNOWFLAKE_TOKEN` set and non-empty in `mcpServers.snowflake.env`?
-- ✅ Already configured → skip to the "Ready to continue" prompt below.
-- ⚠️ Not configured → follow steps below.
+**Check:** Run:
+```bash
+python3 -c "
+import json, os
+d = json.load(open(os.path.expanduser('~/.claude.json')))
+cwd = os.getcwd()
+proj = d.get('projects', {}).get(cwd, {}).get('mcpServers', {})
+user = d.get('mcpServers', {})
+sf = {**user, **proj}.get('snowflake', {})
+print('done' if sf.get('env', {}).get('SNOWFLAKE_TOKEN') else 'missing')
+"
+```
+- ✅ `done` → skip to the "Ready to continue" prompt below.
+- ⚠️ `missing` → follow steps below.
 
 **If not configured:**
 1. Open a browser → log into your Snowflake account
@@ -309,28 +290,51 @@ Check if `~/.claude/settings.json` exists:
 5. **Copy the token immediately** — it is shown only once
 6. Paste the token here
 
-When you have the token, update `~/.claude/settings.json`:
-- Set `SNOWFLAKE_USER` to their email from Phase 1, converted to **UPPERCASE**
-  (e.g. `firstname.lastname@teampicnic.com` → `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
-- Set `SNOWFLAKE_TOKEN` to the pasted token
+When you have the token, register Snowflake as a project-level MCP:
 
-Print: `✅ Snowflake token saved.`
+```bash
+claude mcp add-json --scope project snowflake '{
+  "type": "stdio",
+  "command": "mcp_snowflake_server",
+  "args": [],
+  "env": {
+    "SNOWFLAKE_ACCOUNT": "BF99047-UJ82639",
+    "SNOWFLAKE_USER": "<EMAIL_UPPERCASE>",
+    "SNOWFLAKE_AUTHENTICATOR": "PROGRAMMATIC_ACCESS_TOKEN",
+    "SNOWFLAKE_TOKEN": "<pasted token>",
+    "SNOWFLAKE_WAREHOUSE": "ANALYSIS",
+    "SNOWFLAKE_DATABASE": "PICNIC_NL_PROD",
+    "SNOWFLAKE_SCHEMA": "DIM",
+    "SNOWFLAKE_ROLE": "ANALYST"
+  }
+}'
+```
 
-Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regenerate and update `SNOWFLAKE_TOKEN`.
+Where `<EMAIL_UPPERCASE>` is the email from Phase 1 in **ALL CAPS**
+(e.g. `maarten.dejong@teampicnic.com` → `MAARTEN.DEJONG@TEAMPICNIC.COM`).
+
+Print: `✅ Snowflake registered.`
+
+Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regenerate the token
+and re-run this step.
 
 Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceeding.
 
 ---
 
-### Step 2b — Atlassian (configure only)
+### Step 2b — Atlassian
 
-> **Important:** Use the `mcp-atlassian` Python package configured in `settings.json` — do NOT
-> use `claude mcp add` for Atlassian. The `claude mcp add` approach only supports reading Confluence
-> and Jira; it does not support creating Jira tickets.
-
-**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env` in `settings.json`?
-- ✅ Already configured → skip to the "Ready to continue" prompt below.
-- ⚠️ Not configured → follow steps below.
+**Check:** Run:
+```bash
+python3 -c "
+import json, os
+d = json.load(open(os.path.expanduser('~/.claude.json')))
+conf = d.get('mcpServers', {}).get('confluence', {})
+print('done' if conf.get('env', {}).get('CONFLUENCE_API_TOKEN') else 'missing')
+"
+```
+- ✅ `done` → skip to the "Ready to continue" prompt below.
+- ⚠️ `missing` → follow steps below.
 
 **If not configured:**
 
@@ -344,8 +348,8 @@ pip install mcp-atlassian 2>&1
 pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
 ```
 
-Prefer the path returned by `pyenv which` — it gives the real binary, not a pyenv shim.
-Note the path as `<mcp_atlassian_cmd>` and continue if found.
+Prefer `pyenv which` — it gives the real binary path, not a shim.
+Note the result as `<mcp_atlassian_cmd>` and continue if found.
 
 If not found after attempt 1:
 ```bash
@@ -354,56 +358,43 @@ pip3 install mcp-atlassian 2>&1
 pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
 ```
 
-If still not found after attempt 2:
+If still not found:
 ```bash
-# Attempt 3: pip --user (installs to ~/.local/bin)
+# Attempt 3: pip --user
 pip install --user mcp-atlassian 2>&1 || pip3 install --user mcp-atlassian 2>&1
 find ~/.local/bin /home/*/.local/bin ~/.pyenv/versions -name "mcp-atlassian" -not -path "*/shims/*" -type f 2>/dev/null | head -3
 ```
 
-Use the first path returned as `<mcp_atlassian_cmd>`. Never use a path containing `/shims/` — that is a pyenv shim and will not work when spawned by Claude Code.
+Never use a path containing `/shims/`.
 
-If no binary is found after all three attempts:
-- Print: `⚠️ Could not install mcp-atlassian — skipping for now. Re-run /setup later to set it up.`
-- Skip Atlassian setup entirely and continue to GitHub.
+If no binary found after all three attempts:
+- Print: `⚠️ Could not install mcp-atlassian — skipping. Re-run /setup later to set it up.`
+- Skip Atlassian entirely and continue to GitHub.
 
-**Validate the binary starts correctly (before writing settings.json):**
-
-Run this test to confirm the binary actually launches as an MCP server:
+**Step 2 — Validate the binary:**
 
 ```bash
 echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
-  | timeout 5 "<mcp_atlassian_cmd>" 2>&1 | head -3
+  | timeout 5 "<mcp_atlassian_cmd>" --transport stdio 2>/dev/null | head -1
 ```
 
 - ✅ Output contains `"result"` → binary works. Proceed.
-- ⚠️ Output is empty or contains an error (e.g. `ModuleNotFoundError`, `ImportError`, `No such file`) →
-  the binary is broken. Try upgrading it:
-  ```bash
-  pip install --upgrade mcp-atlassian 2>&1
-  pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
-  ```
-  Re-run the validation. If it still fails, print the error output and tell the user:
-  "mcp-atlassian installed but won't start. Error: <output>. Skipping Atlassian for now — re-run /setup to retry."
-  Skip Atlassian setup entirely and continue to GitHub.
+- ⚠️ Error → try `pip install --upgrade mcp-atlassian`, re-find the binary, re-validate.
+  If still failing, print the error and skip Atlassian.
 
-**Step 2 — Ask the user for their API token:**
+**Step 3 — Ask the user for their API token:**
 
 > "Open a browser → https://id.atlassian.com/manage-profile/security
-> **Scroll down** to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
+> Scroll down to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
 > Paste the token here when you have it."
 
-`CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email from Phase 1 — no need to ask again.
+**Step 4 — Register as user-level MCP:**
 
-**Step 3 — Write `settings.json`:**
-
-Use `<mcp_atlassian_cmd>` (the full path if `which` returned one, otherwise `"mcp-atlassian"`)
-as the `command` value. Add to `mcpServers` in `settings.json`:
-
-```json
-"confluence": {
+```bash
+claude mcp add-json --scope user confluence '{
+  "type": "stdio",
   "command": "<mcp_atlassian_cmd>",
-  "args": [],
+  "args": ["--transport", "stdio"],
   "env": {
     "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
     "CONFLUENCE_USERNAME": "<email from Phase 1>",
@@ -412,32 +403,30 @@ as the `command` value. Add to `mcpServers` in `settings.json`:
     "JIRA_USERNAME": "<email from Phase 1>",
     "JIRA_API_TOKEN": "<pasted token>"
   }
-}
+}'
 ```
 
-Print: `✅ Atlassian token saved.`
+Print: `✅ Atlassian registered.`
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
 ---
 
-### Step 2c — GitHub (configure only)
+### Step 2c — GitHub
 
 **Goal:** Ensure `gh` CLI is installed and authenticated.
 
 Run: `gh auth status`
 - ✅ Logged in → print `✅ GitHub already authenticated.` and continue.
-- ⚠️ Not authenticated → run this command automatically (no user action needed before the browser):
+- ⚠️ Not authenticated → run:
   ```bash
   gh auth login --hostname github.com --git-protocol https --web
   ```
-  This opens a browser tab. Tell the user:
-  > "A browser tab just opened — sign in with your Picnic GitHub account and authorise the app.
-  > Come back here when the browser says you're done."
-  Wait for the user to confirm they completed the browser step, then run `gh auth status` to confirm
-  success and print: `✅ GitHub authenticated.`
+  Tell the user: "A browser tab just opened — sign in with your Picnic GitHub account and
+  authorise the app. Come back here when the browser says you're done."
+  Wait for confirmation, then run `gh auth status` to confirm and print: `✅ GitHub authenticated.`
 
-Note: `gh` credentials are stored by the CLI — no entry needed in `settings.json`.
+Note: `gh` credentials are stored by the CLI — nothing to register in `~/.claude.json`.
 
 ---
 
@@ -454,9 +443,17 @@ If user chooses **B — Skip**: add `slack_setup: skipped` to `./user-config.md`
 
 **If setting up Slack:**
 
-**Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
-- ✅ Already configured → print `✅ Slack already configured.` and continue.
-- ⚠️ Not configured → walk the user through creating their own Slack app:
+**Check:** Run:
+```bash
+python3 -c "
+import json, os
+d = json.load(open(os.path.expanduser('~/.claude.json')))
+slack = d.get('mcpServers', {}).get('slack', {})
+print('done' if slack.get('env', {}).get('SLACK_MCP_XOXP_TOKEN') else 'missing')
+"
+```
+- ✅ `done` → print `✅ Slack already configured.` and continue.
+- ⚠️ `missing` → walk the user through creating their own Slack app:
 
 ```
 Here's how to create your Slack app — follow each step, then come back here.
@@ -489,18 +486,19 @@ Here's how to create your Slack app — follow each step, then come back here.
 Paste the token here when you have it.
 ```
 
-Wait for the user to paste the token, then add to `mcpServers` in `settings.json`:
-```json
-"slack": {
+When the user pastes the token, register it:
+```bash
+claude mcp add-json --scope user slack '{
+  "type": "stdio",
   "command": "slack-mcp-server",
   "args": [],
   "env": {
     "SLACK_MCP_XOXP_TOKEN": "<pasted token>"
   }
-}
+}'
 ```
 
-Print: `✅ Slack token saved.`
+Print: `✅ Slack registered.`
 
 ---
 
@@ -516,12 +514,10 @@ Connections configured:
   Slack        ✅  (or — skipped by choice)
 ```
 
-**One restart required.** After writing all configurations to `settings.json`, print this block
-prominently and **stop**:
+**One restart required.** After registering MCPs, print this block prominently and **stop**:
 
 ```
 ⚡ Restart required — one time
-   All MCP configurations have been written to settings.json.
    MCP servers only load at startup, so one restart is needed
    before Phase 3 (skills) and Phase 4 (verification) can run.
 
@@ -530,14 +526,12 @@ prominently and **stop**:
         (still in the picnic-analyst-assistant folder)
      2. Run /setup — it will sync skills, verify all connections,
         and finish setup
-
-   (Skills and verification run automatically after restart.)
 ```
 
 Do not proceed to Phase 3 or 4. The user must restart first.
 
 **Exception — skip restart if:**
-All MCPs were already in `settings.json` when Phase 2 started (nothing was written in this session)
+All MCPs were already registered when Phase 2 started (nothing was added in this session)
 AND `gh auth status` confirms GitHub is logged in. In that case, continue directly to Phase 3
 without printing the restart block.
 
@@ -643,29 +637,29 @@ Try calling any `mcp__confluence__*` tool (e.g. a Confluence search). Two outcom
 **Case 1 — MCP is loaded (tools respond):** proceed to Step B below.
 
 **Case 2 — MCP not loaded** (tools return "unknown tool" / "server not found"):
-The `confluence` MCP server failed to start. This should be rare since Phase 2b validated the binary — but diagnose anyway:
+The `confluence` MCP server failed to start. Diagnose in order:
 
-```bash
-# Compare path in settings.json vs real binary location
-python3 -c "
-import json, os
-s = json.load(open(os.path.expanduser('~/.claude/settings.json')))
-print('settings.json command:', s.get('mcpServers', {}).get('confluence', {}).get('command', 'NOT_SET'))
-"
-pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
+1. **Check registration:**
+   ```bash
+   python3 -c "
+   import json, os
+   d = json.load(open(os.path.expanduser('~/.claude.json')))
+   conf = d.get('mcpServers', {}).get('confluence', {})
+   print('registered:', bool(conf))
+   print('command:', conf.get('command', 'NOT_SET'))
+   print('args:', conf.get('args', []))
+   "
+   ```
+   - Not registered → go back to Phase 2b and run `claude mcp add-json --scope user confluence ...`.
+   - Registered but `args` missing `--transport stdio` → re-register with the correct args.
 
-# Re-test the binary
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
-  | timeout 5 "$(pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null)" 2>&1 | head -3
-```
-
-- **Path in `settings.json` differs from `pyenv which`** → update `command` in `settings.json` to the real path. Print what changed, then:
-  ```
-  ⚡ Atlassian path corrected — restart needed
-     Please restart Claude Code and re-run /setup to complete Atlassian verification.
-  ```
-- **Binary test fails with an error** → show the error and tell the user: "mcp-atlassian won't start. Error: <output>. Re-run /setup after fixing the issue."
-- **Binary test passes but MCP still not loaded** → unusual; tell the user: "Binary works but Claude Code didn't load it. Try restarting Claude Code once more and re-running /setup."
+2. **Re-test the binary:**
+   ```bash
+   echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
+     | timeout 5 "$(pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null)" --transport stdio 2>/dev/null | head -1
+   ```
+   - ✅ Contains `"result"` → binary is fine; restart Claude Code and re-run /setup.
+   - ⚠️ Error → run `pip install --upgrade mcp-atlassian`, re-find binary path, re-register via `claude mcp add-json`.
 
 Mark Atlassian as ⚠️ in the summary and continue to GitHub.
 
