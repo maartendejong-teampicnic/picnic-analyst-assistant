@@ -11,10 +11,13 @@ For setup and usage documentation, see the [Analyst Assistant Reference Handbook
 | Task | Command |
 |------|---------|
 | Run a one-off Snowflake query and explain the result | `/analyst` |
+| Build a dbt model or create a GitHub PR | `/engineer` |
 | Draft a Confluence page or Slack message | `/writer` |
-| Run a full task: query → Slack update → summary | `/perform` |
+| Run a full task end-to-end: query → PR → Slack update | `/perform` |
+| Add or review tasks in your task list | `/tasks` |
 | Teach the system your SQL conventions or Slack style | `/onboard-knowledge` |
-| Review the system or add new agents and skills | `/architect` |
+| Add a new specialist agent to the system | `/add-agent` |
+| Review the system or update its structure | `/architect` |
 
 The more you invest in teaching the assistant your conventions, the higher the quality of its output.
 
@@ -54,22 +57,28 @@ picnic-analyst-assistant/
 │   ├── ORCHESTRATOR.md
 │   ├── ANALYST.md
 │   ├── ENGINEER.md
-│   └── WRITER.md
+│   ├── WRITER.md
+│   └── index.yaml                     # agent registry (ORCHESTRATOR reads at startup)
 │
 ├── knowledge/                         # skill files loaded by agents at runtime
 │   ├── INDEX.yaml                     # routing: which agent loads which file
 │   ├── agent-common.md                # shared agent instructions (direct mode, startup, rules)
 │   └── sql-snowflake.md               # shared Snowflake SQL conventions (example format)
 │
-├── patterns/                          # meta-maintenance
+├── patterns/                          # meta-maintenance patterns (backed by /setup, /architect, etc.)
+│   ├── setup.md
 │   ├── architect.md
 │   ├── onboard-knowledge.md
-│   └── setup.md
+│   └── add-agent.md
+│
+├── commands/                          # slash command definitions (one file per /command)
+│   ├── perform.md
+│   ├── analyst.md / engineer.md / writer.md
+│   ├── tasks.md / add-agent.md / costs.md
+│   └── setup.md / architect.md / onboard-knowledge.md
 │
 ├── tools/                             # shared tool integrations
-│   └── costs/
-│
-├── commands/                          # slash command definitions
+│   └── costs/                         # Claude API cost tracking tool
 │
 ├── context/                           # personal project context (gitignored)
 │   └── <project>.md                   # your context files (style, usuals, etc.)
@@ -132,4 +141,15 @@ Created locally; gitignored.
 
 ## Onboarding a colleague
 
-Share the [Analyst Assistant Reference Handbook](https://picnic.atlassian.net/wiki/spaces/Commercial/pages/6270025746) — everything they need is there.
+1. Share this repo URL with them
+2. They run the same installation steps above
+3. They run `/setup` — it walks through all phases automatically:
+   - Installs all commands into `~/.claude/commands/`
+   - Writes their `user-config.md` (name, email, team)
+   - Checks MCP connections (Snowflake, GitHub, Confluence)
+   - Syncs shared skills from `picnic-analytical-tools`
+4. Done — they can run `/perform` immediately
+
+Each user's personal files (`user-config.md`, `TASKS.md`, task outputs, personal knowledge files) are gitignored and never shared — everyone gets their own private workspace on top of the shared framework.
+
+Further reading: [Analyst Assistant Reference Handbook](https://picnic.atlassian.net/wiki/spaces/Commercial/pages/6270025746)
