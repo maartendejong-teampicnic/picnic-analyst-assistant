@@ -341,26 +341,27 @@ Run in sequence, stopping at the first success:
 ```bash
 # Attempt 1: standard pip
 pip install mcp-atlassian 2>&1
-which mcp-atlassian 2>/dev/null
+pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
 ```
 
-If `which mcp-atlassian` returns a path → note it as `<mcp_atlassian_cmd>` and continue.
+Prefer the path returned by `pyenv which` — it gives the real binary, not a pyenv shim.
+Note the path as `<mcp_atlassian_cmd>` and continue if found.
 
 If not found after attempt 1:
 ```bash
 # Attempt 2: pip3
 pip3 install mcp-atlassian 2>&1
-which mcp-atlassian 2>/dev/null
+pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
 ```
 
 If still not found after attempt 2:
 ```bash
 # Attempt 3: pip --user (installs to ~/.local/bin)
 pip install --user mcp-atlassian 2>&1 || pip3 install --user mcp-atlassian 2>&1
-find ~/.local/bin /home/*/.local/bin ~/.pyenv -name "mcp-atlassian" -type f 2>/dev/null | head -3
+find ~/.local/bin /home/*/.local/bin ~/.pyenv/versions -name "mcp-atlassian" -not -path "*/shims/*" -type f 2>/dev/null | head -3
 ```
 
-Use the first path returned as `<mcp_atlassian_cmd>`.
+Use the first path returned as `<mcp_atlassian_cmd>`. Never use a path containing `/shims/` — that is a pyenv shim and will not work when spawned by Claude Code.
 
 If no binary is found after all three attempts:
 - Print: `⚠️ Could not install mcp-atlassian — skipping for now. Re-run /setup later to set it up.`
@@ -653,8 +654,9 @@ If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmo
 
 - ⚠️ API error (401 / auth failed) → Automatically attempt to self-heal:
   1. Re-read `settings.json` and verify `CONFLUENCE_API_TOKEN` is set and non-empty.
-  2. Run: `which mcp-atlassian` — if empty, re-run the 3-attempt install from Phase 2 and update
-     the `command` field in `settings.json` with the located binary path.
+  2. Run: `pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null` — use the result
+     (preferring `pyenv which`) to update the `command` field in `settings.json`. Never use a path
+     containing `/shims/`. If empty, re-run the 3-attempt install from Phase 2.
   3. Print the corrected config values (mask the token: show first 8 chars + `...`) and inform:
      "The token or binary path was updated — restarting is needed to pick up the change."
   4. If the error persists, ask the user to re-paste the token:
