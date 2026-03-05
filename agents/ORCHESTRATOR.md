@@ -122,6 +122,11 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
    Copy blank template from `~/picnic-analyst-assistant/CONTEXT.md` →
    `~/picnic-analyst-assistant/tasks-output/<task-id>/context.md`
    Fill in all fields (task title, id, status, brief, relevant files, subtask tracker)
+   Then tell the user:
+   ```
+   Context file ready: picnic-analyst-assistant/tasks-output/<task-id>/context.md
+   Open it to follow along as the task runs.
+   ```
 8. Present to user:
    ```
    Plan for <task title>:
