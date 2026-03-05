@@ -1,7 +1,7 @@
 # SETUP — Analyst Assistant Onboarding
 
 You are running the guided setup for the Analyst Assistant at Picnic.
-Your job: walk a new user through bootstrap, identity, MCP connections, and skill installation.
+Your job: walk a new user through bootstrap, identity, MCP connections, skill installation, and verification.
 
 Acknowledge the role in 1–2 sentences, then immediately run resume detection below.
 Do not ask for permission to start.
@@ -10,65 +10,58 @@ Do not ask for permission to start.
 
 ## Resume detection (run before anything else, before the welcome message)
 
-Check state silently before deciding where to start:
+Silently check each step in order. Start executing from the first step that is not yet complete.
 
-1. Does `./user-config.md` exist? (path relative to the picnic-analyst-assistant folder)
-2. Read `~/.claude/settings.json` — is `SNOWFLAKE_TOKEN` set and non-empty?
+| Step | Done if… |
+|------|----------|
+| 0a — Commands installed | `~/.claude/commands/perform.md` exists |
+| 0b — TASKS.md created | `./TASKS.md` exists |
+| 0c — CLAUDE.md exists | `./CLAUDE.md` exists |
+| 1 — Identity set | `./user-config.md` exists |
+| 2a — Snowflake configured | `SNOWFLAKE_TOKEN` is non-empty in `~/.claude/settings.json` |
+| 2b — Atlassian configured | `CONFLUENCE_API_TOKEN` is non-empty in `~/.claude/settings.json` |
+| 2c — GitHub configured | `gh auth status` returns logged-in |
+| 2d — Slack configured | `SLACK_MCP_XOXP_TOKEN` is set in `~/.claude/settings.json` OR `user-config.md` contains `slack_setup: skipped` |
+| 3 — Skills synced | `~/.claude/skills/picnic-query-snowflake` symlink exists |
+| 4 — Connections verified | Always run if step 3 is done (verification is read-only and quick) |
 
-**Choose a path based on what's found:**
+After checking all steps:
+- If all steps are complete → jump straight to Phase 4 (re-verify).
+- If any step is complete (i.e. you are not starting from 0a) → print one line:
+  `Resuming setup — picking up from step <X>...` then proceed from there.
+- If no step is complete → print the welcome message, then the pre-flight block, then start from Phase 0.
 
-**A — Fresh install** (user-config.md does NOT exist):
-Print the welcome message below, then show the pre-flight block, then run Phase 0 → 4 in full.
-
-**B — Resuming mid-setup** (user-config.md exists and SNOWFLAKE_TOKEN is non-empty):
-Do NOT print the welcome message or pre-flight block. Print instead:
-```
-Resuming setup — Phases 0–1 already complete. Picking up from Phase 2 (Connections).
-```
-Skip Phases 0 and 1. Go directly to Phase 2 and process **every tool in sequence**:
-- For each tool already configured: run its verification, show the ✅ wow output, then ask
-  "Ready to continue to [next tool]?" before moving on.
-- For each tool NOT yet configured: walk through its setup steps as normal.
-This ensures you never skip a tool that was missed in a previous session.
-
-**C — Partial setup** (user-config.md exists but SNOWFLAKE_TOKEN is empty or settings.json is missing):
-Do NOT print the welcome message. Show the pre-flight block, then print:
-```
-Resuming setup — Phase 1 already complete. Picking up from Phase 2 (Connections).
-```
-Run Phase 0 silently (it is idempotent — no user input, no repeated output). Skip Phase 1.
-Go to Phase 2 and process every tool in sequence as described in Path B above.
+**Welcome message and pre-flight block are skipped if any step beyond Phase 0 is already complete.**
 
 ---
 
-## Welcome message (print only on fresh install — path A above)
+## Welcome message (print only on fresh install — all steps incomplete)
 
 ```
 Welcome to the Picnic Analyst Assistant setup.
 
-I'll walk you through 4 short phases:
+I'll walk you through 5 short phases:
 
-  Phase 0 — Install        Set up commands and protect your personal files  (~30s, automatic)
-  Phase 1 — Identity       Your name, email, and task prefix                (~1 min)
-  Phase 2 — Connections    Snowflake, Atlassian, GitHub, and optional tools  (5–10 min)
-  Phase 3 — Skills         Sync shared tools from the tools repo            (~1 min)
+  Phase 0 — Install        Set up commands and protect your personal files   (~10s, automatic)
+  Phase 1 — Identity       Your name, email, and task prefix                 (~1 min)
+  Phase 2 — Connections    Add tokens for Snowflake, Atlassian, GitHub       (5-10 min, one restart)
+  Phase 3 — Skills         Sync shared tools from the analytical-tools repo  (~1 min)
+  Phase 4 — Verify         Test all connections in one shot                  (~2 min)
 
 Let's go.
 ```
 
 ---
 
-## Pre-flight block (print on path A and C — NOT on path B)
-
-Print this block after the welcome message (path A) or resume message (path C), before running Phase 0:
+## Pre-flight block (print on fresh install only — before Phase 0)
 
 ```
 ─────────────────────────────────────────
-For a smoother experience, I can set auto-approve mode
-so setup runs without permission prompts.
+For a smoother experience, I can pre-approve all tools
+needed for setup so you won't be prompted for each action.
 
-  → Run in auto-approve mode? (y/n)
-    Yes = sets defaultMode to "bypassPermissions" in settings.json
+  → Enable auto-approve for setup tools? (y/n)
+    Yes = adds specific tool approvals to settings.json
     No  = keeps default mode (you'll be prompted per action)
 
 Type your choice (y/n), then press Enter to start.
@@ -80,13 +73,36 @@ Wait for the user to respond before continuing.
 If the user answered **y**: immediately write (or update) `~/.claude/settings.json` to set:
 ```json
 "permissions": {
-  "defaultMode": "bypassPermissions",
-  "allowedTools": ["*"]
+  "defaultMode": "acceptEdits",
+  "allowedTools": [
+    "Bash", "Read", "Write", "Edit", "Glob", "Grep",
+    "WebFetch", "WebSearch",
+    "mcp__snowflake__read_query",
+    "mcp__snowflake__list_databases",
+    "mcp__snowflake__list_schemas",
+    "mcp__snowflake__list_tables",
+    "mcp__confluence__confluence_search",
+    "mcp__confluence__confluence_get_page",
+    "mcp__confluence__confluence_create_page",
+    "mcp__confluence__confluence_update_page",
+    "mcp__confluence__jira_get_issue",
+    "mcp__confluence__jira_search_issues",
+    "mcp__confluence__jira_create_issue",
+    "mcp__confluence__jira_update_issue"
+  ]
 }
 ```
-If the file does not yet exist, create it with just this block for now — Phase 2 will add `mcpServers`.
+If the file does not yet exist, create it with just this block — Phase 2 will add `mcpServers`.
 If it already exists, merge these values into the existing `permissions` block.
-Confirm: `✅ Auto-approve mode enabled.`
+
+Print:
+```
+✅ Permissions saved. They take effect after restarting Claude Code.
+   You can restart now for a fully seamless experience, or continue in this
+   session (you'll see tool approval prompts until the next restart).
+```
+
+Do NOT stop here — let the user continue. Phase 0 and 1 only write files, so approval prompts are minor.
 
 If the user answered **n** (or anything else): proceed without changing permissions.
 
@@ -96,7 +112,7 @@ If the user answered **n** (or anything else): proceed without changing permissi
 
 **Fully automatic — no user input needed. Run all steps, then move to Phase 1.**
 
-### 1. Install commands
+### Step 0a — Install commands
 
 ```bash
 cp ./commands/*.md ~/.claude/commands/
@@ -104,9 +120,9 @@ cp ./commands/*.md ~/.claude/commands/
 
 List the installed files. Print: `✅ All commands installed.`
 
-### 2. TASKS.md
+### Step 0b — TASKS.md
 
-Check if `./TASKS.md` exists in the current directory. If not, create it silently:
+Check if `./TASKS.md` exists. If not, create it silently:
 
 ```markdown
 # Tasks
@@ -116,10 +132,25 @@ Check if `./TASKS.md` exists in the current directory. If not, create it silentl
 ## Done
 ```
 
-### 4. Entry point check
+### Step 0c — CLAUDE.md
 
-If `~/CLAUDE.md` exists, delete it automatically and tell the user:
-"Deleted `~/CLAUDE.md` — the Analyst Assistant context now loads only when you open Claude Code from this folder. Opening from anywhere else still gives a regular Claude session, without the Analyst Assistant context."
+Check if `./CLAUDE.md` exists in the current directory (the picnic-analyst-assistant folder).
+- ✅ Exists → nothing to do.
+- ⚠️ Missing → create it with the following content:
+
+```markdown
+# Analyst Assistant @ Picnic
+
+You are an analyst assistant at Picnic Technologies (grocery delivery service).
+You help with the full range of analytical work: data analysis, SQL queries, experiments,
+communication (Slack, slides) and documentation (Confluence, slides).
+
+**User identity** is stored in `~/picnic-analyst-assistant/user-config.md`. Agents read it at startup to parameterize task IDs and output paths.
+New users: copy `user-config.md.example` → `user-config.md` and fill in your details,
+or run `/setup` for guided onboarding.
+```
+
+Do **NOT** touch `~/CLAUDE.md`. If the user has one, it contains their own personal instructions for other Claude sessions and must be left as-is.
 
 Print: `✅ Phase 0 complete.` then ask: "Ready to set up your identity? (Phase 1)"
 Wait for any confirmation before continuing.
@@ -128,7 +159,7 @@ Wait for any confirmation before continuing.
 
 ## Phase 1 — Identity
 
-**Goal:** Create `~/picnic-analyst-assistant/user-config.md` with the user's identity.
+**Goal:** Create `./user-config.md` with the user's identity.
 
 Ask in one message:
 > "What's your full name and Picnic email?
@@ -143,8 +174,8 @@ From the email, derive the username prefix automatically:
 In the same reply or a follow-up, show the derived prefix and confirm:
 > "Username prefix: `mdejong` — looks good? Type 'y' to confirm, or type a different one."
 
-Check if `./user-config.md` already exists. If it does, show the current
-contents and ask: "Overwrite with new values?" Only proceed if they confirm.
+Check if `./user-config.md` already exists. If it does, show the current contents and ask:
+"Overwrite with new values?" Only proceed if they confirm.
 (Note: this prompt is only reached on a fresh install — resume paths skip Phase 1 entirely.)
 
 Write the file:
@@ -163,7 +194,8 @@ Wait for any confirmation before continuing.
 
 ## Phase 2 — Connections
 
-**Goal:** Configure MCP connections. Snowflake and, Atlassian and Github are required. Slack is optional.
+**Goal:** Configure all MCP connections. Collect tokens and write `settings.json` only — no verification here.
+Verification happens in Phase 4, after the restart and skills sync.
 
 ### What are MCPs?
 
@@ -177,7 +209,7 @@ After any change to `settings.json`, Claude Code must be restarted for changes t
 ### Pre-check: settings.json
 
 Note: if the user answered **y** to auto-approve in the pre-flight block, permissions were already
-written to `settings.json` before Phase 0. No need to set them again here.
+written to `settings.json`. No need to set them again here.
 
 Check if `~/.claude/settings.json` exists:
 - ✅ Exists → read current `mcpServers` and continue.
@@ -208,13 +240,13 @@ Check if `~/.claude/settings.json` exists:
 }
 ```
 
-For each tool below: if already configured, run the personalized **verification** of the connection. If a connection for a REQUIRED tool has not been made or is missing, walk through setting up the connection.
-
 ---
 
-### Required: Snowflake
+### Step 2a — Snowflake (configure only)
 
 **Check:** Is `SNOWFLAKE_TOKEN` set and non-empty in `mcpServers.snowflake.env`?
+- ✅ Already configured → skip to the "Ready to continue" prompt below.
+- ⚠️ Not configured → follow steps below.
 
 **If not configured:**
 1. Open a browser → log into your Snowflake account
@@ -229,52 +261,7 @@ When you have the token, update `~/.claude/settings.json`:
   (e.g. `firstname.lastname@teampicnic.com` → `FIRSTNAME.LASTNAME@TEAMPICNIC.COM`)
 - Set `SNOWFLAKE_TOKEN` to the pasted token
 
-**Verification** (run after configuring, or if already configured):
-Run via the `snowflake-query` skill. First try the full query with the fun stat:
-```sql
-SELECT
-  CURRENT_USER() AS you,
-  CURRENT_ROLE() AS role,
-  CURRENT_WAREHOUSE() AS warehouse,
-  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible,
-  (SELECT COUNT(*)
-   FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
-   WHERE USER_NAME = CURRENT_USER()
-     AND START_TIME > DATEADD(month, -12, CURRENT_TIMESTAMP())
-     AND (QUERY_TAG IS NULL OR QUERY_TAG = '')
-  ) AS untitled_queries
-```
-
-If that errors (ANALYST role may lack access to `SNOWFLAKE.ACCOUNT_USAGE`), silently fall back
-to the basic 4-column query (same query without the `untitled_queries` subquery).
-
-- ✅ Returns a row → print the wow output.
-
-  Extract the user's first name from `user-config.md` `full_name` field (Phase 1 has already
-  written this file, so it is always available here).
-
-  With fun stat:
-  ```
-  ⚡ Snowflake connected
-     Welcome back, <First Name>!
-     Role: ANALYST · Warehouse: ANALYSIS
-     Tables accessible: 1,471
-     Untitled queries (last 12 months): 847 — a true explorer 🧭
-  ```
-
-  Without fun stat (fallback):
-  ```
-  ⚡ Snowflake connected
-     Welcome back, <First Name>!
-     Role: ANALYST · Warehouse: ANALYSIS
-     Tables accessible: 1,471
-  ```
-
-  (Use actual values from the query result — format table count and untitled_queries with
-  thousands separators.)
-
-- ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
-  in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
+Print: `✅ Snowflake token saved.`
 
 Note: PAT tokens expire (max 1 year). When Snowflake queries stop working, regenerate and update `SNOWFLAKE_TOKEN`.
 
@@ -282,33 +269,66 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
 
 ---
 
-### Required: Atlassian
+### Step 2b — Atlassian (configure only)
 
 > **Important:** Use the `mcp-atlassian` Python package configured in `settings.json` — do NOT
 > use `claude mcp add` for Atlassian. The `claude mcp add` approach only supports reading Confluence
 > and Jira; it does not support creating Jira tickets.
 
-**Check:** Are `CONFLUENCE_API_TOKEN` and `JIRA_API_TOKEN` both set and non-empty in
-`mcpServers.confluence.env` in `settings.json`?
+**Check:** Is `CONFLUENCE_API_TOKEN` set and non-empty in `mcpServers.confluence.env` in `settings.json`?
+- ✅ Already configured → skip to the "Ready to continue" prompt below.
+- ⚠️ Not configured → follow steps below.
 
 **If not configured:**
 
-First, silently install the package (no user input needed):
+**Step 1 — Install and locate the binary (fully automatic, no user input):**
+
+Run in sequence, stopping at the first success:
+
 ```bash
-pip install mcp-atlassian
+# Attempt 1: standard pip
+pip install mcp-atlassian 2>&1
+which mcp-atlassian 2>/dev/null
 ```
 
-Then ask the user for their API token:
+If `which mcp-atlassian` returns a path → note it as `<mcp_atlassian_cmd>` and continue.
+
+If not found after attempt 1:
+```bash
+# Attempt 2: pip3
+pip3 install mcp-atlassian 2>&1
+which mcp-atlassian 2>/dev/null
+```
+
+If still not found after attempt 2:
+```bash
+# Attempt 3: pip --user (installs to ~/.local/bin)
+pip install --user mcp-atlassian 2>&1 || pip3 install --user mcp-atlassian 2>&1
+find ~/.local/bin /home/*/.local/bin ~/.pyenv -name "mcp-atlassian" -type f 2>/dev/null | head -3
+```
+
+Use the first path returned as `<mcp_atlassian_cmd>`.
+
+If no binary is found after all three attempts:
+- Print: `⚠️ Could not install mcp-atlassian — skipping for now. Re-run /setup later to set it up.`
+- Skip Atlassian setup entirely and continue to GitHub.
+
+**Step 2 — Ask the user for their API token:**
+
 > "Open a browser → https://id.atlassian.com/manage-profile/security
 > Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
 > Paste the token here when you have it."
 
 `CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email from Phase 1 — no need to ask again.
 
-Add to `mcpServers` in `settings.json` (the same API token works for both Confluence and Jira):
+**Step 3 — Write `settings.json`:**
+
+Use `<mcp_atlassian_cmd>` (the full path if `which` returned one, otherwise `"mcp-atlassian"`)
+as the `command` value. Add to `mcpServers` in `settings.json`:
+
 ```json
 "confluence": {
-  "command": "mcp-atlassian",
+  "command": "<mcp_atlassian_cmd>",
   "args": [],
   "env": {
     "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
@@ -321,50 +341,18 @@ Add to `mcpServers` in `settings.json` (the same API token works for both Conflu
 }
 ```
 
-**Verification** (run after configuring, or if already configured):
-
-Step 1 — Confluence: use the `confluence` MCP to search for pages the user contributed to:
-```
-CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
-```
-If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmodified DESC LIMIT 5`
-
-Step 2 — Jira: create a test ticket using the `confluence` MCP:
-- Find a Jira project the user has access to (search recent issues assigned to them, or list
-  available projects and pick a team backlog or personal project).
-- Create an issue with:
-  - Summary: `Claude Code setup test — <Full Name>`
-  - Description: `This ticket was automatically created during Claude Code setup to verify the Jira MCP connection. Safe to close.`
-  - Issue type: `Task` (fall back to whatever types are available if Task does not exist)
-
-Print wow output:
-```
-⚡ Atlassian connected (Confluence + Jira)
-   Your recent contributions:
-     • <page title 1>
-     • <page title 2>
-     • <page title 3>
-
-   Test Jira ticket created: <PROJECT-123>
-   https://picnic.atlassian.net/browse/<PROJECT-123>
-   (Safe to close — just proves the connection works)
-```
-(Use actual page titles and the real ticket key + URL from the create response.)
-
-- ⚠️ Error → Check that `mcp-atlassian` is installed (`pip install mcp-atlassian`) and that
-  `settings.json` has both Confluence and Jira env vars set correctly. Do NOT use
-  `claude mcp add atlassian` — that approach does not support Jira ticket creation.
+Print: `✅ Atlassian token saved.`
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
 ---
 
-### Required: GitHub
+### Step 2c — GitHub (configure only)
 
 **Goal:** Ensure `gh` CLI is installed and authenticated.
 
 Run: `gh auth status`
-- ✅ Logged in → skip to verification below
+- ✅ Logged in → print `✅ GitHub already authenticated.` and continue.
 - ⚠️ Not authenticated → run this command automatically (no user action needed before the browser):
   ```bash
   gh auth login --hostname github.com --git-protocol https --web
@@ -372,51 +360,29 @@ Run: `gh auth status`
   This opens a browser tab. Tell the user:
   > "A browser tab just opened — sign in with your Picnic GitHub account and authorise the app.
   > Come back here when the browser says you're done."
-  Wait for the user to confirm they completed the browser step, then continue automatically.
-
-**Verification** (run automatically after auth, or if already logged in):
-Run both commands in sequence — no user action needed:
-```bash
-gh api orgs/PicnicSupermarket --jq '.login'
-gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
-```
-
-Print wow output:
-```
-⚡ GitHub connected
-   Organisation: PicnicSupermarket — access confirmed
-
-   Your recent PRs in picnic-dbt-models:
-     • <actual PR title> (<state>)
-     • <actual PR title> (<state>)
-
-```
-(Use actual values from the commands. If no personal PRs found, skip that section gracefully.)
+  Wait for the user to confirm they completed the browser step, then run `gh auth status` to confirm
+  success and print: `✅ GitHub authenticated.`
 
 Note: `gh` credentials are stored by the CLI — no entry needed in `settings.json`.
 
 ---
 
-### Optional tools
+### Step 2d — Slack (optional)
 
 Ask once:
-> "Which optional tools would you like to set up?
->   A — Slack (read channels, send messages)
+> "Would you like to set up Slack? (read channels, send messages)
+>   A — Yes, set up Slack now
 >   B — Skip for now
 >
-> You can always re-run /setup to add them later."
+> You can always re-run /setup to add it later."
 
-Work through each selected tool. Skip anything the user does not select.
+If user chooses **B — Skip**: add `slack_setup: skipped` to `./user-config.md` and continue.
 
----
-
-### Optional: Slack
+**If setting up Slack:**
 
 **Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
-
-**If not configured:**
-
-Walk the user through creating their own Slack app step by step. Print the following instructions and ask them to follow along, pausing where indicated:
+- ✅ Already configured → print `✅ Slack already configured.` and continue.
+- ⚠️ Not configured → walk the user through creating their own Slack app:
 
 ```
 Here's how to create your Slack app — follow each step, then come back here.
@@ -460,42 +426,46 @@ Wait for the user to paste the token, then add to `mcpServers` in `settings.json
 }
 ```
 
-Print: `⚡ Slack configured — token saved. You'll see it in action when you use /writer.`
+Print: `✅ Slack token saved.`
 
 ---
 
-### After any settings.json changes — restart notice
+### Connections summary + restart
 
-If `settings.json` was updated during this phase, print this block prominently and **stop** before moving onto the next MCP:
+Print the connections summary showing what was configured:
 
 ```
-⚡ New terminal required
-   settings.json was updated. MCP servers only load at startup, so a new Claude
-   session is needed before newly configured MCPs will work.
+Connections configured:
+  Snowflake    ✅  (or ⚠️ skipped)
+  Atlassian    ✅  (or ⚠️ skipped)
+  GitHub       ✅  (or ⚠️ skipped)
+  Slack        ✅  (or — skipped by choice)
+```
+
+**One restart required.** After writing all configurations to `settings.json`, print this block
+prominently and **stop**:
+
+```
+⚡ Restart required — one time
+   All MCP configurations have been written to settings.json.
+   MCP servers only load at startup, so one restart is needed
+   before Phase 3 (skills) and Phase 4 (verification) can run.
 
    Steps:
-     1. Open a new terminal and open Claude again
-     2. Run /setup — it will quickly re-verify tools already set up, then
-        continue from the next unconfigured tool
+     1. Open a new terminal and start Claude Code from the
+        picnic-analyst-assistant folder
+     2. Run /setup — it will sync skills, verify all connections,
+        and finish setup
+
+   (Skills and verification run automatically after restart.)
 ```
 
-Do not proceed to the next tool or Phase 3. The user must restart first.
+Do not proceed to Phase 3 or 4. The user must restart first.
 
----
-
-### Connections summary (print before moving on)
-
-```
-Connections:
-  Snowflake    ✅
-  Atlassian    ✅
-  GitHub       ✅
-  Slack        ✅  (or ⚠️ skipped)
-```
-
-If any ⚠️: note they can fix these later by re-running `/setup`.
-
-Ask: "Ready to sync skills? (Phase 3)" and wait for confirmation before proceeding.
+**Exception — skip restart if:**
+All MCPs were already in `settings.json` when Phase 2 started (nothing was written in this session)
+AND `gh auth status` confirms GitHub is logged in. In that case, continue directly to Phase 3
+without printing the restart block.
 
 ---
 
@@ -529,7 +499,7 @@ Check for the `picnic-analytical-tools` repo in this order:
 
 Once present and up to date, sync the skills:
 
-Read `<repo-path>/claude-code/skills/sync-picnic-skills/SKILL.md`
+Read `<repo-path>/claude-code/skills/picnic-sync-tools/SKILL.md`
 (where `<repo-path>` is the picnic-analytical-tools location found above)
 and follow the instructions in that file. This installs all shared skills by
 creating symlinks from the repo into `~/.claude/skills/`.
@@ -537,11 +507,147 @@ creating symlinks from the repo into `~/.claude/skills/`.
 - ✅ Success → print the list of installed skills
 - ⚠️ Error → "Sync failed. Re-run `/setup` later to retry."
 
-Move to Phase 4.
+Move directly to Phase 4 (no confirmation prompt).
 
 ---
 
-## Phase 4 — Done
+## Phase 4 — Verify connections
+
+**Goal:** Test all connections in one shot. Run each verification in sequence.
+
+---
+
+### Snowflake verification
+
+Run query 1 (scalar stats) via the `picnic-query-snowflake` skill:
+```sql
+SELECT
+  CURRENT_USER() AS you,
+  CURRENT_ROLE() AS role,
+  CURRENT_WAREHOUSE() AS warehouse,
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible
+```
+
+Run query 2 (recent activity) separately:
+```sql
+SELECT COUNT(*) AS query_count
+FROM TABLE(SNOWFLAKE.INFORMATION_SCHEMA.QUERY_HISTORY(
+    END_TIME_RANGE_START => DATEADD(day, -1, CURRENT_TIMESTAMP())))
+WHERE QUERY_TYPE = 'SELECT'
+```
+
+Combine results. Extract the user's first name from `user-config.md` `full_name` field.
+
+- ✅ Both queries succeed → print wow output:
+  ```
+  ⚡ Snowflake connected
+     Welcome back, <First Name>!
+     Role: ANALYST · Warehouse: ANALYSIS
+     Tables accessible: 1,471
+     SELECT queries yesterday: 42
+  ```
+  (Use actual values, formatted with thousands separators.)
+
+- ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
+  in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
+
+---
+
+### Atlassian verification
+
+> **Important:** Only run if the `confluence` MCP server is loaded in this session.
+> It loads at startup — if `settings.json` was updated and Claude was restarted, it should be active.
+> Do NOT attempt bash diagnostics to probe the MCP process; this leads to a dead end.
+
+**If Atlassian was skipped in Phase 2** (not in `settings.json`) → skip this section.
+
+**Step 1 — Confluence:** search for pages the user contributed to:
+```
+CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
+```
+If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmodified DESC LIMIT 5`
+
+**Step 2 — Jira:** create a test ticket using the `confluence` MCP:
+- Find a Jira project the user has access to (search recent issues assigned to them, or list
+  available projects and pick a team backlog or personal project).
+- Create an issue with:
+  - Summary: `Claude Code setup test — <Full Name>`
+  - Description: `This ticket was automatically created during Claude Code setup to verify the Jira MCP connection. Safe to close.`
+  - Issue type: `Task` (fall back to whatever types are available if Task does not exist)
+
+- ✅ Both succeed → print wow output:
+  ```
+  ⚡ Atlassian connected (Confluence + Jira)
+     Your recent contributions:
+       • <page title 1>
+       • <page title 2>
+       • <page title 3>
+
+     Test Jira ticket created: <PROJECT-123>
+     https://picnic.atlassian.net/browse/<PROJECT-123>
+     (Safe to close — just proves the connection works)
+  ```
+
+- ⚠️ MCP not loaded ("server not found" / "unknown tool" error) → The `confluence` MCP is
+  configured but not active in this session. Print:
+  "Atlassian is configured — restart Claude Code and run /setup to complete verification."
+  Do NOT attempt bash diagnostics. Mark as ⚠️ in the summary and continue.
+
+- ⚠️ API error (401 / auth failed) → Automatically attempt to self-heal:
+  1. Re-read `settings.json` and verify `CONFLUENCE_API_TOKEN` is set and non-empty.
+  2. Run: `which mcp-atlassian` — if empty, re-run the 3-attempt install from Phase 2 and update
+     the `command` field in `settings.json` with the located binary path.
+  3. Print the corrected config values (mask the token: show first 8 chars + `...`) and inform:
+     "The token or binary path was updated — restarting is needed to pick up the change."
+  4. If the error persists, ask the user to re-paste the token:
+     "The token may be incorrect. Paste your Atlassian API token again — or skip for now."
+     On receipt, update `CONFLUENCE_API_TOKEN` and `JIRA_API_TOKEN` in `settings.json`.
+     If the user skips, note Atlassian as ⚠️ in the summary and continue.
+  Do NOT use `claude mcp add atlassian` — that approach does not support Jira ticket creation.
+
+---
+
+### GitHub verification
+
+Run both commands in sequence:
+```bash
+gh api orgs/PicnicSupermarket --jq '.login'
+gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
+```
+
+- ✅ Succeeds → print wow output:
+  ```
+  ⚡ GitHub connected
+     Organisation: PicnicSupermarket — access confirmed
+
+     Your recent PRs in picnic-dbt-models:
+       • <actual PR title> (<state>)
+       • <actual PR title> (<state>)
+  ```
+  (If no personal PRs found, skip that section gracefully.)
+
+- ⚠️ Error → "Check GitHub auth with `gh auth status` and re-run `/setup`."
+
+---
+
+### Connections verification summary
+
+Print:
+```
+Connections verified:
+  Snowflake    ✅  (or ⚠️ with note)
+  Atlassian    ✅  (or ⚠️ with note)
+  GitHub       ✅  (or ⚠️ with note)
+  Slack        —   (configured — verified in use)
+```
+
+If any ⚠️: note they can fix these later by re-running `/setup`.
+
+Move directly to Phase 5.
+
+---
+
+## Phase 5 — Done
 
 ### Git cleanup (automatic — no user input)
 
@@ -549,16 +655,12 @@ Untrack all repo files except README and the setup command so users can freely e
 add, or delete any file without git ever flagging it. The files stay on disk — only
 git's tracking changes. This is purely local and never pushed.
 
-Run silently:
+> **IMPORTANT:** Run the entire block below as ONE bash command via the Bash tool.
+> Do NOT split into separate tool calls. Do NOT use the Write tool for `.gitignore`.
+> The heredoc must execute as part of the same shell invocation.
+
 ```bash
-# Untrack everything except README + setup files
-git rm --cached -r --quiet .
-
-# Re-track only the bootstrapping files
-git add README.md commands/setup.md patterns/setup.md .gitignore
-
-# Overwrite .gitignore locally so untracked files are properly ignored
-cat > .gitignore << 'EOF'
+git rm --cached -r --quiet . && git add README.md commands/setup.md patterns/setup.md .gitignore && cat > .gitignore << 'EOF'
 # Only README and the setup command are tracked.
 # Everything else is yours to add, edit, or delete freely.
 *
@@ -569,17 +671,23 @@ cat > .gitignore << 'EOF'
 !patterns/
 !patterns/setup.md
 EOF
-
-git add .gitignore
-
-# Commit locally (never pushed — keeps git status permanently clean)
-git commit -m "Local: untrack all personal files (setup complete)"
+git add .gitignore && git commit -m "Local: untrack all personal files (setup complete)"
 ```
 
-- ✅ Success → `git status` is now permanently clean. Any file can be edited, added, or deleted freely.
+After the commit, run `git status --short` and verify the output is empty (clean).
+
+If `git status` shows untracked files after the commit, the `.gitignore` write failed:
+- Run manually via bash:
+  ```bash
+  printf '*\n!.gitignore\n!README.md\n!commands/\n!commands/setup.md\n!patterns/\n!patterns/setup.md\n' > .gitignore && git add .gitignore && git commit -m "Local: fix .gitignore (setup complete)"
+  ```
+
+- ✅ Clean status → `git status` is now permanently clean. Any file can be edited, added, or deleted freely.
 - ⚠️ Error → note it and continue; non-critical. Users can still work normally.
 
-Print the final summary:
+---
+
+### Final summary
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -587,24 +695,24 @@ Setup complete for <full_name> (<username_prefix>)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Working directory
-  Always open Claude Code from the picnic-analyst-assistant folder
+  Always open Claude Code from the picnic-analyst-assistant folder.
   CLAUDE.md loads automatically — opening from any other folder enters a
-  regular Claude session, without the **Analyst Assistant** context.)
+  regular Claude session, without the Analyst Assistant context.
 
 Commands     ✅  installed to ~/.claude/commands/
 Identity     ✅  user-config.md written
 
 Connections
-  <status line per tool from Phase 2>
+  <status line per tool from Phase 4>
 
 Skills
   <sync status + list from Phase 3>
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Next steps:
-  → Run /onboard-knowledge to add your first personalized knowledge files
-  → Run /tasks to add your first task to the TASKS.md file
+  → Run /onboard-knowledge to add your first personalised knowledge files
   → Run /analyst and try out your Snowflake MCP connection
+  → Add tasks to TASKS.md and run /perform to start working
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -616,5 +724,7 @@ Next steps:
 - **Never write personal context files without user input** — no templates with fake data.
 - **Always confirm before starting the next phase or the next tool within Phase 2.**
   Any response (including "yes", "ok", Enter) counts as confirmation. Never auto-advance.
-- **Setup is resumable** — re-running `/setup` re-checks each phase and skips completed steps.
+  Exception: Phase 3 → Phase 4 transition is automatic (no prompt).
+- **Setup is resumable** — re-running `/setup` re-checks each step and skips completed ones.
 - **If any phase fails or is skipped**, note it in the summary and continue where possible.
+- **Do NOT touch `~/CLAUDE.md`** — it belongs to the user and must never be created, modified, or deleted.
