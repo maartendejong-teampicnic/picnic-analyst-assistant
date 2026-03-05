@@ -67,7 +67,7 @@ Type your choice (y/n), then press Enter to start.
 ─────────────────────────────────────────
 ```
 
-Wait for the user to respond before continuing.
+Wait for the user to respond before continuing. 
 
 If the user answered **y**: immediately write (or update) `~/.claude/settings.json` to set:
 ```json
@@ -93,15 +93,14 @@ If the user answered **y**: immediately write (or update) `~/.claude/settings.js
 ```
 If the file does not yet exist, create it with just this block — Phase 2 will add `mcpServers`.
 If it already exists, merge these values into the existing `permissions` block.
+If permissions changed and the user answered to change, DO NOT PROCEED to phase 1. Instead, prompt the user to start a new session using the following print message.
 
 Print:
 ```
-✅ Permissions saved. They take effect after restarting Claude Code.
-   You can restart now for a fully seamless experience, or continue in this
-   session (you'll see tool approval prompts until the next restart).
+✅ Permissions saved. They take effect in a new Claude Code session.
+   Open a new terminal, reopen Claude, and continue where you left off
+   automatically using the /setup command again.
 ```
-
-Do NOT stop here — let the user continue. Phase 0 and 1 only write files, so approval prompts are minor.
 
 If the user answered **n** (or anything else): proceed without changing permissions.
 
