@@ -117,12 +117,11 @@ picnic-analyst-assistant/
 ├── CONTEXT.md                         ← blank context template
 ├── tasks-output/<task-id>/                   ← permanent record per task
 │   ├── context.md                     ← coordination file (active if no summary.md)
-│   ├── analyst.md / engineer.md / …   ← agent outputs (copied at close)
+│   ├── analyst.md / engineer.md / …   ← agent outputs (written directly during execution)
 │   └── summary.md                     ← synthesis (marks task complete)
 └── direct-output/{username_prefix}-YYYYMMDD-HHMM-<role>-<slug>/
     └── output.md                      ← direct mode output
 
-~/.claude/data/agents/<task-id>/       ← transient working files (deleted at close)
 ~/.claude/data/Output/                 ← (legacy; no longer used for agent output)
 ~/.claude/data/snowflake-query/        ← query files and JSON results
 ```

@@ -18,9 +18,6 @@ All agent files share a common preamble via `knowledge/agent-common.md` (loaded 
 **Task folders:** `~/picnic-analyst-assistant/tasks-output/<task-id>/`
 One folder per task. `context.md` = active, `summary.md` present = done.
 
-**Transient working files:** `~/.claude/data/agents/<task-id>/<role>/output.md`
-(copied to the task folder on close, then deleted)
-
 ## Hard rules
 
 **NEVER modify shared files without explicit instruction.**

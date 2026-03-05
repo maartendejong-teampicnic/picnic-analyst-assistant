@@ -18,7 +18,7 @@ Status: —
 ## Your Assignment (active agent reads this)
 Role: —
 Instructions: —
-Output file: ~/.claude/data/agents/[task-id]/[role]/output.md
+Output file: ~/picnic-analyst-assistant/tasks-output/[task-id]/[role].md
 Approval required: —
 
 ## Inputs From Prior Agents

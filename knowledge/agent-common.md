@@ -22,7 +22,7 @@ Determine which mode you are in before proceeding:
 - Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`
 - Instructions come from the user's messages — no context file to read
 - No task-id, no tasks-output/ folder, no TASKS.md updates
-- Do not write to `~/.claude/data/agents/` — that's for orchestrated runs only
+- Do not write to `tasks-output/` — that folder is managed by the ORCHESTRATOR in orchestrated mode only
 
 **Output folder:** create explicitly using Bash:
 ```bash
@@ -63,7 +63,7 @@ See your role file for the role-specific output.md schema.
      When in doubt, read it — over-reading is safe; under-reading risks missing conventions.
 3. Read context files (see Section 4 below)
 4. Execute your assignment; write all output to the path in `## Your Assignment → Output file:`
-   (It will be `~/.claude/data/agents/<task-id>/<role>/output.md` — create dir if needed)
+   (It will be `~/picnic-analyst-assistant/tasks-output/<task-id>/<role>.md`)
 
 ---
 

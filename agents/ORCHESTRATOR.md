@@ -60,8 +60,7 @@ Each task lives in its own folder:
 **Active task**: folder exists, `context.md` present, `summary.md` absent.
 **Completed task**: folder exists, `summary.md` present. Permanent record — never deleted.
 
-Agent working files during execution are written to `~/.claude/data/agents/<task-id>/<role>/output.md`
-(transient, fast I/O). On close they are copied to the task folder, then the transient dir is deleted.
+Agent outputs are written directly to `tasks-output/<task-id>/<role>.md` during execution.
 
 ---
 
@@ -154,12 +153,12 @@ c. Spawn via Agent tool with prompt:
    ```
    You are the <ROLE> specialist. Read your context file at
    ~/picnic-analyst-assistant/tasks-output/<task-id>/context.md. Execute your assignment exactly.
-   Write all output to ~/.claude/data/agents/<task-id>/<role>/output.md
-   (create the directory if it doesn't exist).
+   Write all output to ~/picnic-analyst-assistant/tasks-output/<task-id>/<role>.md
+   (create the file if it doesn't exist).
    Read ~/picnic-analyst-assistant/agents/<ROLE_FILE> for your full onboarding.
    (where <ROLE_FILE> is the `file` field from agents/index.yaml — e.g. ANALYST.md)
    ```
-d. After agent completes, read `~/.claude/data/agents/<task-id>/<role>/output.md`
+d. After agent completes, read `~/picnic-analyst-assistant/tasks-output/<task-id>/<role>.md`
 e. If `STATUS: NEEDS_APPROVAL` → surface full draft to user (see gate format)
    → wait for approval keyword → then instruct agent to execute the side effect
 f. If `STATUS: BLOCKED` → relay the question to user → write answer to
@@ -167,7 +166,7 @@ f. If `STATUS: BLOCKED` → relay the question to user → write answer to
 g. Update `## Subtask Tracker` in `tasks-output/<task-id>/context.md` after each agent
 
 ### Phase 3 — Synthesis
-- Read all `~/.claude/data/agents/<task-id>/*/output.md` files
+- Read all agent output files in `~/picnic-analyst-assistant/tasks-output/<task-id>/` (exclude `context.md` and `summary.md`)
 - Compose final summary: what was produced, where it lives (PR link, sheet URL, etc.)
 - Gate any remaining side effects not yet executed
 - Write summary to `tasks-output/<task-id>/summary.md`:
@@ -194,14 +193,8 @@ g. Update `## Subtask Tracker` in `tasks-output/<task-id>/context.md` after each
 - Present the summary to the user
 
 ### Phase 4 — Close
-- Copy each agent's working output to the task folder:
-  - Discover which roles ran by globbing `~/.claude/data/agents/<task-id>/*/`
-  - For each role dir found, copy `output.md` → `tasks-output/<task-id>/<role>.md`
-  - (only copy roles that actually produced output)
-- Verify additional files are present: agents write SQL, CSV, .pptx, .excalidraw, and other
-  outputs directly to `tasks-output/<task-id>/` during execution. Glob the folder and list
-  any such files in `summary.md` under `## Artifacts`.
-- Delete transient working dir: `~/.claude/data/agents/<task-id>/`
+- Verify task folder contents: glob `tasks-output/<task-id>/` and list all files
+  (agent outputs, SQL, CSV, .pptx, .excalidraw, etc.) in `summary.md` under `## Artifacts`.
 - Set task status: `Done` in TASKS.md
 - Report: "Task <task-id> complete. Full record at `tasks-output/<task-id>/`."
 - **Check for next Active task** in TASKS.md (if it exists):
