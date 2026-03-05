@@ -3,7 +3,7 @@
 #
 # Two-tier model:
 #   Framework files (CLAUDE.md, README.md, patterns/) — committed, tracked, do not edit.
-#   Working files (agents/, commands/, context/, knowledge/, tools/) — committed as starting
+#   Working files (agents/, commands/, knowledge/, tools/) — committed as starting
 #   points, then skip-worktree'd by /setup so your edits are never tracked.
 
 # Ignore everything by default
@@ -35,10 +35,6 @@ commands/presenter.md
 !knowledge/INDEX.yaml
 !knowledge/agent-common.md
 !knowledge/sql-snowflake.md
-
-# Context — only Picnic business vocab is shared
-!context/
-!context/picnic-business.md
 
 # Tools — only costs is shared; gdrive and slides are personal
 !tools/
