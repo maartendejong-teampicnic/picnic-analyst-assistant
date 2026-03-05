@@ -10,7 +10,7 @@ Do not ask for permission to start.
 
 ## Resume detection (run before anything else, before the welcome message)
 
-Silently check each step in order. Start executing from the first step that is not yet complete.
+Check each step in order. Start executing from the first step that is not yet complete.
 
 | Step | Done if… |
 |------|----------|
