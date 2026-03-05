@@ -29,7 +29,15 @@ Once you know your start step, decide what to do:
 
 - **Start step is 0a** → fresh install. Print the welcome message, then the pre-flight block, then begin Phase 0.
   _(Do this even if later steps like GitHub auth happen to already be configured on the machine — they are irrelevant to the start decision.)_
-- **Start step is anything after 0a** → resuming. Print one line: `Resuming setup — picking up from step <X>...` then proceed from that step.
+- **Start step is anything after 0a** → resuming. Print a short summary of completed steps, then the resume line. Format:
+  ```
+  Setup progress:
+    ✅ Commands installed
+    ✅ Identity set              (or include whichever steps are done)
+    ✅ Connections configured
+    ⏭  Picking up from: <step name>
+  ```
+  Only list steps that are actually complete. Then proceed from the start step.
 - **No start step (all steps complete)** → jump straight to Phase 4 (re-verify).
 
 ---
@@ -72,10 +80,60 @@ Wait for the user to respond before continuing.
 If the user answered **y**: immediately write (or update) `~/.claude/settings.json` to set:
 ```json
 "permissions": {
-  "defaultMode": "acceptEdits",
-  "allowedTools": [
-    "Bash", "Read", "Write", "Edit", "Glob", "Grep",
-    "WebFetch", "WebSearch",
+  "defaultMode": "default",
+  "allow": [
+    "Bash(*)",
+    "Read",
+    "Glob",
+    "Grep",
+    "Edit",
+    "Write",
+    "WebFetch",
+    "WebSearch",
+    "Bash(git *)",
+    "Bash(gh *)",
+    "Bash(gh api:*)",
+    "Bash(gh repo:*)",
+    "Bash(gh pr:*)",
+    "Bash(git clone:*)",
+    "Bash(git:*)",
+    "Bash(cd * && git *)",
+    "Bash(cd * && gh *)",
+    "Bash(python3:*)",
+    "Bash(python:*)",
+    "Bash(pip install:*)",
+    "Bash(pip3 install:*)",
+    "Bash(poetry run:*)",
+    "Bash(poetry show:*)",
+    "Bash(poetry install:*)",
+    "Bash(ln:*)",
+    "Bash(ls:*)",
+    "Bash(ls *)",
+    "Bash(cat:*)",
+    "Bash(curl *)",
+    "Bash(curl:*)",
+    "Bash(wc *)",
+    "Bash(wc:*)",
+    "Bash(stat *)",
+    "Bash(diff *)",
+    "Bash(du *)",
+    "Bash(du:*)",
+    "Bash(head:*)",
+    "Bash(chmod +x:*)",
+    "Bash(mkdir -p ~/.claude/*)",
+    "Bash(mkdir -p ~/Documents/*)",
+    "Bash(ln -s *)",
+    "Bash(test:*)",
+    "Bash(npx:*)",
+    "Bash(node:*)",
+    "Bash(wsl.exe:*)",
+    "Bash(wslpath:*)",
+    "Bash(powershell.exe:*)",
+    "Bash(docker ps:*)",
+    "Bash(docker exec:*)",
+    "Bash(claude:*)",
+    "Bash(claude mcp:*)",
+    "Bash(do:*)",
     "mcp__snowflake__read_query",
     "mcp__snowflake__list_databases",
     "mcp__snowflake__list_schemas",
@@ -93,13 +151,10 @@ If the user answered **y**: immediately write (or update) `~/.claude/settings.js
 ```
 If the file does not yet exist, create it with just this block — Phase 2 will add `mcpServers`.
 If it already exists, merge these values into the existing `permissions` block.
-If permissions changed and the user answered to change, DO NOT PROCEED to phase 1. Instead, prompt the user to start a new session using the following print message.
 
 Print:
 ```
-✅ Permissions saved. They take effect in a new Claude Code session.
-   Open a new terminal, reopen Claude, and continue where you left off
-   automatically using the /setup command again.
+✅ Permissions saved.
 ```
 
 If the user answered **n** (or anything else): proceed without changing permissions.
@@ -502,7 +557,12 @@ Read `<repo-path>/claude-code/skills/picnic-sync-tools/SKILL.md`
 and follow the instructions in that file. This installs all shared skills by
 creating symlinks from the repo into `~/.claude/skills/`.
 
-- ✅ Success → print the list of installed skills
+- ✅ Success → print the Phase 3 completion block:
+  ```
+  ✅ Phase 3 complete — Skills synced
+     Installed: <N> skills → ~/.claude/skills/
+     <list skill names, one per line, prefixed with •>
+  ```
 - ⚠️ Error → "Sync failed. Re-run `/setup` later to retry."
 
 Move directly to Phase 4 (no confirmation prompt).
@@ -649,38 +709,28 @@ Move directly to Phase 5.
 
 ### Git cleanup (automatic — no user input)
 
-Untrack all repo files except README and the setup command so users can freely edit,
-add, or delete any file without git ever flagging it. The files stay on disk — only
-git's tracking changes. This is purely local and never pushed.
+Add personal files to `.gitignore` so they never appear in `git status`.
+This only touches `.gitignore` — all repo files stay tracked and the remote is unaffected.
 
 > **IMPORTANT:** Run the entire block below as ONE bash command via the Bash tool.
 > Do NOT split into separate tool calls. Do NOT use the Write tool for `.gitignore`.
 > The heredoc must execute as part of the same shell invocation.
 
 ```bash
-git rm --cached -r --quiet . && git add README.md commands/setup.md patterns/setup.md .gitignore && cat > .gitignore << 'EOF'
-# Only README and the setup command are tracked.
-# Everything else is yours to add, edit, or delete freely.
-*
-!.gitignore
-!README.md
-!commands/
-!commands/setup.md
-!patterns/
-!patterns/setup.md
+cat >> .gitignore << 'EOF'
+
+# Personal files — not tracked
+user-config.md
+tasks-output/
+direct-output/
+tasks/
 EOF
-git add .gitignore && git commit -m "Local: untrack all personal files (setup complete)"
+git add .gitignore && git commit -m "Local: ignore personal files (setup complete)"
 ```
 
-After the commit, run `git status --short` and verify the output is empty (clean).
+After the commit, run `git status --short` and verify no personal files appear as untracked.
 
-If `git status` shows untracked files after the commit, the `.gitignore` write failed:
-- Run manually via bash:
-  ```bash
-  printf '*\n!.gitignore\n!README.md\n!commands/\n!commands/setup.md\n!patterns/\n!patterns/setup.md\n' > .gitignore && git add .gitignore && git commit -m "Local: fix .gitignore (setup complete)"
-  ```
-
-- ✅ Clean status → `git status` is now permanently clean. Any file can be edited, added, or deleted freely.
+- ✅ Clean status → personal files are now permanently ignored.
 - ⚠️ Error → note it and continue; non-critical. Users can still work normally.
 
 ---
