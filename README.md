@@ -11,52 +11,48 @@ For setup, usage, and onboarding: see the [Analyst Assistant Reference Handbook]
 ```
 picnic-analyst-assistant/
 │
-├── CLAUDE.md                          # orchestration rules (loaded automatically)
-├── CONTEXT.md                         # blank task context template (used by orchestrator)
-├── TASKS.md                           # your task list (gitignored)
+├── CLAUDE.md                          # loaded automatically; sets Claude's behaviour for this project
+├── CONTEXT.md                         # blank template the orchestrator copies per task
+├── TASKS.md                           # your personal task list (gitignored)
 │
-├── agents/                            # example agents
-│   ├── ORCHESTRATOR.md
-│   ├── ANALYST.md
-│   ├── ENGINEER.md
-│   ├── WRITER.md
-│   └── index.yaml                     # agent registry (ORCHESTRATOR reads at startup)
+├── agents/                            # one file per specialist agent; customise to your workflow
+│   ├── ORCHESTRATOR.md                # decomposes tasks, routes to specialists, gates actions
+│   ├── ANALYST.md                     # writes SQL, analyses data, designs experiments
+│   ├── ENGINEER.md                    # builds dbt models, creates GitHub PRs
+│   ├── WRITER.md                      # drafts Slack messages and Confluence pages
+│   └── index.yaml                     # agent registry: tells ORCHESTRATOR what agents exist
 │
-├── knowledge/                         # skill files loaded by agents at startup
-│   ├── INDEX.yaml                     # routing: which agent loads which file
-│   ├── agent-common.md                # shared agent instructions
-│   └── sql-snowflake.md               # example knowledge file
+├── knowledge/                         # skill files; agents load these at startup via INDEX.yaml
+│   ├── INDEX.yaml                     # routing table: which agent loads which file
+│   ├── agent-common.md                # shared rules and startup sequence for every agent
+│   └── sql-snowflake.md               # example skill file: Snowflake SQL conventions
 │
-├── patterns/                          # meta-maintenance patterns 
-│   ├── setup.md
-│   ├── architect.md
-│   ├── onboard-knowledge.md
-│   └── add-agent.md
+├── patterns/                          # guided flows; each one backs a slash command
+│   ├── setup.md                       # backs /setup    — onboard a new user
+│   ├── architect.md                   # backs /architect — review or change the system
+│   ├── onboard-knowledge.md           # backs /onboard-knowledge — teach the system a new skill
+│   └── add-agent.md                   # backs /add-agent — add a new specialist agent
 │
-├── commands/                          # slash command 
-│   ├── perform.md
-│   ├── analyst.md / engineer.md / writer.md
-│   ├── tasks.md / add-agent.md / costs.md
-│   └── setup.md / architect.md / onboard-knowledge.md
+├── commands/                          # slash command entry points; one file per /command
+│   ├── perform.md / tasks.md          # task orchestration
+│   ├── analyst.md / engineer.md / writer.md   # direct agent access
+│   ├── setup.md / architect.md / onboard-knowledge.md / add-agent.md   # guided flows
+│   └── costs.md                       # Claude API cost tracking
 │
-├── tools/                             # tool integrations
-│   └── costs/                         # Claude API cost tracking tool
+├── tools/costs/                       # cost tracking tool (Python)
 │
-├── context/                           # personal project context (gitignored)
-│   └── <project>.md                   # your context files 
-│
-├── tasks-output/                             # task outputs, one folder per task (gitignored)
+├── tasks-output/                      # one folder per /perform task (gitignored)
 │   └── <task-id>/
-│       ├── context.md
-│       ├── summary.md
-│       └── <role>.md
+│       ├── context.md                 # coordination file: plan, assignments, status
+│       ├── <role>.md                  # each agent writes its output here
+│       └── summary.md                 # synthesis; presence marks the task complete
 │
-├── direct-output/                            # direct-mode outputs (gitignored)
+├── direct-output/                     # output from direct agent commands (gitignored)
 │   └── <username>-YYYYMMDD-HHMM-<role>-<slug>/
 │       └── output.md
 │
-├── user-config.md.example             # identity configuration template
-└── user-config.md                     # your identity: name, prefix, email, team (gitignored)
+├── user-config.md.example             # copy this to user-config.md and fill in your details
+└── user-config.md                     # your identity: name, email, username prefix, team (gitignored)
 ```
 
 ---
@@ -97,5 +93,4 @@ Created locally; gitignored.
 | `TASKS.md` | Your task list |
 | `tasks-output/` | Per-task output folders |
 | `direct-output/` | Direct-mode output folders |
-| `context/` | Personal project context files (communication style, project notes, etc.) |
 
