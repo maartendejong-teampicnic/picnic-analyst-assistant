@@ -123,7 +123,7 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
    Fill in all fields (task title, id, status, brief, relevant files, subtask tracker)
    Then run:
    ```
-   code ~/picnic-analyst-assistant/tasks-output/<task-id>/context.md
+   code --new-window ~/picnic-analyst-assistant/tasks-output/<task-id>/context.md
    ```
    Then tell the user:
    ```
