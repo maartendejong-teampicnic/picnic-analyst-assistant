@@ -1,48 +1,9 @@
-# Allowlist — only explicitly listed files are committed to the shared repo.
-# Everything else is personal/configurable and stays local.
-#
-# Two-tier model:
-#   Framework files (CLAUDE.md, README.md, patterns/) — committed, tracked, do not edit.
-#   Working files (agents/, commands/, knowledge/, tools/) — committed as starting
-#   points, then skip-worktree'd by /setup so your edits are never tracked.
-
-# Ignore everything by default
+# Only README and the setup files are tracked.
+# Everything else is yours to add, edit, or delete freely — git will never flag it.
 *
-
-# Framework — committed and tracked; do not edit
 !.gitignore
-!CLAUDE.md
-!CONTEXT.md
 !README.md
-!user-config.md.example
-!patterns/
-!patterns/*.md
-
-# Working files — committed as starting points; skip-worktree'd after /setup so edits stay local
-!agents/
-!agents/*.md
-!agents/index.yaml
-agents/DESIGNER.md
-agents/PRESENTER.md
 !commands/
-!commands/*.md
-commands/gdrive.md
-commands/designer.md
-commands/presenter.md
-
-# Knowledge — INDEX.yaml and agent-common.md are shared starting points; all other skill files are personal
-!knowledge/
-!knowledge/INDEX.yaml
-!knowledge/agent-common.md
-!knowledge/sql-snowflake.md
-
-# Tools — only costs is shared; gdrive and slides are personal
-!tools/
-!tools/costs/
-!tools/costs/**
-
-# Output folder skeletons — folders committed, contents gitignored
-!direct-output/
-!direct-output/.gitkeep
-!tasks-output/
-!tasks-output/.gitkeep
+!commands/setup.md
+!patterns/
+!patterns/setup.md
