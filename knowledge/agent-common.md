@@ -80,7 +80,28 @@ all context files are personal and gitignored; they may not be present for all u
 
 ---
 
-## 6. Output file header
+## 6. Shared tools
+
+These skills are installed via `picnic-analytical-tools` and available in `~/.claude/skills/`.
+Invoke them using the Skill tool. Only use tools relevant to your role.
+
+| Skill | Use when | Roles |
+|-------|----------|-------|
+| `picnic-query-snowflake` | Run SQL against Snowflake | ANALYST, ORCHESTRATOR |
+| `picnic-read-dwh-data-catalog` | Find tables before writing SQL | ANALYST, ORCHESTRATOR |
+| `picnic-gsheet` | Read/write Google Sheets | ANALYST, WRITER |
+| `picnic-send-slack-message` | Send or post Slack messages | WRITER |
+| `picnic-read-slack-channel` | Read Slack channel history | WRITER, ORCHESTRATOR |
+| `picnic-ads` | Read/write Picnic's Attribute Data Store | ANALYST, ENGINEER |
+| `picnic-check-teamcity-build` | Monitor CI build status | ENGINEER |
+| `picnic-s3` | Read/write S3 files | ANALYST, ENGINEER |
+| `picnic-query-salesforce` | Query Salesforce objects | ANALYST |
+
+If a skill is missing from `~/.claude/skills/`, tell the user to run `picnic-sync-tools`.
+
+---
+
+## 7. Output file header
 
 Every `output.md` begins with:
 
