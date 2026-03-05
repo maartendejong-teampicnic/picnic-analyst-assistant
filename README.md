@@ -15,35 +15,35 @@ picnic-analyst-assistant/
 ├── CONTEXT.md                         # blank task context template (used by orchestrator)
 ├── TASKS.md                           # your task list (gitignored)
 │
-├── agents/                            # agent onboarding files
+├── agents/                            # example agents
 │   ├── ORCHESTRATOR.md
 │   ├── ANALYST.md
 │   ├── ENGINEER.md
 │   ├── WRITER.md
 │   └── index.yaml                     # agent registry (ORCHESTRATOR reads at startup)
 │
-├── knowledge/                         # skill files loaded by agents at runtime
+├── knowledge/                         # skill files loaded by agents at startup
 │   ├── INDEX.yaml                     # routing: which agent loads which file
-│   ├── agent-common.md                # shared agent instructions (direct mode, startup, rules)
-│   └── sql-snowflake.md               # shared Snowflake SQL conventions (example format)
+│   ├── agent-common.md                # shared agent instructions
+│   └── sql-snowflake.md               # example knowledge file
 │
-├── patterns/                          # meta-maintenance patterns (backed by /setup, /architect, etc.)
+├── patterns/                          # meta-maintenance patterns 
 │   ├── setup.md
 │   ├── architect.md
 │   ├── onboard-knowledge.md
 │   └── add-agent.md
 │
-├── commands/                          # slash command definitions (one file per /command)
+├── commands/                          # slash command 
 │   ├── perform.md
 │   ├── analyst.md / engineer.md / writer.md
 │   ├── tasks.md / add-agent.md / costs.md
 │   └── setup.md / architect.md / onboard-knowledge.md
 │
-├── tools/                             # shared tool integrations
+├── tools/                             # tool integrations
 │   └── costs/                         # Claude API cost tracking tool
 │
 ├── context/                           # personal project context (gitignored)
-│   └── <project>.md                   # your context files (style, usuals, etc.)
+│   └── <project>.md                   # your context files 
 │
 ├── tasks-output/                             # task outputs, one folder per task (gitignored)
 │   └── <task-id>/
