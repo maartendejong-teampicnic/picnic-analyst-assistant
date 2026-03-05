@@ -252,7 +252,11 @@ SELECT
   CURRENT_USER() AS you,
   CURRENT_ROLE() AS role,
   CURRENT_WAREHOUSE() AS warehouse,
-  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible
+  (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible,
+  (SELECT COUNT(*) FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_USER(
+    USER_NAME => CURRENT_USER(),
+    END_TIME_RANGE_START => DATEADD(week, -1, CURRENT_TIMESTAMP())
+  ))) AS queries_past_week
 ```
 
 - ✅ Returns a row → print the wow output.
@@ -265,9 +269,10 @@ SELECT
      Welcome back, <First Name>!
      Role: ANALYST · Warehouse: ANALYSIS
      Tables accessible: 1,471
+     Queries run this week: 42
   ```
 
-  (Use the actual table count from the query result, formatted with thousands separators.)
+  (Use actual values from the query result, formatted with thousands separators.)
 
 - ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
   in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
