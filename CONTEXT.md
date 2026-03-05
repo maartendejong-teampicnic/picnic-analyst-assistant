@@ -1,5 +1,5 @@
 # CONTEXT TEMPLATE
-# The orchestrator copies this to tasks/<task-id>/context.md at task start.
+# The orchestrator copies this to tasks-output/<task-id>/context.md at task start.
 # Never use this file directly.
 # ─────────────────────────────────────────────────────────────────────────────
 

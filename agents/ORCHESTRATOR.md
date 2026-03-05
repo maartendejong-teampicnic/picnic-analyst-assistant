@@ -49,7 +49,7 @@ Examples (with prefix `mdejong`):
 Each task lives in its own folder:
 
 ```
-~/picnic-analyst-assistant/tasks/<task-id>/
+~/picnic-analyst-assistant/tasks-output/<task-id>/
 ├── context.md      ← coordination file: plan, assignments, subtask tracker (the "storyline")
 ├── analyst.md      ← ANALYST output: queries, results, A/B design
 ├── engineer.md     ← ENGINEER output: PR details, diffs, CI status
@@ -70,7 +70,7 @@ Agent working files during execution are written to `~/.claude/data/agents/<task
 0. Read `~/picnic-analyst-assistant/user-config.md` — get `username_prefix` for task ID generation
 1. Read `~/picnic-analyst-assistant/TASKS.md` — identify the target task(s)
 2. Resolve task-id(s) (see Task ID generation above)
-3. Check for `~/picnic-analyst-assistant/tasks/<task-id>/context.md`:
+3. Check for `~/picnic-analyst-assistant/tasks-output/<task-id>/context.md`:
    - File exists and no `summary.md` → task in flight; resume from `## Subtask Tracker`
    - File exists and `summary.md` present → task already done; confirm before restarting
    - File absent → clean slate; start planning
@@ -117,16 +117,16 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
 6. Decompose into subtasks; decide agent assignment and ordering
 7. Create task folder and context file:
    ```
-   mkdir ~/picnic-analyst-assistant/tasks/<task-id>/
+   mkdir ~/picnic-analyst-assistant/tasks-output/<task-id>/
    ```
    Copy blank template from `~/picnic-analyst-assistant/CONTEXT.md` →
-   `~/picnic-analyst-assistant/tasks/<task-id>/context.md`
+   `~/picnic-analyst-assistant/tasks-output/<task-id>/context.md`
    Fill in all fields (task title, id, status, brief, relevant files, subtask tracker)
 8. Present to user:
    ```
    Plan for <task title>:
    Task ID: <task-id>
-   Folder: picnic-analyst-assistant/tasks/<task-id>/
+   Folder: picnic-analyst-assistant/tasks-output/<task-id>/
    Agents: <sequence, e.g. ANALYST → WRITER>
    Subtasks:
      1. [ANALYST] Write and run long-press adoption query
@@ -140,12 +140,12 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
 
 ### Phase 2 — Execution (per agent, sequential unless independent)
 For each agent assignment:
-a. Update `## Your Assignment` in `tasks/<task-id>/context.md` for this specific agent
+a. Update `## Your Assignment` in `tasks-output/<task-id>/context.md` for this specific agent
 b. Paste all prior agent key findings into `## Inputs From Prior Agents`
 c. Spawn via Agent tool with prompt:
    ```
    You are the <ROLE> specialist. Read your context file at
-   ~/picnic-analyst-assistant/tasks/<task-id>/context.md. Execute your assignment exactly.
+   ~/picnic-analyst-assistant/tasks-output/<task-id>/context.md. Execute your assignment exactly.
    Write all output to ~/.claude/data/agents/<task-id>/<role>/output.md
    (create the directory if it doesn't exist).
    Read ~/picnic-analyst-assistant/agents/<ROLE_FILE> for your full onboarding.
@@ -155,14 +155,14 @@ d. After agent completes, read `~/.claude/data/agents/<task-id>/<role>/output.md
 e. If `STATUS: NEEDS_APPROVAL` → surface full draft to user (see gate format)
    → wait for approval keyword → then instruct agent to execute the side effect
 f. If `STATUS: BLOCKED` → relay the question to user → write answer to
-   `tasks/<task-id>/context.md ## Pending Inputs` → respawn agent
-g. Update `## Subtask Tracker` in `tasks/<task-id>/context.md` after each agent
+   `tasks-output/<task-id>/context.md ## Pending Inputs` → respawn agent
+g. Update `## Subtask Tracker` in `tasks-output/<task-id>/context.md` after each agent
 
 ### Phase 3 — Synthesis
 - Read all `~/.claude/data/agents/<task-id>/*/output.md` files
 - Compose final summary: what was produced, where it lives (PR link, sheet URL, etc.)
 - Gate any remaining side effects not yet executed
-- Write summary to `tasks/<task-id>/summary.md`:
+- Write summary to `tasks-output/<task-id>/summary.md`:
 
   ```markdown
   # Summary — <task title>
@@ -187,11 +187,11 @@ g. Update `## Subtask Tracker` in `tasks/<task-id>/context.md` after each agent
 ### Phase 4 — Close
 - Copy each agent's working output to the task folder:
   - Discover which roles ran by globbing `~/.claude/data/agents/<task-id>/*/`
-  - For each role dir found, copy `output.md` → `tasks/<task-id>/<role>.md`
+  - For each role dir found, copy `output.md` → `tasks-output/<task-id>/<role>.md`
   - (only copy roles that actually produced output)
 - Delete transient working dir: `~/.claude/data/agents/<task-id>/`
 - Set task status: `Done` in TASKS.md
-- Report: "Task <task-id> complete. Full record at `tasks/<task-id>/`."
+- Report: "Task <task-id> complete. Full record at `tasks-output/<task-id>/`."
 - **Check for next Active task** in TASKS.md (if it exists):
   - If another Active task exists → ask: "Next up: <title>. Start it now?"
   - If no more Active tasks → report: "All active tasks done. Add new tasks to TASKS.md."
@@ -202,7 +202,7 @@ g. Update `## Subtask Tracker` in `tasks/<task-id>/context.md` after each agent
 
 ### Sequential in one session (default)
 After Phase 4 closes a task, the orchestrator picks up the next Active task.
-No collision risk — each task has its own `tasks/<task-id>/` folder.
+No collision risk — each task has its own `tasks-output/<task-id>/` folder.
 
 ### True parallel (two tasks at the same time)
 Open **two Claude Code sessions** (two terminals). Assign one task to each session.

@@ -74,13 +74,13 @@ picnic-analyst-assistant/
 ├── context/                           # personal project context (gitignored)
 │   └── <project>.md                   # your context files (style, usuals, etc.)
 │
-├── tasks/                             # task outputs, one folder per task (gitignored)
+├── tasks-output/                             # task outputs, one folder per task (gitignored)
 │   └── <task-id>/
 │       ├── context.md
 │       ├── summary.md
 │       └── <role>.md
 │
-├── direct/                            # direct-mode outputs (gitignored)
+├── direct-output/                            # direct-mode outputs (gitignored)
 │   └── <username>-YYYYMMDD-HHMM-<role>-<slug>/
 │       └── output.md
 │
@@ -124,8 +124,8 @@ Created locally; gitignored.
 |---------------|---------|
 | `user-config.md` | Your identity (name, email, username prefix, team) |
 | `TASKS.md` | Your task list |
-| `tasks/` | Per-task output folders |
-| `direct/` | Direct-mode output folders |
+| `tasks-output/` | Per-task output folders |
+| `direct-output/` | Direct-mode output folders |
 | `context/` | Personal project context files (communication style, project notes, etc.) |
 
 ---

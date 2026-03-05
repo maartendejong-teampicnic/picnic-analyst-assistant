@@ -18,10 +18,10 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 |------|-------------|---------------|
 | **Framework** | `CLAUDE.md`, `CONTEXT.md`, `README.md`, `user-config.md.example`, `.gitignore`, `patterns/` | Committed and tracked — do not edit |
 | **Working files** | `agents/`, `commands/`, `agents/index.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
-| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `context/`, `knowledge/<skill>.md` (personal) | Gitignored — never committed |
+| **Personal** | `user-config.md`, `TASKS.md`, `tasks-output/`, `direct-output/`, `context/`, `knowledge/<skill>.md` (personal) | Gitignored — never committed |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
-get `username_prefix` for task IDs and `direct/` output folder names.
+get `username_prefix` for task IDs and `direct-output/` output folder names.
 
 ---
 
@@ -115,11 +115,11 @@ All files in `context/` are personal and gitignored — agents skip gracefully i
 picnic-analyst-assistant/
 ├── TASKS.md                           ← task list (Active / Done)
 ├── CONTEXT.md                         ← blank context template
-├── tasks/<task-id>/                   ← permanent record per task
+├── tasks-output/<task-id>/                   ← permanent record per task
 │   ├── context.md                     ← coordination file (active if no summary.md)
 │   ├── analyst.md / engineer.md / …   ← agent outputs (copied at close)
 │   └── summary.md                     ← synthesis (marks task complete)
-└── direct/{username_prefix}-YYYYMMDD-HHMM-<role>-<slug>/
+└── direct-output/{username_prefix}-YYYYMMDD-HHMM-<role>-<slug>/
     └── output.md                      ← direct mode output
 
 ~/.claude/data/agents/<task-id>/       ← transient working files (deleted at close)
@@ -162,7 +162,7 @@ Note: the analyst context loads via project-level CLAUDE.md — no `~/CLAUDE.md`
 They must open Claude Code from `~/Documents/Claude/picnic-analyst-assistant/` for analyst work.
 Opening from any other folder gives a plain Claude session without analyst context — that's intentional.
 
-Note: personal files (`user-config.md`, `TASKS.md`, `tasks/`, `direct/`, personal context)
+Note: personal files (`user-config.md`, `TASKS.md`, `tasks-output/`, `direct-output/`, personal context)
 are gitignored and never committed — their data stays private.
 
 ---

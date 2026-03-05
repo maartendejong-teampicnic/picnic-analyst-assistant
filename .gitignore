@@ -42,7 +42,7 @@ commands/presenter.md
 !tools/costs/**
 
 # Output folder skeletons — folders committed, contents gitignored
-!direct/
-!direct/.gitkeep
-!tasks/
-!tasks/.gitkeep
+!direct-output/
+!direct-output/.gitkeep
+!tasks-output/
+!tasks-output/.gitkeep

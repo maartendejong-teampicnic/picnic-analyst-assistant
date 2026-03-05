@@ -75,7 +75,7 @@ After approval, save the query as `<descriptive_name>.sql` to the direct task fo
    ```
    ```
 6. Orchestrator presents to user → on approval, run via snowflake-query skill
-7. Save the approved query as `<descriptive_name>.sql` to `~/picnic-analyst-assistant/tasks/<task-id>/`
+7. Save the approved query as `<descriptive_name>.sql` to `~/picnic-analyst-assistant/tasks-output/<task-id>/`
    (same folder as the task context file and other agent outputs)
 8. Write results summary to output file:
    ```

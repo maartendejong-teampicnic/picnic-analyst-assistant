@@ -15,7 +15,7 @@ Each file defines one specialist role. The repo ships with ORCHESTRATOR, ANALYST
 and WRITER as starting points — add your own or customise existing ones freely.
 All agent files share a common preamble via `knowledge/agent-common.md` (loaded first by every agent).
 
-**Task folders:** `~/picnic-analyst-assistant/tasks/<task-id>/`
+**Task folders:** `~/picnic-analyst-assistant/tasks-output/<task-id>/`
 One folder per task. `context.md` = active, `summary.md` present = done.
 
 **Transient working files:** `~/.claude/data/agents/<task-id>/<role>/output.md`

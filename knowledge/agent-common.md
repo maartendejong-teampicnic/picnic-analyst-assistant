@@ -21,12 +21,12 @@ Determine which mode you are in before proceeding:
 **Setup:**
 - Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`
 - Instructions come from the user's messages — no context file to read
-- No task-id, no tasks/ folder, no TASKS.md updates
+- No task-id, no tasks-output/ folder, no TASKS.md updates
 - Do not write to `~/.claude/data/agents/` — that's for orchestrated runs only
 
 **Output folder:** create explicitly using Bash:
 ```bash
-mkdir -p ~/picnic-analyst-assistant/direct/{username_prefix}-YYYYMMDD-HHMM-{role}-{slug}/
+mkdir -p ~/picnic-analyst-assistant/direct-output/{username_prefix}-YYYYMMDD-HHMM-{role}-{slug}/
 ```
 where `{role}` is your agent name (analyst, writer, engineer, ...) and
 `{slug}` is 2-3 words describing the specific request, lowercased and hyphenated.
@@ -44,7 +44,7 @@ See your role file for the role-specific output.md schema.
 ## 3. Startup sequence (orchestrated mode)
 
 1. Read the context file at the path given in your spawn prompt — find `## Your Assignment`
-   (The file is at `~/picnic-analyst-assistant/tasks/<task-id>/context.md`)
+   (The file is at `~/picnic-analyst-assistant/tasks-output/<task-id>/context.md`)
 2. **Knowledge loading:** Read `~/picnic-analyst-assistant/knowledge/INDEX.yaml`.
    Find all entries where `agents` includes your role name and `status` is `ready`.
    - `load: always` → read that file now.

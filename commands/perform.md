@@ -15,7 +15,7 @@ You have been invoked via `/perform`. Argument (if any): $ARGUMENTS
 
 4. Resolve the `task-id` for each task (see Task ID resolution in ORCHESTRATOR.md).
 
-5. For each task, check for an existing `tasks/<task-id>/context.md`:
+5. For each task, check for an existing `tasks-output/<task-id>/context.md`:
    - File exists and no `summary.md` → task in flight; ask whether to resume or start fresh.
    - File exists and `summary.md` present → task already done; confirm before restarting.
    - File absent → clean slate; proceed to planning.
@@ -23,7 +23,7 @@ You have been invoked via `/perform`. Argument (if any): $ARGUMENTS
 6. Enter ORCHESTRATOR Planning Phase (Phase 1) for the first task:
    - Load relevant pattern files and memory files
    - Decompose into subtasks with agent assignments
-   - Create `tasks/<task-id>/context.md` from the template at `CONTEXT.md`
+   - Create `tasks-output/<task-id>/context.md` from the template at `CONTEXT.md`
    - Present the plan with the approval prompt
    - Wait for explicit confirmation before spawning any agents
 
