@@ -1,12 +1,21 @@
-Read `~/picnic-analyst-assistant/TASKS.md` and display the full contents.
+Read `~/picnic-analyst-assistant/TASKS.md` silently. Do not display it yet.
 
-Then say: "Run `/perform` to start a task. Type `add` to create a new one."
+Present this menu — nothing else:
+
+```
+What would you like to do?
+
+  1. Add a new task
+  2. Start a task from my list
+```
+
+Wait for the user to reply (1 / 2 / "add" / "start" / "pick" / task title or number).
 
 ---
 
-## Add-task mode
+## Option 1 — Add a new task
 
-If the user types `add`, `new`, or asks to add a task, run the intake below.
+If the user picks 1 or types `add` / `new`, run the intake below.
 Ask **one question at a time**. Do not list all questions upfront.
 
 ### Q1 — Goal
@@ -55,6 +64,34 @@ Show the composed entry to the user and ask:
 
 On confirmation: append the entry under `## Active` in `~/picnic-analyst-assistant/TASKS.md`.
 
-Then say: "Task added. Run `/perform` to start it."
+Then say: "Task added." and immediately offer the menu again:
+
+```
+What would you like to do next?
+
+  1. Add another task
+  2. Start a task from my list
+```
+
+---
+
+## Option 2 — Start a task from the list
+
+If the user picks 2 or types `start` / `pick` / `perform`, display the Active tasks as a
+numbered list (from TASKS.md). If there are no Active tasks, say so and offer Option 1.
+
+Example format:
+```
+Active tasks:
+
+  1. [ANALYSIS] Query Usuals page users of yesterday and post to Slack
+  2. [ENGINEERING] Add long-press metric to dashboard
+
+Pick a number to start.
+```
+
+When the user picks a number, confirm the selection and execute the task by following
+the full ORCHESTRATOR instructions in `~/picnic-analyst-assistant/agents/ORCHESTRATOR.md`
+(read it now if not already loaded). Treat the selected task as if `/perform` was run for it.
 
 $ARGUMENTS
