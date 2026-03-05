@@ -309,22 +309,54 @@ Ask: "Ready to continue to Atlassian?" and wait for confirmation before proceedi
 
 **If not configured:**
 
-First, silently install the package (no user input needed):
+**Step 1 — Install and locate the binary (fully automatic, no user input):**
+
+Run in sequence, stopping at the first success:
+
 ```bash
-pip install mcp-atlassian
+# Attempt 1: standard pip
+pip install mcp-atlassian 2>&1
+which mcp-atlassian 2>/dev/null
 ```
 
-Then ask the user for their API token:
+If `which mcp-atlassian` returns a path → note it as `<mcp_atlassian_cmd>` and continue.
+
+If not found after attempt 1:
+```bash
+# Attempt 2: pip3
+pip3 install mcp-atlassian 2>&1
+which mcp-atlassian 2>/dev/null
+```
+
+If still not found after attempt 2:
+```bash
+# Attempt 3: pip --user (installs to ~/.local/bin)
+pip install --user mcp-atlassian 2>&1 || pip3 install --user mcp-atlassian 2>&1
+find ~/.local/bin /home/*/.local/bin ~/.pyenv -name "mcp-atlassian" -type f 2>/dev/null | head -3
+```
+
+Use the first path returned as `<mcp_atlassian_cmd>`.
+
+If no binary is found after all three attempts:
+- Print: `⚠️ Could not install mcp-atlassian — skipping for now. Re-run /setup later to set it up.`
+- Skip Atlassian setup entirely and continue to GitHub.
+
+**Step 2 — Ask the user for their API token:**
+
 > "Open a browser → https://id.atlassian.com/manage-profile/security
 > Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
 > Paste the token here when you have it."
 
 `CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email from Phase 1 — no need to ask again.
 
-Add to `mcpServers` in `settings.json` (the same API token works for both Confluence and Jira):
+**Step 3 — Write `settings.json`:**
+
+Use `<mcp_atlassian_cmd>` (the full path if `which` returned one, otherwise `"mcp-atlassian"`)
+as the `command` value. Add to `mcpServers` in `settings.json`:
+
 ```json
 "confluence": {
-  "command": "mcp-atlassian",
+  "command": "<mcp_atlassian_cmd>",
   "args": [],
   "env": {
     "CONFLUENCE_URL": "https://picnic.atlassian.net/wiki",
@@ -372,14 +404,22 @@ Print wow output:
 ```
 (Use actual page titles and the real ticket key + URL from the create response.)
 
-- ⚠️ MCP not loaded ("server not found" error) → The `confluence` MCP is configured but not
-  active in this session. This means settings.json was updated but Claude wasn't restarted yet.
-  Print: "Atlassian is configured — restart Claude Code and run /setup to complete verification."
+- ⚠️ MCP not loaded ("server not found" / "unknown tool" error) → The `confluence` MCP is
+  configured but not active in this session. This means settings.json was updated but Claude
+  wasn't restarted yet. This is expected — it will be resolved by the restart block below.
   Do NOT attempt bash diagnostics. Move on.
-- ⚠️ API error (auth failed, token wrong) → Check that `mcp-atlassian` is installed
-  (`pip install mcp-atlassian`) and that both Confluence and Jira env vars in `settings.json`
-  are correct. Do NOT use `claude mcp add atlassian` — that approach does not support Jira
-  ticket creation.
+- ⚠️ API error (401 / auth failed) → Automatically attempt to self-heal:
+  1. Re-read `settings.json` and verify `CONFLUENCE_API_TOKEN` is set and non-empty.
+  2. Run: `which mcp-atlassian` — if empty, re-run the install steps from above and update
+     the `command` field in `settings.json` with the located binary path.
+  3. Print the corrected config values (mask the token: show first 8 chars + `…`) and inform:
+     "The token or binary path was updated — restarting is needed to pick up the change."
+     (No action needed from the user; the restart block below handles this.)
+  4. If the API error persists after the above, ask the user to re-paste the token:
+     "The token may be incorrect. Paste your Atlassian API token again — or skip for now."
+     On receipt, update `CONFLUENCE_API_TOKEN` and `JIRA_API_TOKEN` in `settings.json`.
+     If the user skips, note Atlassian as ⚠️ in the connections summary and continue.
+  Do NOT use `claude mcp add atlassian` — that approach does not support Jira ticket creation.
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
