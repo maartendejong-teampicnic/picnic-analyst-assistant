@@ -104,6 +104,8 @@ If the file does not yet exist, create it with just this block for now — Phase
 If it already exists, merge these values into the existing `permissions` block.
 Confirm: `✅ Tool approvals saved — these take effect after the restart in Phase 2.`
 
+After adjusting `~/.claude/settings.json` succesfully, prompt the user to create a new terminal, start claude again using `\claude` and run `/setup` again to apply the changes and continue from where we left off.
+
 If the user answered **n** (or anything else): proceed without changing permissions.
 
 ---
@@ -268,10 +270,11 @@ SELECT
   CURRENT_ROLE() AS role,
   CURRENT_WAREHOUSE() AS warehouse,
   (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible,
-  (SELECT COUNT(*) FROM TABLE(INFORMATION_SCHEMA.QUERY_HISTORY_BY_USER(
-    USER_NAME => CURRENT_USER(),
-    END_TIME_RANGE_START => DATEADD(week, -1, CURRENT_TIMESTAMP())
-  ))) AS queries_past_week
+  (SELECT COUNT(*) AS total_queries
+FROM TABLE(SNOWFLAKE.INFORMATION_SCHEMA.QUERY_HISTORY(
+    END_TIME_RANGE_START => DATEADD(day, -1, CURRENT_TIMESTAMP()),
+    RESULT_LIMIT => 10000
+));) AS queries_yesterday
 ```
 
 - ✅ Returns a row → print the wow output.
@@ -284,7 +287,7 @@ SELECT
      Welcome back, <First Name>!
      Role: ANALYST · Warehouse: ANALYSIS
      Tables accessible: 1,471
-     Queries run this week: 42
+     Queries run yesterday: 42
   ```
 
   (Use actual values from the query result, formatted with thousands separators.)
