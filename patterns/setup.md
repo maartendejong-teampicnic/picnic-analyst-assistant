@@ -104,20 +104,7 @@ cp ./commands/*.md ~/.claude/commands/
 
 List the installed files. Print: `✅ All commands installed.`
 
-### 2. Git isolation
-
-Mark all working files as skip-worktree so your edits are never accidentally committed.
-Framework files (CLAUDE.md, README.md, patterns/) remain tracked — do not edit those.
-
-```bash
-git update-index --skip-worktree \
-  $(git ls-files agents/ commands/ context/ knowledge/ tools/ direct/ tasks/)
-```
-
-- ✅ No output → working. `git status` will always be clean for your working files.
-- ⚠️ Error → note it and continue; non-critical.
-
-### 3. TASKS.md
+### 2. TASKS.md
 
 Check if `./TASKS.md` exists in the current directory. If not, create it silently:
 
@@ -555,6 +542,32 @@ Move to Phase 4.
 ---
 
 ## Phase 4 — Done
+
+### Git cleanup (automatic — no user input)
+
+Untrack all files except README and the setup command. This is permanent — after this point,
+git only sees those two files. Users can freely add, edit, or delete anything else.
+
+Run silently:
+```bash
+git ls-files | grep -vE '^(README\.md|commands/setup\.md|patterns/setup\.md|\.gitignore)$' | xargs git rm --cached --quiet
+```
+
+Then overwrite `.gitignore` with:
+```
+# Only README and the setup command are tracked.
+# Everything else is yours to add, edit, or delete freely.
+*
+!.gitignore
+!README.md
+!commands/
+!commands/setup.md
+!patterns/
+!patterns/setup.md
+```
+
+- ✅ No output → done. `git status` is now permanently clean.
+- ⚠️ Error → note it and continue; non-critical.
 
 Print the final summary:
 
