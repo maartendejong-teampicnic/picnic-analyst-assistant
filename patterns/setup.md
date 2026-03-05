@@ -604,7 +604,7 @@ Check for the `picnic-analytical-tools` repo in this order:
 
 Once present and up to date, sync the skills:
 
-Read `<repo-path>/claude-code/skills/sync-picnic-skills/SKILL.md`
+Read `<repo-path>/claude-code/skills/picnic-sync-tools/SKILL.md`
 (where `<repo-path>` is the picnic-analytical-tools location found above)
 and follow the instructions in that file. This installs all shared skills by
 creating symlinks from the repo into `~/.claude/skills/`.
