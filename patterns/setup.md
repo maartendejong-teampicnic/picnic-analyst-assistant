@@ -367,6 +367,26 @@ If no binary is found after all three attempts:
 - Print: `⚠️ Could not install mcp-atlassian — skipping for now. Re-run /setup later to set it up.`
 - Skip Atlassian setup entirely and continue to GitHub.
 
+**Validate the binary starts correctly (before writing settings.json):**
+
+Run this test to confirm the binary actually launches as an MCP server:
+
+```bash
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
+  | timeout 5 "<mcp_atlassian_cmd>" 2>&1 | head -3
+```
+
+- ✅ Output contains `"result"` → binary works. Proceed.
+- ⚠️ Output is empty or contains an error (e.g. `ModuleNotFoundError`, `ImportError`, `No such file`) →
+  the binary is broken. Try upgrading it:
+  ```bash
+  pip install --upgrade mcp-atlassian 2>&1
+  pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
+  ```
+  Re-run the validation. If it still fails, print the error output and tell the user:
+  "mcp-atlassian installed but won't start. Error: <output>. Skipping Atlassian for now — re-run /setup to retry."
+  Skip Atlassian setup entirely and continue to GitHub.
+
 **Step 2 — Ask the user for their API token:**
 
 > "Open a browser → https://id.atlassian.com/manage-profile/security
@@ -566,7 +586,7 @@ creating symlinks from the repo into `~/.claude/skills/`.
   ```
 - ⚠️ Error → "Sync failed. Re-run `/setup` later to retry."
 
-Move directly to Phase 4 (no confirmation prompt).
+Ask: "Ready to verify all connections? (Phase 4)" and wait for any confirmation before continuing.
 
 ---
 
@@ -614,19 +634,52 @@ Combine results. Extract the user's first name from `user-config.md` `full_name`
 
 ### Atlassian verification
 
-> **Important:** Only run if the `confluence` MCP server is loaded in this session.
-> It loads at startup — if `settings.json` was updated and Claude was restarted, it should be active.
-> Do NOT attempt bash diagnostics to probe the MCP process; this leads to a dead end.
-
 **If Atlassian was skipped in Phase 2** (not in `settings.json`) → skip this section.
 
-**Step 1 — Confluence:** search for pages the user contributed to:
+#### Step A — Confirm the MCP is loaded
+
+Try calling any `mcp__confluence__*` tool (e.g. a Confluence search). Two outcomes:
+
+**Case 1 — MCP is loaded (tools respond):** proceed to Step B below.
+
+**Case 2 — MCP not loaded** (tools return "unknown tool" / "server not found"):
+The `confluence` MCP server failed to start. This should be rare since Phase 2b validated the binary — but diagnose anyway:
+
+```bash
+# Compare path in settings.json vs real binary location
+python3 -c "
+import json, os
+s = json.load(open(os.path.expanduser('~/.claude/settings.json')))
+print('settings.json command:', s.get('mcpServers', {}).get('confluence', {}).get('command', 'NOT_SET'))
+"
+pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null
+
+# Re-test the binary
+echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
+  | timeout 5 "$(pyenv which mcp-atlassian 2>/dev/null || which mcp-atlassian 2>/dev/null)" 2>&1 | head -3
+```
+
+- **Path in `settings.json` differs from `pyenv which`** → update `command` in `settings.json` to the real path. Print what changed, then:
+  ```
+  ⚡ Atlassian path corrected — restart needed
+     Please restart Claude Code and re-run /setup to complete Atlassian verification.
+  ```
+- **Binary test fails with an error** → show the error and tell the user: "mcp-atlassian won't start. Error: <output>. Re-run /setup after fixing the issue."
+- **Binary test passes but MCP still not loaded** → unusual; tell the user: "Binary works but Claude Code didn't load it. Try restarting Claude Code once more and re-running /setup."
+
+Mark Atlassian as ⚠️ in the summary and continue to GitHub.
+
+---
+
+#### Step B — Verify Confluence and Jira (MCP is loaded)
+
+**Confluence:** search for pages the user contributed to:
 ```
 CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
 ```
 If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmodified DESC LIMIT 5`
 
-**Step 2 — Jira:** create a test ticket using the `confluence` MCP:
+**Jira:** create a test ticket using the `confluence` MCP:
 - Find a Jira project the user has access to (search recent issues assigned to them, or list
   available projects and pick a team backlog or personal project).
 - Create an issue with:
@@ -646,11 +699,6 @@ If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmo
      https://picnic.atlassian.net/browse/<PROJECT-123>
      (Safe to close — just proves the connection works)
   ```
-
-- ⚠️ MCP not loaded ("server not found" / "unknown tool" error) → The `confluence` MCP is
-  configured but not active in this session. Print:
-  "Atlassian is configured — restart Claude Code and run /setup to complete verification."
-  Do NOT attempt bash diagnostics. Mark as ⚠️ in the summary and continue.
 
 - ⚠️ API error (401 / auth failed) → Automatically attempt to self-heal:
   1. Re-read `settings.json` and verify `CONFLUENCE_API_TOKEN` is set and non-empty.
@@ -788,7 +836,6 @@ Next steps:
 - **Never write personal context files without user input** — no templates with fake data.
 - **Always confirm before starting the next phase or the next tool within Phase 2.**
   Any response (including "yes", "ok", Enter) counts as confirmation. Never auto-advance.
-  Exception: Phase 3 → Phase 4 transition is automatic (no prompt).
 - **Setup is resumable** — re-running `/setup` re-checks each step and skips completed ones.
 - **If any phase fails or is skipped**, note it in the summary and continue where possible.
 - **Do NOT touch `~/CLAUDE.md`** — it belongs to the user and must never be created, modified, or deleted.
