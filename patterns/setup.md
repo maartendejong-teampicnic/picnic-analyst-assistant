@@ -42,11 +42,11 @@ Welcome to the Picnic Analyst Assistant setup.
 
 I'll walk you through 5 short phases:
 
-  Phase 0 — Install        Set up commands and protect your personal files   (~10s, automatic)
-  Phase 1 — Identity       Your name, email, and task prefix                 (~1 min)
-  Phase 2 — Connections    Add tokens for Snowflake, Atlassian, GitHub       (5-10 min, one restart)
-  Phase 3 — Skills         Sync shared tools from the analytical-tools repo  (~1 min)
-  Phase 4 — Verify         Test all connections in one shot                  (~2 min)
+  Phase 0 — Install        Set up commands                               (~10s, automatic)
+  Phase 1 — Identity       Your name, email, and prefix                  (~1 min)
+  Phase 2 — Connections    Add tokens for Snowflake, Atlassian, GitHub   (~5 min)
+  Phase 3 — Skills         Sync shared Picnic tools                      (~1 min)
+  Phase 4 — Verify         Test all connections in one shot              (~2 min)
 
 Let's go.
 ```
