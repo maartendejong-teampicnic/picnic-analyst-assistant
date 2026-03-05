@@ -134,8 +134,23 @@ Check if `./TASKS.md` exists in the current directory. If not, create it silentl
 
 ### 4. Entry point check
 
-If `~/CLAUDE.md` exists, delete it automatically and tell the user:
-"Deleted `~/CLAUDE.md` — the Analyst Assistant context now loads only when you open Claude Code from this folder. Opening from anywhere else still gives a regular Claude session, without the Analyst Assistant context."
+Verify that `./CLAUDE.md` exists in the current directory (the picnic-analyst-assistant folder).
+- ✅ Exists → nothing to do.
+- ⚠️ Missing → create it with the following content:
+
+```markdown
+# Analyst Assistant @ Picnic
+
+You are an analyst assistant at Picnic Technologies (grocery delivery service).
+You help with the full range of analytical work: data analysis, SQL queries, experiments,
+communication (Slack, slides) and documentation (Confluence, slides).
+
+**User identity** is stored in `~/picnic-analyst-assistant/user-config.md`. Agents read it at startup to parameterize task IDs and output paths.
+New users: copy `user-config.md.example` → `user-config.md` and fill in your details,
+or run `/setup` for guided onboarding.
+```
+
+Do NOT touch `~/CLAUDE.md`. If the user has one, it contains their own personal instructions for other Claude sessions and must be left as-is.
 
 Print: `✅ Phase 0 complete.` then ask: "Ready to set up your identity? (Phase 1)"
 Wait for any confirmation before continuing.
