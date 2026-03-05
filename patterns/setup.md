@@ -615,6 +615,8 @@ Combine results. Extract the user's first name from `user-config.md` `full_name`
 - ⚠️ Error → "Token may be expired or `SNOWFLAKE_USER` is not all-caps. Regenerate the PAT
   in Snowflake UI if needed, update `settings.json`, then restart Claude Code."
 
+After verifying the Snowflake connection, ask the user whether they want to continue testing the Atlassian connection.
+
 ---
 
 ### Atlassian verification
@@ -667,7 +669,7 @@ If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmo
 **Jira:** create a test ticket using the `confluence` MCP:
 - Find a Jira project the user has access to (search recent issues assigned to them, or list
   available projects and pick a team backlog or personal project).
-- Create an issue with:
+- Create a ticket with:
   - Summary: `Claude Code setup test — <Full Name>`
   - Description: `This ticket was automatically created during Claude Code setup to verify the Jira MCP connection. Safe to close.`
   - Issue type: `Task` (fall back to whatever types are available if Task does not exist)
@@ -675,7 +677,7 @@ If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmo
 - ✅ Both succeed → print wow output:
   ```
   ⚡ Atlassian connected (Confluence + Jira)
-     Your recent contributions:
+     Your recent Confluence contributions:
        • <page title 1>
        • <page title 2>
        • <page title 3>
@@ -697,6 +699,8 @@ If no results (new employee), fall back to: `space = "ANALYTICS" ORDER BY lastmo
      On receipt, update `CONFLUENCE_API_TOKEN` and `JIRA_API_TOKEN` in `settings.json`.
      If the user skips, note Atlassian as ⚠️ in the summary and continue.
   Do NOT use `claude mcp add atlassian` — that approach does not support Jira ticket creation.
+
+After verifying the Atlassian connection, ask the user whether they want to continue testing the Github verification.
 
 ---
 
