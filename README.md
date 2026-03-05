@@ -1,6 +1,6 @@
 # Picnic Analyst Assistant
 
-A Claude Code framework that gives you a personal **Analyst Assistant** — a multi-agent system that knows your data, your conventions, and your communication style.
+A Claude Code framework that lets you create _specialist agents_ combining shared Picnic resources with personalized knowledge. 
 
 For setup and usage documentation, see the [Analyst Assistant Reference Handbook](https://picnic.atlassian.net/wiki/spaces/Commercial/pages/6270025746).
 
