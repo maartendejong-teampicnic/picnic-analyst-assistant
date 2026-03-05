@@ -370,7 +370,7 @@ If no binary is found after all three attempts:
 **Step 2 — Ask the user for their API token:**
 
 > "Open a browser → https://id.atlassian.com/manage-profile/security
-> Go to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
+> **Scroll down** to **API tokens** → **Create API token** → name it `claude-code` → copy immediately.
 > Paste the token here when you have it."
 
 `CONFLUENCE_USERNAME` and `JIRA_USERNAME` are the Picnic email from Phase 1 — no need to ask again.
