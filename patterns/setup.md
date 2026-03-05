@@ -50,7 +50,7 @@ I'll walk you through 4 short phases:
 
   Phase 0 — Install        Set up commands and protect your personal files  (~30s, automatic)
   Phase 1 — Identity       Your name, email, and task prefix                (~1 min)
-  Phase 2 — Connections    Snowflake, GitHub, and optional tools            (5–10 min)
+  Phase 2 — Connections    Snowflake, Atlassian, GitHub, and optional tools            (5–10 min)
   Phase 3 — Skills         Sync shared tools from the tools repo            (~1 min)
 
 Let's go.
@@ -104,20 +104,7 @@ cp ./commands/*.md ~/.claude/commands/
 
 List the installed files. Print: `✅ All commands installed.`
 
-### 2. Git isolation
-
-Mark all working files as skip-worktree so your edits are never accidentally committed.
-Framework files (CLAUDE.md, README.md, patterns/) remain tracked — do not edit those.
-
-```bash
-git update-index --skip-worktree \
-  $(git ls-files agents/ commands/ context/ knowledge/ tools/ direct/ tasks/)
-```
-
-- ✅ No output → working. `git status` will always be clean for your working files.
-- ⚠️ Error → note it and continue; non-critical.
-
-### 3. TASKS.md
+### 2. TASKS.md
 
 Check if `./TASKS.md` exists in the current directory. If not, create it silently:
 
@@ -555,6 +542,42 @@ Move to Phase 4.
 ---
 
 ## Phase 4 — Done
+
+### Git cleanup (automatic — no user input)
+
+Untrack all repo files except README and the setup command so users can freely edit,
+add, or delete any file without git ever flagging it. The files stay on disk — only
+git's tracking changes. This is purely local and never pushed.
+
+Run silently:
+```bash
+# Untrack everything except README + setup files
+git rm --cached -r --quiet .
+
+# Re-track only the bootstrapping files
+git add README.md commands/setup.md patterns/setup.md .gitignore
+
+# Overwrite .gitignore locally so untracked files are properly ignored
+cat > .gitignore << 'EOF'
+# Only README and the setup command are tracked.
+# Everything else is yours to add, edit, or delete freely.
+*
+!.gitignore
+!README.md
+!commands/
+!commands/setup.md
+!patterns/
+!patterns/setup.md
+EOF
+
+git add .gitignore
+
+# Commit locally (never pushed — keeps git status permanently clean)
+git commit -m "Local: untrack all personal files (setup complete)"
+```
+
+- ✅ Success → `git status` is now permanently clean. Any file can be edited, added, or deleted freely.
+- ⚠️ Error → note it and continue; non-critical. Users can still work normally.
 
 Print the final summary:
 
