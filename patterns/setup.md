@@ -601,14 +601,6 @@ SELECT
   (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES) AS tables_accessible
 ```
 
-Run query 2 (recent activity) separately:
-```sql
-SELECT COUNT(*) AS query_count
-FROM TABLE(SNOWFLAKE.INFORMATION_SCHEMA.QUERY_HISTORY(
-    END_TIME_RANGE_START => DATEADD(day, -1, CURRENT_TIMESTAMP())))
-WHERE QUERY_TYPE = 'SELECT'
-```
-
 Combine results. Extract the user's first name from `user-config.md` `full_name` field.
 
 - ✅ Both queries succeed → print wow output:
@@ -617,7 +609,6 @@ Combine results. Extract the user's first name from `user-config.md` `full_name`
      Welcome back, <First Name>!
      Role: ANALYST · Warehouse: ANALYSIS
      Tables accessible: 1,471
-     SELECT queries yesterday: 42
   ```
   (Use actual values, formatted with thousands separators.)
 
