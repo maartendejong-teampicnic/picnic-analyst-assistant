@@ -50,7 +50,7 @@ I'll walk you through 4 short phases:
 
   Phase 0 — Install        Set up commands and protect your personal files  (~30s, automatic)
   Phase 1 — Identity       Your name, email, and task prefix                (~1 min)
-  Phase 2 — Connections    Snowflake, Atlassian, GitHub, and optional tools            (5–10 min)
+  Phase 2 — Connections    Snowflake, Atlassian, GitHub, and optional tools  (5–10 min)
   Phase 3 — Skills         Sync shared tools from the tools repo            (~1 min)
 
 Let's go.
