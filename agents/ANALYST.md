@@ -33,8 +33,6 @@ Generated: <ISO timestamp>
 illustrate a finding; always include raw output path>
 ```
 
-After approval, save the query as `<descriptive_name>.sql` to the direct task folder (next to output.md).
-
 ---
 
 ## Core rules
