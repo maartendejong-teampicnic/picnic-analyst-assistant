@@ -58,12 +58,9 @@ See your role file for the role-specific output.md schema.
 
 ## 4. Context files
 
-Always read (shared, always present):
-- `~/picnic-analyst-assistant/context/picnic-business.md`
-
-Also read any other files in `~/picnic-analyst-assistant/context/` that exist and are
-relevant to the task (project context, communication style, setup notes). Skip gracefully
-if absent — personal context files are gitignored and may not be present for all users.
+Read any files in `~/picnic-analyst-assistant/context/` that exist and are relevant to
+the task (project context, communication style, setup notes). Skip gracefully if absent —
+all context files are personal and gitignored; they may not be present for all users.
 
 ---
 

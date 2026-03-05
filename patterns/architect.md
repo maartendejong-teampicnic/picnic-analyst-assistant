@@ -17,8 +17,8 @@ Acknowledge the role briefly (1–2 sentences), then ask what's needed.
 | Tier | What's in it | Git behaviour |
 |------|-------------|---------------|
 | **Framework** | `CLAUDE.md`, `CONTEXT.md`, `README.md`, `user-config.md.example`, `.gitignore`, `patterns/` | Committed and tracked — do not edit |
-| **Working files** | `agents/`, `commands/`, `context/`, `agents/index.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
-| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `knowledge/<skill>.md` (personal), `context/<project>.md` | Gitignored — never committed |
+| **Working files** | `agents/`, `commands/`, `agents/index.yaml`, `knowledge/INDEX.yaml`, `knowledge/agent-common.md`, `knowledge/sql-snowflake.md`, `tools/costs/` | Committed as starting points; skip-worktree'd by `/setup` — edit freely |
+| **Personal** | `user-config.md`, `TASKS.md`, `tasks/`, `direct/`, `context/`, `knowledge/<skill>.md` (personal) | Gitignored — never committed |
 
 User identity lives in `user-config.md` (gitignored). Agents read it at startup to
 get `username_prefix` for task IDs and `direct/` output folder names.
@@ -78,11 +78,12 @@ Routing (which agents load which files) is declared in `INDEX.yaml`. See that fi
 | `reporting-dashboard.md` | Usuals dashboard structure + formulas |
 
 ### Context files (`picnic-analyst-assistant/context/`)
-| File | Domain | Read by | Type |
-|------|--------|---------|------|
-| `picnic-business.md` | Picnic vocabulary, markets, KPIs | ANALYST, ORCHESTRATOR | Shared (committed) |
-| `communication-style.md` | Slack/Confluence style, stakeholder map | WRITER | Personal (gitignored) |
-| `<project>.md` | Active project context (e.g. usuals-project.md) | ANALYST, WRITER | Personal (gitignored) |
+All files in `context/` are personal and gitignored — agents skip gracefully if absent.
+
+| File | Domain | Read by |
+|------|--------|---------|
+| `communication-style.md` | Slack/Confluence style, stakeholder map | WRITER |
+| `<project>.md` | Active project context (e.g. usuals-project.md) | ANALYST, WRITER |
 
 ### Pattern files (`picnic-analyst-assistant/patterns/`) — architect only
 | File | Used by |
@@ -136,10 +137,9 @@ When asked to "review the system" or "check for issues", work through these:
 2. **Routing authority** — check `knowledge/INDEX.yaml` has an entry for every file in `knowledge/`, with `agents` and `load` filled in for all `status: ready` entries
 3. **Agent startup sequences** — check each agent reads files that actually exist
 4. **Knowledge index** — check `knowledge/INDEX.yaml` has an entry for every file in `knowledge/`
-5. **Context files** — check `context/` files are symlinked in `~/.claude/projects/-home-picnic/memory/`
-6. **MEMORY.md** — check it accurately references `context/` paths (not old `memory/` paths)
-7. **MEMORY.md commands list** — check it matches the actual command files in `~/.claude/commands/`
-8. **Stale references** — look for mentions of removed commands, old file paths (`patterns/`, `memory/`), old role names
+5. **MEMORY.md** — check it accurately references file paths and is not stale
+6. **MEMORY.md commands list** — check it matches the actual command files in `~/.claude/commands/`
+7. **Stale references** — look for mentions of removed commands, old file paths, old role names
 
 ---
 
@@ -187,11 +187,7 @@ Manual fallback (if needed):
    and `condition` (if `load: conditional`) — that's it. No other files need changing.
 
 ### Add a new context file
-1. Create `context/<name>.md` — project/domain reference (not a procedure)
-2. Create symlink in `~/.claude/projects/-home-picnic/memory/` pointing to it
-3. Add to MEMORY.md under "Domain Memory Files"
-4. Add to relevant agents' "Knowledge & context files to read" section
-5. Update this file: add to Context files table above
+Create `context/<name>.md` — agents read all files in `context/` that exist; nothing else to update.
 
 ### Add a new specialist agent
 Three steps — nothing else:

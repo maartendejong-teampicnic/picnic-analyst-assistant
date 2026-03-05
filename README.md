@@ -71,9 +71,8 @@ picnic-analyst-assistant/
 │
 ├── commands/                          # slash command definitions
 │
-├── context/                           # reference context loaded by agents
-│   ├── picnic-business.md             # Picnic vocabulary (shared)
-│   └── <project>.md                   # your project context (gitignored)
+├── context/                           # personal project context (gitignored)
+│   └── <project>.md                   # your context files (style, usuals, etc.)
 │
 ├── tasks/                             # task outputs, one folder per task (gitignored)
 │   └── <task-id>/
@@ -115,7 +114,6 @@ they are marked skip-worktree — any edits you make stay local and will never b
 |---------------|---------|
 | `agents/` | Agent onboarding files — adapt prompts and rules to your workflow |
 | `commands/` | Slash command definitions — add, rename, or remove commands |
-| `context/` | Reference context loaded by agents — add your project files here |
 | `knowledge/` | Skill files — extend INDEX.yaml and add your own via `/onboard-knowledge` |
 | `tools/costs/` | Claude API cost tracking tool |
 
@@ -128,6 +126,7 @@ Created locally; gitignored.
 | `TASKS.md` | Your task list |
 | `tasks/` | Per-task output folders |
 | `direct/` | Direct-mode output folders |
+| `context/` | Personal project context files (communication style, project notes, etc.) |
 
 ---
 
