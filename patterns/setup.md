@@ -64,14 +64,6 @@ Print this block after the welcome message (path A) or resume message (path C), 
 
 ```
 ─────────────────────────────────────────
-⚙  Setup will perform the following:
-   • Install command files to ~/.claude/commands/
-   • Update git index to protect your personal files
-   • Create or update ~/.claude/settings.json
-   • Run bash commands (git, gh, poetry)
-   • Prompt for tokens to paste (Snowflake)
-   • Restart will be required after settings changes
-
 For a smoother experience, I can set auto-approve mode
 so setup runs without permission prompts.
 
@@ -385,20 +377,22 @@ Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 **Goal:** Ensure `gh` CLI is installed and authenticated.
 
 Run: `gh auth status`
-- ✅ Logged in → continue
-- ⚠️ Not authenticated → run `gh auth login`:
-  1. Select **GitHub.com**
-  2. Choose **HTTPS**
-  3. Authenticate via browser — sign in with your Picnic GitHub account
-  4. Re-run `gh auth status` to confirm
+- ✅ Logged in → skip to verification below
+- ⚠️ Not authenticated → run this command automatically (no user action needed before the browser):
+  ```bash
+  gh auth login --hostname github.com --git-protocol https --web
+  ```
+  This opens a browser tab. Tell the user:
+  > "A browser tab just opened — sign in with your Picnic GitHub account and authorise the app.
+  > Come back here when the browser says you're done."
+  Wait for the user to confirm they completed the browser step, then continue automatically.
 
-**Verification:**
-1. Verify org access: `gh api orgs/PicnicSupermarket --jq '.login'`
-2. Show their own recent PRs:
-   ```bash
-   gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
-   ```
-
+**Verification** (run automatically after auth, or if already logged in):
+Run both commands in sequence — no user action needed:
+```bash
+gh api orgs/PicnicSupermarket --jq '.login'
+gh pr list --repo PicnicSupermarket/picnic-dbt-models --author @me --state all --limit 3 --json title,state
+```
 
 Print wow output:
 ```
@@ -434,19 +428,47 @@ Work through each selected tool. Skip anything the user does not select.
 **Check:** Is `SLACK_MCP_XOXP_TOKEN` set and non-empty in `mcpServers.slack.env`?
 
 **If not configured:**
-1. Check with a colleague who has Slack set up — they can share Picnic Claude app details
-2. Go to the Picnic Claude Slack app → **OAuth & Permissions** → confirm scopes include:
-   `chat:write`, `channels:read`, `channels:history`, `lists:read`
-3. Under **OAuth Tokens for Your Workspace**, copy the **User OAuth Token** (starts with `xoxp-`)
-4. Paste the token here
 
-Add to `mcpServers` in `settings.json`:
+Walk the user through creating their own Slack app step by step. Print the following instructions and ask them to follow along, pausing where indicated:
+
+```
+Here's how to create your Slack app — follow each step, then come back here.
+
+1. Open: https://api.slack.com/apps/
+   Click "Create New App" → choose "From scratch"
+
+2. Give it a name (e.g. "Claude Code - <Your Name>") and select the
+   Picnic workspace from the dropdown → click "Create App"
+
+3. In the left navigation bar, scroll down and click "OAuth & Permissions"
+
+4. Scroll down to "Scopes" → under "User Token Scopes", click "Add an OAuth Scope"
+   and add each of the following one by one:
+     • channels:history
+     • channels:read
+     • chat:write
+     • lists:read
+
+5. Scroll back up to the top of the page and click "Request to Workspace Install"
+   → follow the prompts and submit the request
+
+6. ⚠️  A Picnic workspace admin needs to approve your app before you can get a token.
+   Ping someone in the #analytics-engineering or #it-support channel to approve it.
+   Come back here once it's approved.
+
+7. After approval: return to your app at https://api.slack.com/apps/,
+   go to "OAuth & Permissions", and copy the "User OAuth Token" (starts with xoxp-)
+
+Paste the token here when you have it.
+```
+
+Wait for the user to paste the token, then add to `mcpServers` in `settings.json`:
 ```json
 "slack": {
   "command": "slack-mcp-server",
   "args": [],
   "env": {
-    "SLACK_MCP_XOXP_TOKEN": "<token>"
+    "SLACK_MCP_XOXP_TOKEN": "<pasted token>"
   }
 }
 ```
