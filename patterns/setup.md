@@ -10,7 +10,7 @@ Do not ask for permission to start.
 
 ## Resume detection (run before anything else, before the welcome message)
 
-Check each step in order. Start executing from the first step that is not yet complete.
+Check steps in order from top to bottom. Stop at the first step that is NOT complete — that is your start step. Do not check further.
 
 | Step | Done if… |
 |------|----------|
@@ -25,14 +25,12 @@ Check each step in order. Start executing from the first step that is not yet co
 | 3 — Skills synced | `~/.claude/skills/picnic-query-snowflake` symlink exists |
 | 4 — Connections verified | Always run if step 3 is done (verification is read-only and quick) |
 
-After checking all steps:
-- If all steps are complete → jump straight to Phase 4 (re-verify).
-- If step 0a is NOT complete → this is a fresh install. Print the welcome message, then the pre-flight block, then start from Phase 0.
-  **This is true even if later steps (e.g. GitHub auth) happen to already be configured on the machine.**
-- If step 0a IS complete but not all steps are done → print one line:
-  `Resuming setup — picking up from step <X>...` then proceed from the first incomplete step.
+Once you know your start step, decide what to do:
 
-**Welcome message and pre-flight block are shown when step 0a is not yet complete (fresh install), and skipped on genuine resume.**
+- **Start step is 0a** → fresh install. Print the welcome message, then the pre-flight block, then begin Phase 0.
+  _(Do this even if later steps like GitHub auth happen to already be configured on the machine — they are irrelevant to the start decision.)_
+- **Start step is anything after 0a** → resuming. Print one line: `Resuming setup — picking up from step <X>...` then proceed from that step.
+- **No start step (all steps complete)** → jump straight to Phase 4 (re-verify).
 
 ---
 
