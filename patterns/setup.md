@@ -48,7 +48,7 @@ Welcome to the Picnic Analyst Assistant setup.
 
 I'll walk you through 4 short phases:
 
-  Phase 0 — Install        Set up commands and protect your personal files  (~30s, automatic)
+  Phase 0 — Install        Set up commands and protect your personal files  (~10s, automatic)
   Phase 1 — Identity       Your name, email, and task prefix                (~1 min)
   Phase 2 — Connections    Snowflake, Atlassian, GitHub, and optional tools  (5–10 min)
   Phase 3 — Skills         Sync shared tools from the tools repo            (~1 min)
@@ -64,11 +64,12 @@ Print this block after the welcome message (path A) or resume message (path C), 
 
 ```
 ─────────────────────────────────────────
-For a smoother experience, I can set auto-approve mode
-so setup runs without permission prompts.
+For a smoother experience, I can pre-approve all tools
+needed for setup so you won't be prompted for each action.
 
-  → Run in auto-approve mode? (y/n)
-    Yes = sets defaultMode to "bypassPermissions" in settings.json
+  → Enable auto-approve for setup tools? (y/n)
+    Yes = adds specific tool approvals to settings.json
+          (takes effect after the restart in Phase 2)
     No  = keeps default mode (you'll be prompted per action)
 
 Type your choice (y/n), then press Enter to start.
@@ -80,13 +81,28 @@ Wait for the user to respond before continuing.
 If the user answered **y**: immediately write (or update) `~/.claude/settings.json` to set:
 ```json
 "permissions": {
-  "defaultMode": "bypassPermissions",
-  "allowedTools": ["*"]
+  "defaultMode": "acceptEdits",
+  "allowedTools": [
+    "Bash", "Read", "Write", "Edit", "Glob", "Grep",
+    "WebFetch", "WebSearch",
+    "mcp__snowflake__read_query",
+    "mcp__snowflake__list_databases",
+    "mcp__snowflake__list_schemas",
+    "mcp__snowflake__list_tables",
+    "mcp__confluence__confluence_search",
+    "mcp__confluence__confluence_get_page",
+    "mcp__confluence__confluence_create_page",
+    "mcp__confluence__confluence_update_page",
+    "mcp__confluence__jira_get_issue",
+    "mcp__confluence__jira_search_issues",
+    "mcp__confluence__jira_create_issue",
+    "mcp__confluence__jira_update_issue"
+  ]
 }
 ```
 If the file does not yet exist, create it with just this block for now — Phase 2 will add `mcpServers`.
 If it already exists, merge these values into the existing `permissions` block.
-Confirm: `✅ Auto-approve mode enabled.`
+Confirm: `✅ Tool approvals saved — these take effect after the restart in Phase 2.`
 
 If the user answered **n** (or anything else): proceed without changing permissions.
 
@@ -323,6 +339,11 @@ Add to `mcpServers` in `settings.json` (the same API token works for both Conflu
 
 **Verification** (run after configuring, or if already configured):
 
+> **Important:** Only run verification if the `confluence` MCP server is already loaded in
+> this session. It loads at startup — if `settings.json` was just updated, a restart is needed
+> first (handled by the restart block below). Do NOT attempt bash diagnostics to probe the
+> MCP process; this leads to a dead end.
+
 Step 1 — Confluence: use the `confluence` MCP to search for pages the user contributed to:
 ```
 CQL: contributor = currentUser() ORDER BY lastmodified DESC LIMIT 5
@@ -351,9 +372,14 @@ Print wow output:
 ```
 (Use actual page titles and the real ticket key + URL from the create response.)
 
-- ⚠️ Error → Check that `mcp-atlassian` is installed (`pip install mcp-atlassian`) and that
-  `settings.json` has both Confluence and Jira env vars set correctly. Do NOT use
-  `claude mcp add atlassian` — that approach does not support Jira ticket creation.
+- ⚠️ MCP not loaded ("server not found" error) → The `confluence` MCP is configured but not
+  active in this session. This means settings.json was updated but Claude wasn't restarted yet.
+  Print: "Atlassian is configured — restart Claude Code and run /setup to complete verification."
+  Do NOT attempt bash diagnostics. Move on.
+- ⚠️ API error (auth failed, token wrong) → Check that `mcp-atlassian` is installed
+  (`pip install mcp-atlassian`) and that both Confluence and Jira env vars in `settings.json`
+  are correct. Do NOT use `claude mcp add atlassian` — that approach does not support Jira
+  ticket creation.
 
 Ask: "Ready to continue to GitHub?" and wait for confirmation before proceeding.
 
@@ -464,22 +490,31 @@ Print: `⚡ Slack configured — token saved. You'll see it in action when you u
 
 ---
 
-### After any settings.json changes — restart notice
+### After all MCP configs are written — one restart
 
-If `settings.json` was updated during this phase, print this block prominently and **stop** before moving onto the next MCP:
+**Do not restart after each individual MCP.** Instead: configure every MCP that needs setup (Snowflake, Atlassian, GitHub, optional Slack) in sequence, writing all entries to `settings.json`. Only after ALL configurations are written, print this block prominently and **stop**:
 
 ```
-⚡ New terminal required
-   settings.json was updated. MCP servers only load at startup, so a new Claude
-   session is needed before newly configured MCPs will work.
+⚡ Restart required — one time
+   All MCP configurations have been written to settings.json.
+   MCP servers only load at startup, so one restart is needed
+   before any of the newly configured connections will work.
 
    Steps:
-     1. Open a new terminal and open Claude again
-     2. Run /setup — it will quickly re-verify tools already set up, then
-        continue from the next unconfigured tool
+     1. Open a new terminal and start Claude Code from the
+        picnic-analyst-assistant folder
+     2. Run /setup — it will verify all connections and continue
+        to Phase 3
+
+   (If you already completed some of these steps before and
+   are returning to verify, the connections phase runs fast.)
 ```
 
-Do not proceed to the next tool or Phase 3. The user must restart first.
+Do not proceed to the connection verifications or Phase 3. The user must restart first.
+
+**How to detect whether to restart or verify:**
+- If any MCP was added or updated to `settings.json` in this session → show restart block and stop.
+- If all MCPs were already in `settings.json` when Phase 2 started AND the MCP server responds to tool calls → run verifications directly (no restart needed).
 
 ---
 
