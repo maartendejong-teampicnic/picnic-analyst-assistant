@@ -506,8 +506,8 @@ prominently and **stop**:
    before Phase 3 (skills) and Phase 4 (verification) can run.
 
    Steps:
-     1. Open a new terminal and start Claude Code from the
-        picnic-analyst-assistant folder
+     1. Open a new terminal and start Claude Code again
+        (still in the picnic-analyst-assistant folder)
      2. Run /setup — it will sync skills, verify all connections,
         and finish setup
 
