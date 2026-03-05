@@ -175,6 +175,7 @@ g. Update `## Subtask Tracker` in `tasks-output/<task-id>/context.md` after each
   ## Artifacts
   - PR: <url if applicable>
   - Sheet: <url if applicable>
+  - Files: <list any .sql, .csv, .pptx, .excalidraw files in tasks-output/<task-id>/, or "none">
 
   ## Agents used
   <list of roles that ran>
@@ -189,6 +190,9 @@ g. Update `## Subtask Tracker` in `tasks-output/<task-id>/context.md` after each
   - Discover which roles ran by globbing `~/.claude/data/agents/<task-id>/*/`
   - For each role dir found, copy `output.md` → `tasks-output/<task-id>/<role>.md`
   - (only copy roles that actually produced output)
+- Verify additional files are present: agents write SQL, CSV, .pptx, .excalidraw, and other
+  outputs directly to `tasks-output/<task-id>/` during execution. Glob the folder and list
+  any such files in `summary.md` under `## Artifacts`.
 - Delete transient working dir: `~/.claude/data/agents/<task-id>/`
 - Set task status: `Done` in TASKS.md
 - Report: "Task <task-id> complete. Full record at `tasks-output/<task-id>/`."

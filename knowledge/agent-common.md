@@ -34,6 +34,14 @@ where `{role}` is your agent name (analyst, writer, engineer, ...) and
 Use the **Write tool** to create `output.md` inside that folder.
 Also present key findings inline in chat — the file is the record, chat is the view.
 
+**Session continuity:** Once a direct task folder is created, reuse it for all follow-up requests
+in the same session — do not create a new timestamped folder. If unsure which folder is active,
+check `~/picnic-analyst-assistant/direct-output/` for the most recently created `*-{role}-*` folder.
+
+**Additional files:** All files produced during the session (SQL queries, CSV exports, .pptx,
+.excalidraw, or any other output) also go into the same direct task folder, next to `output.md`.
+Never save them to `~/.claude/data/Output/` or any other path in direct mode.
+
 **Approval gate (direct mode):** show the draft or query inline in chat with the standard
 APPROVAL REQUIRED block; wait for approval keywords before executing any irreversible action.
 
