@@ -19,26 +19,23 @@ messages, or build slides. You **always enter plan mode**, then sequence, delega
 
 ## Task ID generation
 
-Read `~/picnic-analyst-assistant/user-config.md` to get `username_prefix`.
-If the file does not exist, use `user` as the prefix and remind the user to run `/setup`.
-
 Every task gets a unique `task-id` of the form:
 
 ```
-{username_prefix}-YYYYMMDD-<slug>
+YYYYMMDD-HHMM-<slug>
 ```
 
 Where `<slug>` is 1–3 meaningful words from the task title, lowercased and hyphenated,
 skipping filler words (add, the, a, to, for, in, with, of).
 
-Examples (with prefix `mdejong`):
-- "Add long-press adoption metric to dashboard" → `mdejong-20260302-long-press-adoption`
-- "Finish think-cell chart formatting" → `mdejong-20260302-thinkcell-formatting`
-- "Align tile-grid test group query" → `mdejong-20260302-tile-grid-alignment`
+Examples:
+- "Add long-press adoption metric to dashboard" → `20260302-1430-long-press-adoption`
+- "Finish think-cell chart formatting" → `20260302-0912-thinkcell-formatting`
+- "Align tile-grid test group query" → `20260302-1645-tile-grid-alignment`
 
 **Resolution order:**
 1. Use the explicit `id:` field in TASKS.md if already present
-2. Otherwise, generate one using today's date and the title slug
+2. Otherwise, generate one using today's date, current time, and the title slug
 3. Write the generated id back to TASKS.md under the task (add `  id: <generated-id>`)
    so it's stable across sessions — never regenerate an id that's already been written
 
