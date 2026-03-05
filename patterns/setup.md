@@ -709,29 +709,43 @@ Move directly to Phase 5.
 
 ### Git cleanup (automatic — no user input)
 
-Add personal files to `.gitignore` so they never appear in `git status`.
-This only touches `.gitignore` — all repo files stay tracked and the remote is unaffected.
+Untrack all repo files except README and the setup files so users can freely edit,
+add, or delete any file without git ever flagging it (no red/orange/green indicators).
+The files stay on disk — only git's tracking changes.
+
+This commit is **purely local and must never be pushed.**
 
 > **IMPORTANT:** Run the entire block below as ONE bash command via the Bash tool.
 > Do NOT split into separate tool calls. Do NOT use the Write tool for `.gitignore`.
 > The heredoc must execute as part of the same shell invocation.
 
 ```bash
-cat >> .gitignore << 'EOF'
-
-# Personal files — not tracked
-user-config.md
-tasks-output/
-direct-output/
-tasks/
+git rm --cached -r --quiet . && git add README.md commands/setup.md patterns/setup.md .gitignore && cat > .gitignore << 'EOF'
+# Only README and the setup files are tracked.
+# Everything else is yours to add, edit, or delete freely — git will never flag it.
+*
+!.gitignore
+!README.md
+!commands/
+!commands/setup.md
+!patterns/
+!patterns/setup.md
 EOF
-git add .gitignore && git commit -m "Local: ignore personal files (setup complete)"
+git add .gitignore && git commit -m "Local: untrack all personal files (setup complete) [DO NOT PUSH]"
 ```
 
-After the commit, run `git status --short` and verify no personal files appear as untracked.
+After the commit, run `git status --short` and verify the output is empty (clean).
 
-- ✅ Clean status → personal files are now permanently ignored.
+If `git status` shows untracked files after the commit, the `.gitignore` write failed. Run manually:
+```bash
+printf '*\n!.gitignore\n!README.md\n!commands/\n!commands/setup.md\n!patterns/\n!patterns/setup.md\n' > .gitignore && git add .gitignore && git commit -m "Local: fix .gitignore (setup complete) [DO NOT PUSH]"
+```
+
+- ✅ Clean status → `git status` is permanently clean. Any file can be edited, added, or deleted freely.
 - ⚠️ Error → note it and continue; non-critical. Users can still work normally.
+
+> **After this step, never run `git push` from the picnic-analyst-assistant folder.**
+> The README and setup files are updated by the repo maintainer — get new versions via `git pull`.
 
 ---
 
