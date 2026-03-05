@@ -1,47 +1,58 @@
-# Allowlist — only explicitly listed files are committed to the shared repo.
-# Everything else is personal/configurable and stays local.
-#
-# Two-tier model:
-#   Framework files (CLAUDE.md, README.md, patterns/) — committed, tracked, do not edit.
-#   Working files (agents/, commands/, knowledge/, tools/) — committed as starting
-#   points, then skip-worktree'd by /setup so your edits are never tracked.
-
-# Ignore everything by default
+# Ignore everything by default.
+# Only explicitly listed files are tracked — so any new file you create
+# (new agents, knowledge files, tasks, config) is automatically invisible to git.
 *
 
-# Framework — committed and tracked; do not edit
+# Always track the gitignore itself
 !.gitignore
+
+# Framework files
+!README.md
 !CLAUDE.md
 !CONTEXT.md
-!README.md
 !user-config.md.example
-!patterns/
-!patterns/*.md
 
-# Working files — committed as starting points; skip-worktree'd after /setup so edits stay local
+# Agents — only the shipped templates (new agents you create are ignored)
 !agents/
-!agents/*.md
+!agents/ANALYST.md
+!agents/ENGINEER.md
+!agents/ORCHESTRATOR.md
+!agents/WRITER.md
 !agents/index.yaml
-agents/DESIGNER.md
-agents/PRESENTER.md
-!commands/
-!commands/*.md
-commands/gdrive.md
-commands/designer.md
-commands/presenter.md
 
-# Knowledge — INDEX.yaml and agent-common.md are shared starting points; all other skill files are personal
+# Commands — only the shipped commands (new commands you create are ignored)
+!commands/
+!commands/add-agent.md
+!commands/analyst.md
+!commands/architect.md
+!commands/costs.md
+!commands/engineer.md
+!commands/onboard-knowledge.md
+!commands/perform.md
+!commands/setup.md
+!commands/tasks.md
+!commands/writer.md
+
+# Knowledge — only the shipped files (new knowledge files you create are ignored)
 !knowledge/
 !knowledge/INDEX.yaml
 !knowledge/agent-common.md
 !knowledge/sql-snowflake.md
 
-# Tools — only costs is shared; gdrive and slides are personal
+# Patterns — only the shipped patterns
+!patterns/
+!patterns/add-agent.md
+!patterns/architect.md
+!patterns/onboard-knowledge.md
+!patterns/setup.md
+
+# Tools — only the shipped tools
 !tools/
 !tools/costs/
-!tools/costs/**
+!tools/costs/SKILL.md
+!tools/costs/costs.py
 
-# Output folder skeletons — folders committed, contents gitignored
+# Output folders — track skeleton only, not contents
 !direct-output/
 !direct-output/.gitkeep
 !tasks-output/
