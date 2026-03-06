@@ -4,10 +4,13 @@
 # ─────────────────────────────────────────────────────────────────────────────
 
 # CONTEXT — [task-id]
-Generated: —
-Task: —
-Task ID: —
-Status: —
+
+| Field       | Value |
+|-------------|-------|
+| **Task**    | —     |
+| **Task ID** | —     |
+| **Generated** | —   |
+| **Status**  | `Planning` |
 
 ## Task Brief
 [Full task description, constraints, desired outcome]

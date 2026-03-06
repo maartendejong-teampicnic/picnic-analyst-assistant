@@ -123,7 +123,8 @@ Agents discover their own knowledge files via `knowledge/INDEX.yaml` at startup.
    ```
    Then tell the user:
    ```
-   Context file ready — opening it now so you can follow along.
+   Context file opened in a new window.
+   Press Ctrl+Shift+V to view it as formatted markdown preview.
    ```
 8. Present to user:
    ```
